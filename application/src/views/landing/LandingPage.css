@@ -134,6 +134,7 @@
 }
 
 .radar-grid,
+.radar-world-map,
 .radar-circle,
 .radar-crosshair,
 .radar-sweep,
@@ -142,6 +143,7 @@
 }
 
 .radar-grid {
+  z-index: 1;
   inset: 5%;
   border-radius: 50%;
   background-image:
@@ -151,7 +153,18 @@
   mask-image: radial-gradient(circle, #000 48%, transparent 76%);
 }
 
+.radar-world-map {
+  z-index: 0;
+  inset: 9%;
+  border-radius: 50%;
+  background-color: var(--muted);
+  opacity: 0.35;
+  mask: url("/world-dots.svg") center / 140% auto no-repeat;
+  -webkit-mask: url("/world-dots.svg") center / 140% auto no-repeat;
+}
+
 .radar-circle {
+  z-index: 1;
   top: 50%;
   left: 50%;
   aspect-ratio: 1;
@@ -173,6 +186,7 @@
 }
 
 .radar-crosshair {
+  z-index: 1;
   top: 50%;
   left: 9%;
   width: 82%;
@@ -184,7 +198,7 @@
 }
 
 .radar-sweep {
-  z-index: 1;
+  z-index: 2;
   inset: 9%;
   border-radius: 50%;
   background: conic-gradient(
@@ -199,7 +213,7 @@
 }
 
 .radar-dot {
-  z-index: 2;
+  z-index: 3;
   width: 0.55rem;
   aspect-ratio: 1;
   border-radius: 50%;
@@ -209,31 +223,23 @@
 }
 
 .radar-dot-one {
-  top: 30%;
-  left: 64%;
+  top: 32%;
+  left: 13%;
   background: #ef9b55;
   box-shadow: 0 0 12px rgba(239, 155, 85, 0.8);
   animation-delay: 0.5s;
 }
 
 .radar-dot-two {
-  top: 62%;
-  left: 35%;
+  top: 49%;
+  left: 63%;
   animation-delay: 1.1s;
 }
 
 .radar-dot-three {
-  top: 70%;
-  left: 66%;
+  top: 43%;
+  left: 79%;
   animation-delay: 1.7s;
-}
-
-.radar-readout {
-  position: absolute;
-  right: 16%;
-  bottom: 17%;
-  color: var(--muted);
-  font-size: 0.62rem;
 }
 
 /* Steps strip and team section */

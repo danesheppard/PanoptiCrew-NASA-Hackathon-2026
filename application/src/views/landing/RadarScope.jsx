@@ -13,6 +13,7 @@ export default function RadarScope() {
       aria-label="Radar scope scanning satellite evidence"
     >
       <div className="radar-grid" aria-hidden="true" />
+      <div className="radar-world-map" aria-hidden="true" />
       <div className="radar-circle radar-circle-outer" aria-hidden="true" />
       <div className="radar-circle radar-circle-middle" aria-hidden="true" />
       <div className="radar-circle radar-circle-inner" aria-hidden="true" />
@@ -28,7 +29,6 @@ export default function RadarScope() {
       <span className="radar-dot radar-dot-one" aria-hidden="true" />
       <span className="radar-dot radar-dot-two" aria-hidden="true" />
       <span className="radar-dot radar-dot-three" aria-hidden="true" />
-      {/* <span className="radar-readout">LIVE OBSERVATION</span> */}
     </div>
   );
 }
