@@ -7,6 +7,9 @@ export default function App() {
   const [view, setView] = useState("welcome");
   const [study, setStudy] = useState(null);
 
+  // preventDefault on right clicks
+  document.addEventListener("contextmenu", (e) => e.preventDefault());
+
   if (view === "welcome") return <Welcome onStart={() => setView("map")} />;
 
   if (view === "case" && study)

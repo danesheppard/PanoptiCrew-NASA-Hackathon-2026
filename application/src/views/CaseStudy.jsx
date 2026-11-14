@@ -36,7 +36,7 @@ const reducedMotion = () =>
 const TILE_URL = import.meta.env.VITE_TERRAIN_TILES;
 const SAT_URL = import.meta.env.VITE_SAT_TILES;
 const ZOOM = 12;
-const EXAGGERATION = 2;
+const EXAGGERATION = 1;
 const SIZE = 10;
 // Chapter colors multiply the imagery, so keep them close to white.
 const tint = (hex) => new THREE.Color(0xffffff).lerp(new THREE.Color(hex), 0.3);
@@ -91,6 +91,40 @@ async function loadTerrain(tile, lat, signal) {
   return geometry;
 }
 
+// Walls from the terrain's perimeter down to a flat base, plus a bottom cap.
+function buildSkirt(plane, base) {
+  const { widthSegments, heightSegments } = plane.parameters;
+  const cols = widthSegments + 1;
+  const rows = heightSegments + 1;
+  const src = plane.attributes.position;
+
+  // Perimeter vertex indices in loop order, corners counted once.
+  const ring = [];
+  for (let c = 0; c < cols; c++) ring.push(c);
+  for (let r = 1; r < rows; r++) ring.push(r * cols + cols - 1);
+  for (let c = cols - 2; c >= 0; c--) ring.push((rows - 1) * cols + c);
+  for (let r = rows - 2; r >= 1; r--) ring.push(r * cols);
+
+  // Vertices: top 2k, bottom 2k+1, cap center 2n.
+  const n = ring.length;
+  const verts = new Float32Array((2 * n + 1) * 3);
+  const index = [];
+  ring.forEach((v, k) => {
+    const x = src.getX(v);
+    const y = src.getY(v);
+    verts.set([x, y, src.getZ(v), x, y, base], k * 6);
+    const m = (k + 1) % n;
+    index.push(2 * k, 2 * k + 1, 2 * m, 2 * k + 1, 2 * m + 1, 2 * m);
+    index.push(2 * n, 2 * k + 1, 2 * m + 1);
+  });
+  verts.set([0, 0, base], 6 * n);
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+  geometry.setIndex(index);
+  return geometry;
+}
+
 export default function CaseStudy({ study, onBack }) {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
@@ -131,11 +165,23 @@ export default function CaseStudy({ study, onBack }) {
     terrain.rotation.x = -Math.PI / 2;
     scene.add(terrain);
 
+    // Child of terrain so it shares the rotation; flat shading avoids smeared normals.
+    const skirtMaterial = new THREE.MeshStandardMaterial({
+      color: 0x51483b,
+      roughness: 0.95,
+      flatShading: true,
+      side: THREE.DoubleSide,
+    });
+    const skirt = new THREE.Mesh(new THREE.BufferGeometry(), skirtMaterial);
+    terrain.add(skirt);
+
     const loader = new AbortController();
     loadTerrain(tile, study.coordinates[1], loader.signal)
       .then((geometry) => {
         terrain.geometry.dispose();
         terrain.geometry = geometry;
+        skirt.geometry.dispose();
+        skirt.geometry = buildSkirt(geometry, -0.5);
       })
       .catch((err) => err.name !== "AbortError" && console.warn(err));
 
@@ -185,6 +231,8 @@ export default function CaseStudy({ study, onBack }) {
       renderer.setAnimationLoop(null);
       controls.dispose();
       terrain.geometry.dispose();
+      skirt.geometry.dispose();
+      skirtMaterial.dispose();
       satTexture.dispose();
       material.dispose();
       renderer.dispose();
