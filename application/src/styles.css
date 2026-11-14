@@ -1,0 +1,111 @@
+* { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  height: 100%;
+  font-family: system-ui, sans-serif;
+  color: #e8ecf4;
+  background: #0b1020;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  background: #0b3d91;
+  color: #fff;
+}
+
+button:hover { background: #1554c0; }
+
+button.link {
+  background: none;
+  padding: 0;
+  color: #9db4e0;
+}
+
+.welcome {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+.welcome h1 { font-size: 3rem; margin-bottom: 0.5rem; }
+.lede { font-size: 1.2rem; line-height: 1.5; }
+
+.sample, .meta { color: #9aa3b5; }
+
+.badge {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: #5a3e00;
+  color: #ffd27a;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.map-view, .case-view {
+  display: flex;
+  height: 100%;
+}
+
+.panel {
+  width: 360px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  overflow-y: auto;
+  background: #121a30;
+  border-right: 1px solid #24304f;
+}
+
+.panel h3 { margin-bottom: 0.25rem; font-size: 1rem; }
+.panel dt { color: #9aa3b5; font-size: 0.8rem; }
+.panel dd { margin: 0 0 0.6rem; }
+
+.launch { margin-top: auto; }
+
+.map, .scene {
+  position: relative;
+  flex: 1;
+}
+
+.attribution {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  padding: 0.1rem 0.4rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: #333;
+  font-size: 0.7rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin: 1rem 0;
+}
+
+.tabs button {
+  flex: 1;
+  background: #24304f;
+}
+
+.tabs button.active { background: #0b3d91; }
+
+.imagery {
+  display: grid;
+  place-items: center;
+  height: 140px;
+  border: 1px dashed #4a5878;
+  border-radius: 6px;
+  color: #9aa3b5;
+  text-align: center;
+  padding: 1rem;
+}
