@@ -1,6 +1,6 @@
 # Case 2 export: Gandak River flood seen by NISAR (HH)
 
-Produced by `notebooks/case2_flood_bihar.ipynb`.
+Produced by `notebooks/case2.ipynb` (section 9).
 
 Everything the app needs is written to `data/case2/export/` (about 45 MB; the folder is committed to git). The app developer does not need Python: images are ready to lay on a web map, numbers are in JSON.
 
@@ -8,7 +8,7 @@ Everything the app needs is written to `data/case2/export/` (about 45 MB; the fo
 data/case2/export/
   manifest.json                          what everything is: dates, corners, legend, colours, encodings, file list
   stats.json                             km² per class and per date, thresholds and how they were chosen
-  README.md                              this section, for the developer
+  README.md                              this file, for the developer
   reference/sentinel2_2026-06-25.webp    satellite photo of the box
   reference/places.geojson               town points and the Gandak River line (lon/lat)
   radar/hh_raw_<date>.webp               7 images: HH as delivered, grey
