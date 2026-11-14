@@ -1,9 +1,11 @@
 import DeckGL from "@deck.gl/react";
+import { _GlobeView as GlobeView } from "@deck.gl/core";
 import { TileLayer } from "@deck.gl/geo-layers";
 import { BitmapLayer, ScatterplotLayer } from "@deck.gl/layers";
 import { caseStudies } from "../data/caseStudies.js";
 
-const initialView = { longitude: 20, latitude: 20, zoom: 1.5 };
+const globe = new GlobeView({ resolution: 10 });
+const initialView = { longitude: 20, latitude: 20, zoom: 3 };
 
 const basemap = new TileLayer({
   id: "basemap",
@@ -67,6 +69,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
       </aside>
       <div className="map">
         <DeckGL
+          views={globe}
           initialViewState={initialView}
           controller
           layers={[basemap, markers]}
