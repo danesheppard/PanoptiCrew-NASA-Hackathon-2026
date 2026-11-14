@@ -1,13 +1,13 @@
-import DeckGL from '@deck.gl/react';
-import { TileLayer } from '@deck.gl/geo-layers';
-import { BitmapLayer, ScatterplotLayer } from '@deck.gl/layers';
-import { caseStudies } from '../data/caseStudies.js';
+import DeckGL from "@deck.gl/react";
+import { TileLayer } from "@deck.gl/geo-layers";
+import { BitmapLayer, ScatterplotLayer } from "@deck.gl/layers";
+import { caseStudies } from "../data/caseStudies.js";
 
 const initialView = { longitude: 20, latitude: 20, zoom: 1.5 };
 
 const basemap = new TileLayer({
-  id: 'basemap',
-  data: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  id: "basemap",
+  data: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
   maxZoom: 19,
   tileSize: 256,
   renderSubLayers: (props) => {
@@ -22,10 +22,11 @@ const basemap = new TileLayer({
 
 export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const markers = new ScatterplotLayer({
-    id: 'case-studies',
+    id: "case-studies",
     data: caseStudies,
     getPosition: (d) => d.coordinates,
-    getFillColor: (d) => (d.id === selected?.id ? [255, 140, 0] : [11, 61, 145]),
+    getFillColor: (d) =>
+      d.id === selected?.id ? [255, 140, 0] : [11, 61, 145],
     getLineColor: [255, 255, 255],
     stroked: true,
     lineWidthMinPixels: 2,
@@ -38,7 +39,9 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   return (
     <div className="map-view">
       <aside className="panel">
-        <button className="link" onClick={onHome}>← Home</button>
+        <button className="link" onClick={onHome}>
+          ← Home
+        </button>
         {selected ? (
           <>
             <span className="badge">Sample content</span>
@@ -49,10 +52,14 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
               <dt>Location</dt>
               <dd>{selected.location}</dd>
               <dt>Timeline</dt>
-              <dd>{selected.timeline.start} → {selected.timeline.end}</dd>
+              <dd>
+                {selected.timeline.start} → {selected.timeline.end}
+              </dd>
             </dl>
             <p>{selected.stages.takeaway.summary}</p>
-            <button className="launch" onClick={onLaunch}>Launch Case Study</button>
+            <button className="launch" onClick={onLaunch}>
+              Launch Case Study
+            </button>
           </>
         ) : (
           <p>Select a case study on the map to see its summary.</p>
@@ -63,7 +70,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
           initialViewState={initialView}
           controller
           layers={[basemap, markers]}
-          getCursor={({ isHovering }) => (isHovering ? 'pointer' : 'grab')}
+          getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
         />
         <span className="attribution">© OpenStreetMap contributors</span>
       </div>

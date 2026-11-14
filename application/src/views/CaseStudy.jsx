@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 const tabs = [
-  { key: 'leadUp', label: 'Lead-up', color: 0x4f8a3c },
-  { key: 'event', label: 'Event', color: 0xc0502e },
-  { key: 'takeaway', label: 'Takeaway', color: 0x8a7a4f },
+  { key: "leadUp", label: "Lead-up", color: 0x4f8a3c },
+  { key: "event", label: "Event", color: 0xc0502e },
+  { key: "takeaway", label: "Takeaway", color: 0x8a7a4f },
 ];
 
 function buildTerrain() {
@@ -14,7 +14,11 @@ function buildTerrain() {
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
     const y = pos.getY(i);
-    pos.setZ(i, Math.sin(x * 0.8) * Math.cos(y * 0.6) * 0.6 + Math.sin(x * 2.1 + y) * 0.15);
+    pos.setZ(
+      i,
+      Math.sin(x * 0.8) * Math.cos(y * 0.6) * 0.6 +
+        Math.sin(x * 2.1 + y) * 0.15,
+    );
   }
   geometry.computeVertexNormals();
   return geometry;
@@ -30,7 +34,12 @@ export default function CaseStudy({ study, onBack }) {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0b1020);
 
-    const camera = new THREE.PerspectiveCamera(50, mount.clientWidth / mount.clientHeight, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(
+      50,
+      mount.clientWidth / mount.clientHeight,
+      0.1,
+      100,
+    );
     camera.position.set(0, 8, 9);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -38,7 +47,10 @@ export default function CaseStudy({ study, onBack }) {
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     mount.appendChild(renderer.domElement);
 
-    const material = new THREE.MeshStandardMaterial({ color: tabs[0].color, flatShading: true });
+    const material = new THREE.MeshStandardMaterial({
+      color: tabs[0].color,
+      flatShading: true,
+    });
     materialRef.current = material;
     const terrain = new THREE.Mesh(buildTerrain(), material);
     terrain.rotation.x = -Math.PI / 2;
@@ -57,7 +69,7 @@ export default function CaseStudy({ study, onBack }) {
       camera.updateProjectionMatrix();
       renderer.setSize(mount.clientWidth, mount.clientHeight);
     };
-    window.addEventListener('resize', onResize);
+    window.addEventListener("resize", onResize);
 
     renderer.setAnimationLoop(() => {
       controls.update();
@@ -65,7 +77,7 @@ export default function CaseStudy({ study, onBack }) {
     });
 
     return () => {
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener("resize", onResize);
       renderer.setAnimationLoop(null);
       controls.dispose();
       terrain.geometry.dispose();
@@ -84,14 +96,20 @@ export default function CaseStudy({ study, onBack }) {
   return (
     <div className="case-view">
       <aside className="panel">
-        <button className="link" onClick={onBack}>← Back to Map</button>
+        <button className="link" onClick={onBack}>
+          ← Back to Map
+        </button>
         <span className="badge">Sample content</span>
         <h2>{study.title}</h2>
         <p className="meta">{study.location}</p>
 
         <nav className="tabs">
           {tabs.map((t) => (
-            <button key={t.key} className={t.key === tab.key ? 'active' : ''} onClick={() => setTab(t)}>
+            <button
+              key={t.key}
+              className={t.key === tab.key ? "active" : ""}
+              onClick={() => setTab(t)}
+            >
               {t.label}
             </button>
           ))}
@@ -102,10 +120,15 @@ export default function CaseStudy({ study, onBack }) {
 
         <h3>Timeline</h3>
         <p className="meta">
-          Lead-up {study.timeline.start} · Event {study.timeline.event} · End {study.timeline.end}
+          Lead-up {study.timeline.start} · Event {study.timeline.event} · End{" "}
+          {study.timeline.end}
         </p>
         <h3>Sources</h3>
-        <ul>{study.sources.map((s) => <li key={s}>{s}</li>)}</ul>
+        <ul>
+          {study.sources.map((s) => (
+            <li key={s}>{s}</li>
+          ))}
+        </ul>
         <h3>Methods</h3>
         <p>{study.methods}</p>
         <h3>Limitations</h3>
