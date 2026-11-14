@@ -1,0 +1,158 @@
+{
+  "case": "case2",
+  "title": "Gandak River flood, Bihar, India",
+  "event_date": "2026-09-28",
+  "story": "Record flood of the Gandak River on Sep 28, 2026 (91.25 m at Bagaha, 543,500 cusecs from the Valmikinagar barrage, embankment breach at Sheetalpur, Gopalganj).",
+  "bbox_lonlat": [
+    84.15,
+    26.1,
+    84.75,
+    26.6
+  ],
+  "image_crs": "EPSG:3857",
+  "image_corners": [
+    [
+      84.13646446971275,
+      26.614634172899674
+    ],
+    [
+      84.76620208267364,
+      26.614634172899674
+    ],
+    [
+      84.76620208267364,
+      26.085576677999846
+    ],
+    [
+      84.13646446971275,
+      26.085576677999846
+    ]
+  ],
+  "image_corners_order": "top-left, top-right, bottom-right, bottom-left, as [lon, lat]",
+  "raster_crs": "EPSG:32644",
+  "pixel_m": 20,
+  "satellite": "NISAR (NASA-ISRO), L-band",
+  "product": "NISAR_L2_GCOV_PROVISIONAL_V1",
+  "track": "149D frame 075",
+  "channel": "HH",
+  "dates": [
+    "2026-06-24",
+    "2026-07-06",
+    "2026-07-18",
+    "2026-08-11",
+    "2026-09-04",
+    "2026-09-28",
+    "2026-10-10"
+  ],
+  "key_dates": {
+    "before": "2026-09-04",
+    "peak": "2026-09-28",
+    "after": "2026-10-10"
+  },
+  "pairs": [
+    {
+      "before": "2026-09-04",
+      "after": "2026-09-28",
+      "png": "flood/flood_2026-09-04_2026-09-28.png",
+      "tif": "flood/flood_2026-09-04_2026-09-28.tif"
+    },
+    {
+      "before": "2026-09-28",
+      "after": "2026-10-10",
+      "png": "flood/flood_2026-09-28_2026-10-10.png",
+      "tif": "flood/flood_2026-09-28_2026-10-10.tif"
+    }
+  ],
+  "legend": {
+    "1": {
+      "label": "water on both dates",
+      "color": "#08306b"
+    },
+    "2": {
+      "label": "newly flooded (open water)",
+      "color": "#2b8cbe"
+    },
+    "3": {
+      "label": "dry again (water receded)",
+      "color": "#d9b26f"
+    },
+    "4": {
+      "label": "brighter: partly flooded villages, crops, trees",
+      "color": "#6a51a3"
+    },
+    "5": {
+      "label": "darker: possibly submerged vegetation",
+      "color": "#5ab4ac"
+    }
+  },
+  "water_color": "#c6dbef",
+  "files": {
+    "photo": {
+      "path": "reference/sentinel2_2026-06-25.webp",
+      "date": "2026-06-25",
+      "source": "Sentinel-2 L2A, Earth Search"
+    },
+    "places": "reference/places.geojson",
+    "radar_raw": {
+      "2026-06-24": "radar/hh_raw_2026-06-24.webp",
+      "2026-07-06": "radar/hh_raw_2026-07-06.webp",
+      "2026-07-18": "radar/hh_raw_2026-07-18.webp",
+      "2026-08-11": "radar/hh_raw_2026-08-11.webp",
+      "2026-09-04": "radar/hh_raw_2026-09-04.webp",
+      "2026-09-28": "radar/hh_raw_2026-09-28.webp",
+      "2026-10-10": "radar/hh_raw_2026-10-10.webp"
+    },
+    "radar_clean": {
+      "2026-06-24": "radar/hh_clean_2026-06-24.webp",
+      "2026-07-06": "radar/hh_clean_2026-07-06.webp",
+      "2026-07-18": "radar/hh_clean_2026-07-18.webp",
+      "2026-08-11": "radar/hh_clean_2026-08-11.webp",
+      "2026-09-04": "radar/hh_clean_2026-09-04.webp",
+      "2026-09-28": "radar/hh_clean_2026-09-28.webp",
+      "2026-10-10": "radar/hh_clean_2026-10-10.webp"
+    },
+    "radar_values": {
+      "2026-06-24": "radar/hh_clean_2026-06-24.tif",
+      "2026-07-06": "radar/hh_clean_2026-07-06.tif",
+      "2026-07-18": "radar/hh_clean_2026-07-18.tif",
+      "2026-08-11": "radar/hh_clean_2026-08-11.tif",
+      "2026-09-04": "radar/hh_clean_2026-09-04.tif",
+      "2026-09-28": "radar/hh_clean_2026-09-28.tif",
+      "2026-10-10": "radar/hh_clean_2026-10-10.tif"
+    },
+    "water": {
+      "2026-06-24": "water/water_2026-06-24.png",
+      "2026-07-06": "water/water_2026-07-06.png",
+      "2026-07-18": "water/water_2026-07-18.png",
+      "2026-08-11": "water/water_2026-08-11.png",
+      "2026-09-04": "water/water_2026-09-04.png",
+      "2026-09-28": "water/water_2026-09-28.png",
+      "2026-10-10": "water/water_2026-10-10.png"
+    }
+  },
+  "encodings": {
+    "radar_webp": {
+      "db_min": -25.0,
+      "db_max": 0.0,
+      "formula": "dB = db_min + (db_max - db_min) * grey / 255",
+      "no_data": "alpha 0"
+    },
+    "radar_tif": {
+      "dtype": "uint8",
+      "formula": "dB = -40.0 + 0.25 * value",
+      "no_data": 255
+    },
+    "flood_tif": {
+      "dtype": "uint8",
+      "codes": {
+        "0": "no flood change",
+        "1": "water on both dates",
+        "2": "newly flooded (open water)",
+        "3": "dry again (water receded)",
+        "4": "brighter: partly flooded villages, crops, trees",
+        "5": "darker: possibly submerged vegetation"
+      },
+      "no_data": 255
+    }
+  }
+}
