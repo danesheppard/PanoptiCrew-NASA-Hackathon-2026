@@ -153,3 +153,9 @@ dataScience/data/*/cache/
 __pycache__/
 .ipynb_checkpoints/
 venv/
+
+# MacOS files
+.DS_Store
+
+# VS Code settings
+.vscode/
