@@ -147,3 +147,9 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Data Science
+dataScience/data/*/cache/
+__pycache__/
+.ipynb_checkpoints/
+venv/
