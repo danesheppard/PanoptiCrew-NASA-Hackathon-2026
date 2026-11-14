@@ -1,3 +1,19 @@
+/* GPT-6 Luna generated css for PanoptiCrew project */
+
+/* Global styles */
+:root {
+  --bg: #0b1020;
+  --panel: #111830;
+  --surface: #121a30;
+  --border: #1d2742;
+  --text: #e8ebf3;
+  --muted: #aab3c8;
+  --accent: #c6f36b;
+  --accent-ink: #0b1020;
+  --warn-bg: #5a3d0c;
+  --warn-text: #f7cf7d;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -32,22 +48,7 @@ button.link {
   color: #9db4e0;
 }
 
-.welcome {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 4rem 1.5rem;
-}
-
-.welcome h1 {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
-}
-.lede {
-  font-size: 1.2rem;
-  line-height: 1.5;
-}
-
-.sample,
+/* Shared labels */
 .meta {
   color: #9aa3b5;
 }
@@ -64,6 +65,7 @@ button.link {
   letter-spacing: 0.05em;
 }
 
+/* Global map */
 .map-view {
   display: flex;
   height: 100%;
@@ -129,6 +131,7 @@ button:disabled {
   height: 100%;
 }
 
+/* Case study */
 .case-bar {
   display: flex;
   align-items: center;
@@ -262,6 +265,7 @@ button.secondary {
   }
 }
 
+/* Respect the user's motion preference for animated content. */
 @media (prefers-reduced-motion: reduce) {
   .story-card {
     animation: none;
@@ -281,6 +285,7 @@ button.secondary {
   pointer-events: none;
 }
 
+/* Case study timeline */
 .timeline {
   display: flex;
   align-items: center;
@@ -368,6 +373,7 @@ button.secondary {
   white-space: nowrap;
 }
 
+/* Responsive layout */
 @media (max-width: 768px) {
   .case-bar h1 .meta,
   .scene-hint {
