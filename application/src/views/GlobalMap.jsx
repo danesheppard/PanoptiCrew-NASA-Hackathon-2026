@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import DeckGL from "@deck.gl/react";
 import { _GlobeView as GlobeView } from "@deck.gl/core";
 import { TileLayer } from "@deck.gl/geo-layers";
-import { BitmapLayer, IconLayer, ScatterplotLayer } from "@deck.gl/layers";
+import { BitmapLayer, IconLayer, LineLayer } from "@deck.gl/layers";
 import { caseStudies } from "../data/caseStudies.ts";
 
 const globe = new GlobeView({ resolution: 10 });
@@ -19,7 +19,6 @@ const basemap = new TileLayer({
   data: import.meta.env.VITE_SAT_TILES,
   maxZoom: 19,
   tileSize: 256,
-  opacity: 0.01,
   renderSubLayers: (props) => {
     const { west, south, east, north } = props.tile.bbox;
     return new BitmapLayer(props, {
@@ -32,7 +31,10 @@ const basemap = new TileLayer({
 
 const ICON_PX = 128;
 const RING = 6;
-const ICON_ALTITUDE_METERS = 2000;
+const BASE_ICON_ALTITUDE_METERS = 600000;
+const MIN_ICON_ALTITUDE_METERS = 5000;
+const MIN_ZOOM = 2;
+const MAX_ZOOM = 10;
 
 // Center-crops the image into a circle with a white ring; a missing image leaves a blue disc.
 async function circleIcon({ iconImage }) {
@@ -75,6 +77,12 @@ async function circleIcon({ iconImage }) {
 
 export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const [icons, setIcons] = useState(null);
+  const [viewState, setViewState] = useState(initialView);
+  const zoom = viewState.zoom;
+  const iconAltitude = Math.max(
+    MIN_ICON_ALTITUDE_METERS,
+    BASE_ICON_ALTITUDE_METERS * 2 ** (initialView.zoom - zoom),
+  );
 
   useEffect(() => {
     Promise.all(
@@ -82,24 +90,22 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     ).then((entries) => setIcons(Object.fromEntries(entries)));
   }, []);
 
-  const markerFallback = new ScatterplotLayer({
-    id: "case-study-marker-fallback",
+  const pointers = new LineLayer({
+    id: "case-study-pointers",
     data: caseStudies,
-      getPosition: ({ coordinates }) => [
-        ...calculateCentroid(coordinates),
-        ICON_ALTITUDE_METERS,
-      ],
-    getFillColor: [11, 61, 145, 255],
-    getLineColor: [255, 255, 255, 255],
-    getRadius: ({ id }) => (id === selected?.id ? 9 : 7),
-    radiusUnits: "pixels",
-    billboard: true,
-    parameters: { depthTest: false },
-    stroked: true,
-    lineWidthMinPixels: 2,
-    pickable: true,
-    onClick: ({ object }) => onSelect(object),
-    updateTriggers: { getRadius: selected?.id },
+    getSourcePosition: ({ coordinates }) => [
+      ...calculateCentroid(coordinates),
+      0,
+    ],
+    getTargetPosition: ({ coordinates }) => [
+      ...calculateCentroid(coordinates),
+      iconAltitude,
+    ],
+    getColor: [255, 255, 255, 200],
+    getWidth: 2,
+    widthUnits: "pixels",
+    parameters: { depthTest: true, cullMode: "none" },
+    updateTriggers: { getTargetPosition: iconAltitude },
   });
 
   const markers =
@@ -109,7 +115,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
       data: caseStudies,
       getPosition: ({ coordinates }) => [
         ...calculateCentroid(coordinates),
-        ICON_ALTITUDE_METERS,
+        iconAltitude,
       ],
       getIcon: ({ id }) => ({
         id,
@@ -118,10 +124,13 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
         height: ICON_PX,
       }),
       getSize: ({ id }) => (id === selected?.id ? 64 : 44),
-      parameters: { depthTest: false },
+      parameters: { depthTest: true, cullMode: "none" },
       pickable: true,
       onClick: ({ object }) => onSelect(object),
-      updateTriggers: { getSize: selected?.id },
+      updateTriggers: {
+        getPosition: iconAltitude,
+        getSize: selected?.id,
+      },
     });
 
   return (
@@ -161,9 +170,12 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
       <div className="map">
         <DeckGL
           views={globe}
-          initialViewState={initialView}
-          controller
-          layers={[basemap, markerFallback, markers]}
+          viewState={viewState}
+          controller={{ minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM }}
+          onViewStateChange={({ viewState: nextViewState }) =>
+            setViewState(nextViewState)
+          }
+          layers={[basemap, pointers, markers]}
           getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
         />
         <span className="attribution">© OpenStreetMap contributors</span>
