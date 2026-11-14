@@ -64,8 +64,7 @@ button.link {
   letter-spacing: 0.05em;
 }
 
-.map-view,
-.case-view {
+.map-view {
   display: flex;
   height: 100%;
 }
@@ -113,19 +112,281 @@ button.link {
   font-size: 0.7rem;
 }
 
-.tabs {
-  display: flex;
-  gap: 0.25rem;
-  margin: 1rem 0;
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #ffd27a;
+  outline-offset: 2px;
 }
 
-.tabs button {
-  flex: 1;
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.case-view {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+}
+
+.case-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  background: #121a30;
+  border-bottom: 1px solid #24304f;
+}
+
+.case-bar h1 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.case-bar .badge {
+  margin: 0;
+}
+
+.about {
+  position: relative;
+  margin-left: auto;
+}
+
+.about-body {
+  position: absolute;
+  right: 0;
+  top: 2rem;
+  z-index: 2;
+  width: min(360px, 90vw);
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0 1rem 1rem;
+  border: 1px solid #24304f;
+  border-radius: 8px;
+  background: #121a30;
+}
+
+.about-body h3 {
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button.secondary {
   background: #24304f;
 }
 
-.tabs button.active {
-  background: #0b3d91;
+.scene {
+  position: relative;
+  overflow: hidden;
+}
+
+.scene-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.story-card {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: 380px;
+  max-height: calc(100% - 2rem);
+  overflow-y: auto;
+  padding: 1.25rem;
+  border: 1px solid #24304f;
+  border-radius: 10px;
+  background: rgba(18, 26, 48, 0.92);
+  animation: fade-in 0.4s ease-out;
+}
+
+.story-card h2 {
+  margin: 0.25rem 0 0.75rem;
+  line-height: 1.2;
+}
+
+.story-card .headline {
+  font-size: 1.75rem;
+}
+
+.story-card h3 {
+  margin: 1rem 0 0.25rem;
+  font-size: 0.95rem;
+}
+
+.kicker {
+  margin: 0;
+  color: #ffd27a;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric {
+  color: #c3cbe0;
+}
+
+.metric strong {
+  display: block;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.actions {
+  padding-left: 1.2rem;
+}
+
+.confidence {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid #4a5878;
+  border-radius: 999px;
+  color: #c3cbe0;
+  font-size: 0.8rem;
+  cursor: help;
+}
+
+.story-card button {
+  display: block;
+  margin-top: 1rem;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-card {
+    animation: none;
+  }
+}
+
+.scene-hint {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  margin: 0;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  background: rgba(11, 16, 32, 0.75);
+  color: #9aa3b5;
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.timeline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem 1.75rem;
+  background: #121a30;
+  border-top: 1px solid #24304f;
+}
+
+.track {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  margin: 0 3rem;
+  border-radius: 2px;
+  background: #24304f;
+}
+
+.track-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: #ffd27a;
+  transition: width 0.6s ease;
+}
+
+.point {
+  position: absolute;
+  top: -0.6rem;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0;
+  background: none;
+  color: #9aa3b5;
+  font-size: 0.85rem;
+}
+
+.point:hover {
+  background: none;
+  color: #fff;
+}
+
+.point small {
+  font-size: 0.7rem;
+}
+
+.dot {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #4a5878;
+  border-radius: 50%;
+  background: #121a30;
+}
+
+.point.done .dot {
+  border-color: #ffd27a;
+  background: #ffd27a;
+}
+
+.point.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.point.active .dot {
+  border-color: #ffd27a;
+  background: #0b1020;
+  box-shadow: 0 0 0 4px rgba(255, 210, 122, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track-fill {
+    transition: none;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .case-bar h1 .meta,
+  .scene-hint {
+    display: none;
+  }
+
+  .story-card {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-height: 55%;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .track {
+    margin: 0 2rem;
+  }
 }
 
 .imagery {
