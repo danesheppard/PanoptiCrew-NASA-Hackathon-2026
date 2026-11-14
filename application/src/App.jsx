@@ -13,6 +13,9 @@ export default function App() {
   const [view, setView] = useState("landing");
   const [study, setStudy] = useState(null);
 
+  // preventDefault on right clicks
+  document.addEventListener("contextmenu", (e) => e.preventDefault());
+
   if (view === "landing") return <LandingPage onStart={() => setView("map")} />;
 
   if (view === "case" && study)
