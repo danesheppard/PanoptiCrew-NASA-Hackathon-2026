@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { calculateCentroid } from "../utilities.ts";
+import { calculateCentroid } from "../utilities/utilities.ts";
+import buildLegend from "../utilities/buildLegend.jsx";
 import Header from "./Header/Header.jsx";
 
 // `key` matches a study stage type; `date` maps to a key in study.key_dates.
@@ -281,53 +282,6 @@ function buildSkirt(plane, base) {
   return geometry;
 }
 
-/**
- * Builds a legend component for the given legend properties.
- * Supports a gradient legend with low and high end labels, and a categorical legend with specific color mappings.
- * @param {Legend} legendProps
- * @returns
- */
-function buildLegend(legendProps) {
-  const legend = legendProps;
-  if (legend?.type === "categories") {
-    // Build a list of color swatches and labels, according to the categories array
-    if (Array.isArray(legend?.categories) && legend.categories.length > 0) {
-      return (
-        <div className="legend">
-          {legend.categories.map(({ color, label }, i) => (
-            <div key={i} className="legend-item">
-              <span className="legend-color" style={{ background: color }} />
-              <span className="legend-label">{label}</span>
-            </div>
-          ))}
-        </div>
-      );
-    }
-  }
-  // If legend type is not categories, continue to build gradient legend
-  const hasLegend =
-    Array.isArray(legend?.gradient) &&
-    legend.gradient.length >= 2 &&
-    typeof legend.labels?.lowEnd === "string" &&
-    typeof legend.labels?.highEnd === "string";
-
-  if (!hasLegend) return null;
-
-  const legendGradient = `linear-gradient(to right, ${legend.gradient
-    .map(([red, green, blue]) => `rgb(${red} ${green} ${blue})`)
-    .join(", ")})`;
-
-  return (
-    <div className="legend">
-      <div className="legend-gradient" style={{ background: legendGradient }} />
-      <div className="legend-labels">
-        <span>{legend.labels.lowEnd}</span>
-        <span>{legend.labels.highEnd}</span>
-      </div>
-    </div>
-  );
-}
-
 // Place labels and the flood path replay: a glowing dot runs down the path and labels light up as it reaches them.
 const REPLAY_SECONDS = 8;
 const LIFT = 0.04;
@@ -410,17 +364,6 @@ export default function CaseStudy({ study, onBack, onHome }) {
   const chapter = chapters[index];
   const stage = study.stages.find((item) => item.type === chapter.key);
   const legend = stage?.legend;
-  const hasLegend =
-    Array.isArray(legend?.gradient) &&
-    legend.gradient.length >= 2 &&
-    typeof legend.labels?.lowEnd === "string" &&
-    typeof legend.labels?.highEnd === "string";
-
-  const legendGradient = hasLegend
-    ? `linear-gradient(to right, ${legend.gradient
-        .map(([red, green, blue]) => `rgb(${red} ${green} ${blue})`)
-        .join(", ")})`
-    : undefined;
   const overlayAvailable = Boolean(
     study.coordinates && stage?.imagery && /\.(png|webp)$/i.test(stage.imagery),
   );
@@ -830,30 +773,12 @@ export default function CaseStudy({ study, onBack, onHome }) {
           role="img"
           aria-label={`3D terrain of ${study.location}, ${chapter.label} view`}
         />
-        {hasLegend && (
-          <div
-            className="stage-legend case-legend"
-            role="group"
-            aria-label={`${chapter.label} map legend`}
-          >
-            <span className="stage-legend-title">Map legend</span>
-            <div
-              className="stage-legend-gradient"
-              style={{ background: legendGradient }}
-              aria-hidden="true"
-            />
-            <div className="stage-legend-labels">
-              <span>{legend.labels.lowEnd}</span>
-              <span>{legend.labels.highEnd}</span>
-            </div>
-            {stage?.replay && (
-              <div className="stage-legend-path">
-                <span className="stage-legend-line" aria-hidden="true" />
-                Traced flood path
-              </div>
-            )}
-          </div>
-        )}
+        {buildLegend(legend, {
+          className: "case-legend",
+          title: "Map legend",
+          ariaLabel: `${chapter.label} map legend`,
+          showFloodPath: Boolean(stage?.replay),
+        })}
 
         <article
           key={chapter.key}

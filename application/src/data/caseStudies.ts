@@ -10,16 +10,20 @@ type EventStage = {
   imagery: string;
   legend?: Legend;
   timeline?: string;
-  replay?: Array<[number, number]> | string; // ADDED: string option, a GeoJSON line file under public/assets/geospatial
+  replay?: Array<[number, number]> | string; // Inline [longitude, latitude] points or a GeoJSON line path under public/assets/geospatial.
   actions?: string[]; // Recommended actions or responses following the event stage
   chart?: string; // Optional chart associated with the event stage
-  camera?: [number, number, number]; // ADDED: optional camera position for this stage, defaults to the shared view in CaseStudy.jsx
+  camera?: [number, number, number]; // Optional Three.js camera position [x, y, z].
 };
 
 type Legend = {
-  gradient: [number, number, number][];
+  gradient: [number, number, number][]; // RGB color stops.
   labels: { lowEnd: string; highEnd: string };
   type?: string;
+  categories?: Array<{
+    color: [number, number, number]; // RGB swatch color.
+    label: string;
+  }>;
 };
 
 type CaseStudy = {
@@ -32,19 +36,19 @@ type CaseStudy = {
   story: string; // Intro slide for case study
   method: string; // Description of how the case study was conducted
   limitations: string; // Limitations of the case study, e.g., data quality or coverage
-  coordinates: Array<number>; // [longitude, latitude] or [minLon, minLat, maxLon, maxLat] depending on the case study
+  coordinates: Array<number>; // Geographic bounds: [west, south, east, north].
   image_crs: string; // Coordinate reference system of the imagery
   satellite: string; // Satellite used for the imagery
   sources: string[]; // List of sources for the case study
   key_dates: { before: string; event: string; after: string }; // Key dates for the case study: before, during, and after the event
-  scene?: { places?: string; flood_path_km?: number; [key: string]: unknown }; // ADDED: places (GeoJSON of labels) and flood_path_km are read by CaseStudy.jsx
+  scene?: { places?: string; flood_path_km?: number; [key: string]: unknown }; // Optional scene assets and replay metadata.
   layers?: Array<{
     name: string;
     file: string;
     legend: Legend;
   }>;
   pairs?: Array<object>;
-  camera?: [number, number, number]; // ADDED: optional camera position for every stage of this study
+  camera?: [number, number, number]; // Optional default Three.js camera position [x, y, z].
   stages: StageArray;
 };
 
@@ -666,6 +670,322 @@ export const caseStudies = [
           },
         },
         chart: "case1/takeaway.png",
+      },
+    ],
+  },
+  {
+    case: "case3",
+    title: "Bald Range wildfire, Summerland, British Columbia (August 2026)",
+    event_date: "2026-08-07",
+    story:
+      "On the evening of August 7, 2026 a wildfire started in the hills west of Summerland, in British Columbia's Okanagan valley. After a long drought, strong westerly winds pushed it downhill towards Okanagan Lake: about 5,000 ha burned in three hours and 15,600 ha by August 10. More than 20,000 people in Summerland and Peachland were ordered to leave, an 80-year-old woman died while evacuating, and about 150 structures were damaged or destroyed; in Faulder only 8 of 81 homes survived. The fire was held on August 28 at about 25,200 ha. NISAR's L-band radar sees through the smoke and into the forest canopy.",
+    method:
+      "The HV radar channel measures the forest canopy: the wave bounces in needles and branches. For every pixel we compare HV after the fire with July 25 (before), and remove the common change of the unburned forest 1 to 6 km around the fire (rain, calibration). In that unburned forest HV moves by about 0.6 dB on its own, so a drop of 1 dB (2 times) marks canopy loss and 2 dB (3 times) severe canopy loss, on land that was vegetated before and in patches of 9 or more pixels. The result is checked against the official fire perimeter and the Sentinel-2 burn severity.",
+    limitations:
+      "Provisional NISAR data (calibrated, not yet officially validated). The radar sees the canopy: light ground fires under a canopy that survived are not detected. NISAR has no data between July 27 and August 10, so the first days of the fire are not imaged. Rain on August 30 and partial coverage in October add noise. Logging also lowers HV; it is told apart by the date and the official perimeter.",
+    coordinates: [-120.066303, 49.469633, -119.61584, 49.750396],
+    image_crs: "EPSG:3857",
+    satellite:
+      "NISAR (NASA-ISRO), L-band, track 71 descending, frame 63, HV channel",
+    sources: [
+      "NISAR L2 GCOV, Provisional (NISAR_L2_GCOV_PROVISIONAL_V1), NASA Earthdata / ASF",
+      "BC Wildfire Service fire perimeter K51490, BC Data Catalogue (PROT_CURRENT_FIRE_POLYS_SP)",
+      "Sentinel-2 L2A photos and burn severity (ESA Copernicus), via Earth Search",
+      "OpenStreetMap, place names",
+      "BC Wildfire Service, Bald Range incident K51490; Castanet, Summerland Review, Kelowna Capital News, CBC News and The Canadian Press (August to October 2026)",
+      "Wikipedia, Bald Range fire: https://en.wikipedia.org/wiki/Bald_Range_fire",
+      "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case3.ipynb)",
+    ],
+    key_dates: {
+      before: "2026-07-25",
+      event: "2026-08-18",
+      after: "2026-09-11",
+    },
+    scene: {
+      imagery: "case3/sentinel2_2026-08-04.webp",
+      imagery_after: "case3/sentinel2_2026-09-18.webp",
+      places: "case3/places.geojson",
+      perimeter: "case3/perimeter.geojson",
+    },
+    layers: [
+      {
+        name: "NISAR radar (HV), 2026-07-25, before",
+        file: "case3/hv_clean_2026-07-25.webp",
+        legend: {
+          gradient: [
+            [0, 0, 0],
+            [255, 255, 255],
+          ],
+          labels: {
+            lowEnd: "-25 dB: dark, water, rock or bare ground",
+            highEnd: "-5 dB: bright, dense forest canopy",
+          },
+        },
+      },
+      {
+        name: "NISAR radar (HV), 2026-09-11, after",
+        file: "case3/hv_clean_2026-09-11.webp",
+        legend: {
+          gradient: [
+            [0, 0, 0],
+            [255, 255, 255],
+          ],
+          labels: {
+            lowEnd: "-25 dB: dark, water, rock or bare ground",
+            highEnd: "-5 dB: bright, dense forest canopy",
+          },
+        },
+      },
+      {
+        name: "Canopy loss, 2026-07-25 → 2026-08-18",
+        file: "case3/burn_2026-08-18.png",
+        legend: {
+          type: "categories",
+          gradient: [
+            [254, 196, 79],
+            [215, 48, 31],
+          ],
+          labels: {
+            lowEnd:
+              "Canopy loss (radar echo 1 dB lower than the unburned forest)",
+            highEnd: "Severe canopy loss (2 dB or more)",
+          },
+          categories: [
+            {
+              color: [254, 196, 79],
+              label:
+                "Canopy loss (radar echo 1 dB lower than the unburned forest)",
+            },
+            {
+              color: [215, 48, 31],
+              label: "Severe canopy loss (2 dB or more)",
+            },
+          ],
+        },
+      },
+      {
+        name: "Canopy loss, 2026-07-25 → 2026-09-11",
+        file: "case3/burn_2026-09-11.png",
+        legend: {
+          type: "categories",
+          gradient: [
+            [254, 196, 79],
+            [215, 48, 31],
+          ],
+          labels: {
+            lowEnd:
+              "Canopy loss (radar echo 1 dB lower than the unburned forest)",
+            highEnd: "Severe canopy loss (2 dB or more)",
+          },
+          categories: [
+            {
+              color: [254, 196, 79],
+              label:
+                "Canopy loss (radar echo 1 dB lower than the unburned forest)",
+            },
+            {
+              color: [215, 48, 31],
+              label: "Severe canopy loss (2 dB or more)",
+            },
+          ],
+        },
+      },
+      {
+        name: "Optical burn severity (Sentinel-2), 2026-08-04 → 2026-09-18",
+        file: "case3/burn_severity_optical.png",
+        legend: {
+          type: "categories",
+          gradient: [
+            [240, 240, 240],
+            [255, 255, 178],
+            [254, 204, 92],
+            [253, 141, 60],
+            [189, 0, 38],
+          ],
+          labels: {
+            lowEnd: "Optical burn severity: unburned",
+            highEnd: "Optical burn severity: high",
+          },
+          categories: [
+            {
+              color: [240, 240, 240],
+              label: "Optical burn severity: unburned",
+            },
+            {
+              color: [255, 255, 178],
+              label: "Optical burn severity: low",
+            },
+            {
+              color: [254, 204, 92],
+              label: "Optical burn severity: moderate-low",
+            },
+            {
+              color: [253, 141, 60],
+              label: "Optical burn severity: moderate-high",
+            },
+            {
+              color: [189, 0, 38],
+              label: "Optical burn severity: high",
+            },
+          ],
+        },
+      },
+    ],
+    pairs: [
+      {
+        reference: "2026-07-25",
+        secondary: "2026-08-18",
+        file: "case3/burn_2026-08-18.png",
+        "canopy loss": 40.5,
+        "severe canopy loss": 7.4,
+        "inside perimeter (km²)": 41.0,
+        "outside perimeter (km²)": 6.9,
+      },
+      {
+        reference: "2026-07-25",
+        secondary: "2026-08-30",
+        file: "case3/burn_2026-08-30.png",
+        "canopy loss": 65.5,
+        "severe canopy loss": 7.4,
+        "inside perimeter (km²)": 40.6,
+        "outside perimeter (km²)": 32.4,
+      },
+      {
+        reference: "2026-07-25",
+        secondary: "2026-09-11",
+        file: "case3/burn_2026-09-11.png",
+        "canopy loss": 53.6,
+        "severe canopy loss": 29.0,
+        "inside perimeter (km²)": 74.2,
+        "outside perimeter (km²)": 8.5,
+      },
+      {
+        reference: "2026-07-25",
+        secondary: "2026-09-23",
+        file: "case3/burn_2026-09-23.png",
+        "canopy loss": 51.5,
+        "severe canopy loss": 39.2,
+        "inside perimeter (km²)": 82.5,
+        "outside perimeter (km²)": 8.2,
+      },
+      {
+        reference: "2026-07-25",
+        secondary: "2026-10-05",
+        file: "case3/burn_2026-10-05.png",
+        "canopy loss": 47.9,
+        "severe canopy loss": 32.1,
+        "inside perimeter (km²)": 69.9,
+        "outside perimeter (km²)": 10.1,
+      },
+      {
+        reference: "2026-07-25",
+        secondary: "2026-10-17",
+        file: "case3/burn_2026-10-17.png",
+        "canopy loss": 47.9,
+        "severe canopy loss": 44.2,
+        "inside perimeter (km²)": 82.5,
+        "outside perimeter (km²)": 9.7,
+      },
+    ],
+    stages: [
+      {
+        type: "leadUp",
+        headline: "Before: the forests above Summerland",
+        metric: {
+          label: "last NISAR pass before the fire started",
+          value: "13 days before",
+        },
+        summary:
+          "On July 25, after weeks of drought, the forests west of Summerland are bright in the radar's HV channel: the wave bounces many times in needles and branches before coming back. Lakes, rock and bare ground are dark. This is the reference image: the next NISAR pass came on August 18, after the fire had started, because NISAR has no data between July 27 and August 10.",
+        confidence: "High",
+        imagery: "case3/hv_clean_2026-07-25.webp",
+        legend: {
+          gradient: [
+            [0, 0, 0],
+            [255, 255, 255],
+          ],
+          labels: {
+            lowEnd: "-25 dB: dark, water, rock or bare ground",
+            highEnd: "-5 dB: bright, dense forest canopy",
+          },
+        },
+      },
+      {
+        type: "event",
+        headline: "During the fire: the canopy echo collapses",
+        metric: {
+          label:
+            "of canopy already lost inside the fire perimeter on August 18",
+          value: "41 km²",
+        },
+        summary:
+          "On August 18, eleven days after ignition, the fire was still burning (about 22,000 ha) while most of Summerland was allowed back home. The radar echo of the forest had dropped clearly over 41 km² inside the fire perimeter. We compare each pixel with July 25 and remove what the unburned forest around the fire did on its own (rain, season), so only the change caused by the fire remains. Yellow: canopy loss; red: severe canopy loss.",
+        confidence: "Medium",
+        imagery: "case3/burn_2026-08-18.png",
+        legend: {
+          type: "categories",
+          gradient: [
+            [254, 196, 79],
+            [215, 48, 31],
+          ],
+          labels: {
+            lowEnd:
+              "Canopy loss (radar echo 1 dB lower than the unburned forest)",
+            highEnd: "Severe canopy loss (2 dB or more)",
+          },
+          categories: [
+            {
+              color: [254, 196, 79],
+              label:
+                "Canopy loss (radar echo 1 dB lower than the unburned forest)",
+            },
+            {
+              color: [215, 48, 31],
+              label: "Severe canopy loss (2 dB or more)",
+            },
+          ],
+        },
+      },
+      {
+        type: "takeaway",
+        headline: "After: where the forest canopy burned",
+        metric: {
+          label:
+            "of forest canopy lost by September 11, 90% of it inside the official perimeter",
+          value: "83 km²",
+        },
+        summary:
+          "Once the fire was held, NISAR shows 83 km² of lost canopy, 29 km² of it severe. An independent optical check agrees: the radar flags 82% of the areas Sentinel-2 rates as high burn severity and only 2% of unburned land. Light ground fires under a surviving canopy are not seen: the radar answers where the forest canopy burned.",
+        confidence: "High",
+        imagery: "case3/burn_2026-09-11.png",
+        legend: {
+          type: "categories",
+          gradient: [
+            [254, 196, 79],
+            [215, 48, 31],
+          ],
+          labels: {
+            lowEnd:
+              "Canopy loss (radar echo 1 dB lower than the unburned forest)",
+            highEnd: "Severe canopy loss (2 dB or more)",
+          },
+          categories: [
+            {
+              color: [254, 196, 79],
+              label:
+                "Canopy loss (radar echo 1 dB lower than the unburned forest)",
+            },
+            {
+              color: [215, 48, 31],
+              label: "Severe canopy loss (2 dB or more)",
+            },
+          ],
+        },
+        actions: [
+          "Map canopy loss with NISAR while a fire is still burning: radar sees through the smoke that blinds optical satellites.",
+          "Start erosion and debris-flow checks on the slopes with severe canopy loss (red) above Summerland, whose drinking-water source was damaged.",
+          "Inside the official perimeter, areas without canopy loss likely burned lightly: use them to plan surveys and replanting.",
+        ],
       },
     ],
   },

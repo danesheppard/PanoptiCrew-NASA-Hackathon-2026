@@ -17,7 +17,8 @@ import {
   IconMap,
 } from "@tabler/icons-react";
 import { caseStudies } from "../data/caseStudies.ts";
-import { calculateCentroid } from "../utilities.ts";
+import { calculateCentroid } from "../utilities/utilities.ts";
+import buildLegend from "../utilities/buildLegend.jsx";
 import Header from "./Header/Header.jsx";
 import "./GlobalMap.css";
 
@@ -34,16 +35,6 @@ const MIN_ICON_ALTITUDE_METERS = 5000;
 const MIN_ZOOM = 2;
 const MAX_ZOOM = 13;
 const GLOBE_MIN_ZOOM = 4; // was MAX_ZOOM / 2 (4)
-
-// Interpolators are stateless, so one instance of each is reused for every transition.
-// Globe: plain rotation. Flat map: FlyTo (zoom out, pan, zoom in), which is built for Web Mercator.
-const globeInterpolator = new LinearInterpolator([
-  "longitude",
-  "latitude",
-  "zoom",
-]);
-const flatInterpolator = new FlyToInterpolator();
-const easeInOut = (t) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
 
 // Case studies are static, so their centroids are computed once instead of on every render.
 const centroids = new Map(
@@ -221,16 +212,6 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     radarStages.find((stage) => stage.name.includes(radarStageType)) ??
     radarStages[0];
   const radarLegend = radarStage?.legend;
-  const hasRadarLegend =
-    Array.isArray(radarLegend?.gradient) &&
-    radarLegend.gradient.length >= 2 &&
-    typeof radarLegend.labels?.lowEnd === "string" &&
-    typeof radarLegend.labels?.highEnd === "string";
-  const radarGradient = hasRadarLegend
-    ? `linear-gradient(to right, ${radarLegend.gradient
-        .map(([red, green, blue]) => `rgb(${red} ${green} ${blue})`)
-        .join(", ")})`
-    : undefined;
   /**
    * Builds the main basemap layer for high-detail tiles.
    * Change from projected to globe view requires updating the TileLayer id for a fresh retrieval of tiles.
@@ -545,24 +526,11 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
               layers={[fallbackBasemap, basemap, radarLayer, pointers, markers]}
               getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
             />
-            {hasRadarLegend && (
-              <div
-                className="stage-legend map-legend"
-                role="group"
-                aria-label={`${radarStage.type} map legend`}
-              >
-                <span className="stage-legend-title">Map legend</span>
-                <div
-                  className="stage-legend-gradient"
-                  style={{ background: radarGradient }}
-                  aria-hidden="true"
-                />
-                <div className="stage-legend-labels">
-                  <span>{radarLegend.labels.lowEnd}</span>
-                  <span>{radarLegend.labels.highEnd}</span>
-                </div>
-              </div>
-            )}
+            {buildLegend(radarLegend, {
+              className: "map-legend",
+              title: "Map legend",
+              ariaLabel: `${radarStage} map legend`,
+            })}
             <div className="toggle-view" role="group" aria-label="Map view">
               <button
                 className="toggle-view-option"

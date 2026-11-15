@@ -185,6 +185,25 @@ button.secondary {
   text-align: right;
 }
 
+.stage-legend-categories {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.stage-legend-category {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stage-legend-color {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: 0 0 auto;
+  border: 1px solid rgba(232, 235, 243, 0.45);
+  border-radius: 2px;
+}
+
 .case-legend {
   top: 1rem;
   right: 1rem;
