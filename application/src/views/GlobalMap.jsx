@@ -329,7 +329,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const radarLayer =
     selected?.coordinates && radarStage
       ? new BitmapLayer({
-          id: `radar-layer-${selected.case}-${radarStage.type}`,
+          id: `radar-layer-${selected.case}`,
           data: null,
           image: radarStage.file.startsWith("/")
             ? radarStage.file

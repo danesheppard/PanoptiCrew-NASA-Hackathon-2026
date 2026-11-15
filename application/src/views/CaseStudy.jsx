@@ -241,6 +241,53 @@ function buildSkirt(plane, base) {
   return geometry;
 }
 
+/**
+ * Builds a legend component for the given legend properties.
+ * Supports a gradient legend with low and high end labels, and a categorical legend with specific color mappings.
+ * @param {Legend} legendProps
+ * @returns
+ */
+function buildLegend(legendProps) {
+  const legend = legendProps;
+  if (legend?.type === "categories") {
+    // Build a list of color swatches and labels, according to the categories array
+    if (Array.isArray(legend?.categories) && legend.categories.length > 0) {
+      return (
+        <div className="legend">
+          {legend.categories.map(({ color, label }, i) => (
+            <div key={i} className="legend-item">
+              <span className="legend-color" style={{ background: color }} />
+              <span className="legend-label">{label}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+  }
+  // If legend type is not categories, continue to build gradient legend
+  const hasLegend =
+    Array.isArray(legend?.gradient) &&
+    legend.gradient.length >= 2 &&
+    typeof legend.labels?.lowEnd === "string" &&
+    typeof legend.labels?.highEnd === "string";
+
+  if (!hasLegend) return null;
+
+  const legendGradient = `linear-gradient(to right, ${legend.gradient
+    .map(([red, green, blue]) => `rgb(${red} ${green} ${blue})`)
+    .join(", ")})`;
+
+  return (
+    <div className="legend">
+      <div className="legend-gradient" style={{ background: legendGradient }} />
+      <div className="legend-labels">
+        <span>{legend.labels.lowEnd}</span>
+        <span>{legend.labels.highEnd}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function CaseStudy({ study, onBack, onHome }) {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
@@ -255,6 +302,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
     legend.gradient.length >= 2 &&
     typeof legend.labels?.lowEnd === "string" &&
     typeof legend.labels?.highEnd === "string";
+
   const legendGradient = hasLegend
     ? `linear-gradient(to right, ${legend.gradient
         .map(([red, green, blue]) => `rgb(${red} ${green} ${blue})`)

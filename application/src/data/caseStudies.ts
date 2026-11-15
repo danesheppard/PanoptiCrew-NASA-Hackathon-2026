@@ -80,7 +80,7 @@ export const caseStudies = [
     layers: [
       {
         name: "NISAR radar (HH), 2026-08-11, before",
-        file: "case2/radar/hh_clean_2026-08-11.webp",
+        file: "case2/hh_clean_2026-08-11.webp",
         legend: {
           gradient: [
             [0, 0, 0],
@@ -94,7 +94,7 @@ export const caseStudies = [
       },
       {
         name: "NISAR radar (HH), 2026-09-28, flood peak",
-        file: "case2/radar/hh_clean_2026-09-28.webp",
+        file: "case2/hh_clean_2026-09-28.webp",
         legend: {
           gradient: [
             [0, 0, 0],
@@ -108,7 +108,7 @@ export const caseStudies = [
       },
       {
         name: "Open water, 2026-09-04",
-        file: "case2/water/water_2026-09-04.png",
+        file: "case2/water_2026-09-04.png",
         legend: {
           type: "categories",
           gradient: [[198, 219, 239]],
@@ -126,7 +126,7 @@ export const caseStudies = [
       },
       {
         name: "Open water, 2026-09-28",
-        file: "case2/water/water_2026-09-28.png",
+        file: "case2/water_2026-09-28.png",
         legend: {
           type: "categories",
           gradient: [[198, 219, 239]],
@@ -144,7 +144,7 @@ export const caseStudies = [
       },
       {
         name: "Flood map, 2026-09-04 → 2026-09-28",
-        file: "case2/flood/flood_2026-09-04_2026-09-28.png",
+        file: "case2/flood_2026-09-04_2026-09-28.png",
         legend: {
           type: "categories",
           gradient: [
@@ -184,7 +184,7 @@ export const caseStudies = [
       },
       {
         name: "Recession, 2026-09-28 → 2026-10-10",
-        file: "case2/flood/flood_2026-09-28_2026-10-10.png",
+        file: "case2/flood_2026-09-28_2026-10-10.png",
         legend: {
           type: "categories",
           gradient: [
@@ -227,7 +227,7 @@ export const caseStudies = [
       {
         reference: "2026-09-04",
         secondary: "2026-09-28",
-        file: "case2/flood/flood_2026-09-04_2026-09-28.png",
+        file: "case2/flood_2026-09-04_2026-09-28.png",
         "water on both dates": 49.3,
         "newly flooded (open water)": 68.2,
         "dry again (water receded)": 17.9,
@@ -237,7 +237,7 @@ export const caseStudies = [
       {
         reference: "2026-09-28",
         secondary: "2026-10-10",
-        file: "case2/flood/flood_2026-09-28_2026-10-10.png",
+        file: "case2/flood_2026-09-28_2026-10-10.png",
         "water on both dates": 25.7,
         "newly flooded (open water)": 12.8,
         "dry again (water receded)": 93.0,
