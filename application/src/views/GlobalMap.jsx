@@ -277,11 +277,11 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
    * @param {number} duration - Animation length in milliseconds.
    */
   const moveCamera = (target, duration) => {
-    setTransitionProps({
-      transitionDuration: duration,
-      transitionInterpolator: isGlobe ? globeInterpolator : flatInterpolator,
-      transitionEasing: easeInOut,
-    });
+    // setTransitionProps({
+    //   transitionDuration: duration,
+    //   transitionInterpolator: isGlobe ? globeInterpolator : flatInterpolator,
+    //   transitionEasing: easeInOut,
+    // });
     setViewState((prev) => ({
       ...prev,
       ...target,
@@ -290,6 +290,8 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
         : target.longitude,
       pitch: 0,
       bearing: 0,
+      transitionInterpolator: new FlyToInterpolator({ speed: 1.2 }),
+      transitionDuration: duration,
     }));
   };
 
@@ -301,10 +303,9 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
    */
   const selectStudy = (study) => {
     onSelect(study);
-    if (!study) return moveCamera(initialView, 1000);
+    if (!study) return moveCamera(initialView, 2000);
     const [longitude, latitude] = centroids.get(study.case);
-    const zoom = isGlobe ? 3 : study.coordinates ? 9.5 : 6; // was 6 on the flat map
-    moveCamera({ longitude, latitude, zoom }, 1200);
+    moveCamera({ longitude, latitude }, 2000);
   };
 
   /**
@@ -489,8 +490,10 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
                   value={selected?.case ?? ""}
                   onChange={(event) =>
                     selectStudy(
-                      caseStudies.find(({ id }) => id === event.target.value) ??
-                        null,
+                      caseStudies.find(
+                        ({ case: studyCase }) =>
+                          studyCase === event.target.value,
+                      ) ?? null,
                     )
                   }
                 >
@@ -525,6 +528,8 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
                * Updates the view state unless the interaction is in transition.
                */
               onViewStateChange={({ viewState: nextViewState }) => {
+                // Ignore any changes if the interaction is in transition
+                if (nextViewState.isTransitioning) return;
                 const { longitude, latitude, zoom, pitch, bearing } =
                   nextViewState;
                 setViewState({
