@@ -32,8 +32,8 @@ const RING = 6;
 const BASE_ICON_ALTITUDE_METERS = 600000;
 const MIN_ICON_ALTITUDE_METERS = 5000;
 const MIN_ZOOM = 2;
-const MAX_ZOOM = 8;
-const GLOBE_MAX_ZOOM = MAX_ZOOM / 2;
+const MAX_ZOOM = 13; // was 8
+const GLOBE_MAX_ZOOM = 7; // was MAX_ZOOM / 2 (4)
 
 // Interpolators are stateless, so one instance of each is reused for every transition.
 // Globe: plain rotation. Flat map: FlyTo (zoom out, pan, zoom in), which is built for Web Mercator.
@@ -198,6 +198,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isGlobe, setIsGlobe] = useLocalStorage("isGlobe", false);
   const [viewState, setViewState] = useLocalStorage("viewState", initialView);
+  const [radarStageType, setRadarStageType] = useState("leadUp");
   const [transitionProps, setTransitionProps] = useState(null);
   const deckViewState = transitionProps
     ? { ...viewState, ...transitionProps }
@@ -211,6 +212,14 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     MIN_ICON_ALTITUDE_METERS,
     BASE_ICON_ALTITUDE_METERS * 2 ** (initialView.zoom - viewState.zoom),
   );
+  const radarStages = selected?.imageBounds
+    ? selected.stages.filter(
+        (stage) => stage.imagery && !stage.imagery.startsWith("Placeholder:"),
+      )
+    : [];
+  const radarStage =
+    radarStages.find((stage) => stage.type === radarStageType) ??
+    radarStages[0];
 
   // On switching views: clamp zoom to that view's limit and reset any tilt or rotation
   useEffect(() => {
@@ -264,7 +273,8 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     onSelect(study);
     if (!study) return moveCamera(initialView, 1000);
     const [longitude, latitude] = centroids.get(study.id);
-    moveCamera({ longitude, latitude, zoom: isGlobe ? 3 : 6 }, 1200);
+    const zoom = isGlobe ? 3 : study.imageBounds ? 9.5 : 6; // was 6 on the flat map
+    moveCamera({ longitude, latitude, zoom }, 1200);
   };
 
   /**
@@ -296,11 +306,39 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   });
 
   /**
+   * Builds the radar layer for the selected case study, if available.
+   *
+   * @returns {BitmapLayer|null} The radar layer, or null if not available.
+   */
+  const radarLayer =
+    selected?.imageBounds && radarStage
+      ? new BitmapLayer({
+          id: `radar-layer-${selected.id}-${radarStage.type}`,
+          data: null,
+          image: radarStage.imagery.startsWith("/")
+            ? radarStage.imagery
+            : `/assets/geospatial/${radarStage.imagery}`,
+          bounds: selected.imageBounds,
+          opacity: 0.75,
+          parameters: {
+            depthTest: isGlobe,
+            polygonOffsetFill: true,
+            polygonOffset: [-1, -1],
+          },
+        })
+      : null;
+
+  // Filter out the selected case study from the marker data if a radar layer is present.
+  const markerData = radarLayer
+    ? caseStudies.filter(({ id }) => id !== selected?.id)
+    : caseStudies;
+
+  /**
    * Builds the vertical line layer from the ground up to each floating marker.
    */
   const pointers = new LineLayer({
     id: "case-study-pointers",
-    data: caseStudies,
+    data: markerData,
     getSourcePosition: ({ id }) => [...centroids.get(id), 0],
     getTargetPosition: ({ id }) => [...centroids.get(id), iconAltitude],
     getColor: [...accentRgb, 200],
@@ -318,7 +356,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     icons &&
     new IconLayer({
       id: "case-studies",
-      data: caseStudies,
+      data: markerData, // was data: caseStudies
       getPosition: ({ id }) => [...centroids.get(id), iconAltitude],
       getIcon: ({ id }) => ({
         id,
@@ -361,6 +399,38 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
               <>
                 <span className="badge">Sample content</span>
                 <h2>{selected.title}</h2>
+                <label className="radar-layer-select">
+                  <span>Radar layer</span>
+                  <div className="map-study-select-control">
+                    <select
+                      value={radarStage?.type ?? ""}
+                      disabled={!radarStages.length}
+                      aria-label="Radar layer"
+                      onChange={(event) =>
+                        setRadarStageType(event.target.value)
+                      }
+                    >
+                      {radarStages.length ? (
+                        radarStages.map((stage) => (
+                          <option key={stage.type} value={stage.type}>
+                            {stage.type === "leadUp"
+                              ? "Before"
+                              : stage.type === "event"
+                                ? "During"
+                                : "After"}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="">No imagery available</option>
+                      )}
+                    </select>
+                    <IconChevronDown
+                      className="map-study-chevron"
+                      aria-hidden="true"
+                      focusable="false"
+                    />
+                  </div>
+                </label>
                 <dl>
                   <dt>Type</dt>
                   <dd>{selected.type}</dd>
@@ -452,7 +522,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
               }}
               onTransitionEnd={() => setTransitionProps(null)}
               onTransitionInterrupt={() => setTransitionProps(null)}
-              layers={[fallbackBasemap, basemap, pointers, markers]}
+              layers={[fallbackBasemap, basemap, radarLayer, pointers, markers]}
               getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
             />
             <div className="toggle-view" role="group" aria-label="Map view">
