@@ -12,21 +12,6 @@ const globe = new GlobeView({ resolution: 10 });
 const initialView = { longitude: 70, latitude: 25, zoom: 2 };
 const mapView = new MapView({ repeat: true });
 
-const basemap = new TileLayer({
-  id: "basemap",
-  data: import.meta.env.VITE_SAT_TILES,
-  maxZoom: 19,
-  tileSize: 256,
-  renderSubLayers: (props) => {
-    const { west, south, east, north } = props.tile.bbox;
-    return new BitmapLayer(props, {
-      data: null,
-      image: props.data,
-      bounds: [west, south, east, north],
-    });
-  },
-});
-
 const ICON_PX = 128;
 const RING = 6;
 const BASE_ICON_ALTITUDE_METERS = 600000;
@@ -82,6 +67,23 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     BASE_ICON_ALTITUDE_METERS * 2 ** (initialView.zoom - zoom),
   );
   const [isGlobe, setIsGlobe] = useLocalStorage("isGlobe", false);
+  // Change from projected to globe view changes TileLayer id to for a fresh retrieval of tiles. Otherwise,
+  // old tiles may persist as off-putting rectangular patches on the globe.
+  const basemap = new TileLayer({
+    id: isGlobe ? "basemap-globe" : "basemap-map",
+    data: import.meta.env.VITE_SAT_TILES,
+    maxZoom: 19,
+    tileSize: 256,
+    refinementStrategy: isGlobe ? "never" : "best-available",
+    renderSubLayers: (props) => {
+      const { west, south, east, north } = props.tile.bbox;
+      return new BitmapLayer(props, {
+        data: null,
+        image: props.data,
+        bounds: [west, south, east, north],
+      });
+    },
+  });
 
   useEffect(() => {
     // When globe is toggled on, make sure that the new max zoom state is applied,
@@ -191,7 +193,13 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
           }}
           onViewStateChange={({ viewState: nextViewState }) => {
             const { longitude, latitude, zoom, pitch, bearing } = nextViewState;
-            setViewState({ longitude, latitude, zoom, pitch, bearing });
+            setViewState({
+              longitude,
+              latitude,
+              zoom,
+              pitch: isGlobe ? 0 : pitch,
+              bearing: isGlobe ? 0 : bearing,
+            });
           }}
           layers={[basemap, pointers, markers]}
           getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
