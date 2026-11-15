@@ -8,7 +8,7 @@ import Header from "./Header/Header.jsx";
 const chapters = [
   { key: "intro", label: "Overview", color: 0x5a6b8a, camera: [0, 12, 12] },
   {
-    key: "leadUp",
+    key: "before",
     label: "Lead-up",
     date: "start",
     color: 0x4f8a3c,
@@ -22,7 +22,7 @@ const chapters = [
     camera: [5, 5, 6],
   },
   {
-    key: "takeaway",
+    key: "after",
     label: "Takeaway",
     date: "end",
     color: 0x8a7a4f,
@@ -516,9 +516,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  const time = (k) => new Date(study.timeline[k]).getTime();
-  const span = time("end") - time("start");
-  const pos = (c) => ((time(c.date) - time("start")) / span) * 100;
+  const pos = (c) => (steps.indexOf(c) / (steps.length - 1)) * 100;
   const isLast = index === chapters.length - 1;
 
   return (
@@ -587,7 +585,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
             <>
               <p className="kicker">
                 {index}/{steps.length} · {chapter.label} ·{" "}
-                {study.timeline[chapter.date]}
+                {study.key_dates[chapter.date]}
               </p>
               <h2>{stage.headline}</h2>
               <p className="metric">
@@ -648,9 +646,6 @@ export default function CaseStudy({ study, onBack, onHome }) {
             <>
               <p className="kicker">Case study · {study.title}</p>
               <h2 className="headline">{study.headline}</h2>
-              <p className="metric">
-                <strong>{study.keyMetric.value}</strong> {study.keyMetric.label}
-              </p>
               <p>{study.story}</p>
               <button onClick={() => go(1)}>Begin the story →</button>
             </>
@@ -691,7 +686,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
             >
               <span className="dot" aria-hidden="true" />
               {c.label}
-              <small>{study.timeline[c.date]}</small>
+              <small>{study.key_dates[c.date]}</small>
             </button>
           ))}
         </div>
@@ -706,7 +701,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
 
       <p className="sr-only" aria-live="polite">
         {index
-          ? `Chapter ${index} of ${steps.length}: ${chapter.label}, ${study.timeline[chapter.date]}`
+          ? `Chapter ${index} of ${steps.length}: ${chapter.label}, ${study.key_dates[chapter.date]}`
           : "Overview"}
       </p>
     </div>

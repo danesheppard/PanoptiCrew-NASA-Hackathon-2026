@@ -213,12 +213,12 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     BASE_ICON_ALTITUDE_METERS * 2 ** (initialView.zoom - viewState.zoom),
   );
   const radarStages = selected?.coordinates
-    ? selected.stages.filter(
-        (stage) => stage.imagery && !stage.imagery.startsWith("Placeholder:"),
+    ? selected.layers.filter(
+        (stage) => stage.file && !stage.file.startsWith("Placeholder:"),
       )
     : [];
   const radarStage =
-    radarStages.find((stage) => stage.type === radarStageType) ??
+    radarStages.find((stage) => stage.name.includes(radarStageType)) ??
     radarStages[0];
   const radarLegend = radarStage?.legend;
   const hasRadarLegend =
@@ -331,9 +331,9 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
       ? new BitmapLayer({
           id: `radar-layer-${selected.case}-${radarStage.type}`,
           data: null,
-          image: radarStage.imagery.startsWith("/")
-            ? radarStage.imagery
-            : `/assets/geospatial/${radarStage.imagery}`,
+          image: radarStage.file.startsWith("/")
+            ? radarStage.file
+            : `/assets/geospatial/${radarStage.file}`,
           bounds: selected.coordinates,
           opacity: 0.75,
           parameters: {
@@ -427,12 +427,8 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
                     >
                       {radarStages.length ? (
                         radarStages.map((stage) => (
-                          <option key={stage.type} value={stage.type}>
-                            {stage.type === "leadUp"
-                              ? "Before"
-                              : stage.type === "event"
-                                ? "During"
-                                : "After"}
+                          <option key={stage.name} value={stage.name}>
+                            {stage.name}
                           </option>
                         ))
                       ) : (
@@ -453,7 +449,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
                   <dd>{selected.location}</dd>
                   <dt>Timeline</dt>
                   <dd>
-                    {selected.timeline.start} → {selected.timeline.end}
+                    {selected.key_dates.before} → {selected.key_dates.after}
                   </dd>
                 </dl>
                 <p>
