@@ -4,13 +4,13 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { calculateCentroid } from "../utilities.ts";
 import Header from "./Header/Header.jsx";
 
-// `date` maps each chapter to a key in study.timeline; `camera` frames that chapter.
+// `key` matches a study stage type; `date` maps to a key in study.key_dates.
 const chapters = [
   { key: "intro", label: "Overview", color: 0x5a6b8a, camera: [0, 12, 12] },
   {
-    key: "before",
+    key: "leadUp",
     label: "Lead-up",
-    date: "start",
+    date: "before",
     color: 0x4f8a3c,
     camera: [0, 8, 9],
   },
@@ -22,9 +22,9 @@ const chapters = [
     camera: [5, 5, 6],
   },
   {
-    key: "after",
+    key: "takeaway",
     label: "Takeaway",
-    date: "end",
+    date: "after",
     color: 0x8a7a4f,
     camera: [-6, 9, 7],
   },
