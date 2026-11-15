@@ -1,0 +1,75 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.3375,
+     17.5
+    ]
+   },
+   "properties": {
+    "name": "Caroline Bezengi (wreck)",
+    "km_along_path": 0.0
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.0153,
+     17.5168
+    ]
+   },
+   "properties": {
+    "name": "Al Hallaniyah",
+    "km_along_path": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     55.6097,
+     17.8853
+    ]
+   },
+   "properties": {
+    "name": "Shuwaymiyah",
+    "km_along_path": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     56.2721,
+     17.9385
+    ]
+   },
+   "properties": {
+    "name": "Sharbithat",
+    "km_along_path": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     57.7824,
+     18.9806
+    ]
+   },
+   "properties": {
+    "name": "Ras Madrakah",
+    "km_along_path": null
+   }
+  }
+ ]
+}

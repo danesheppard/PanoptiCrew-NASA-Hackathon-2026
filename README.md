@@ -40,5 +40,5 @@ Each workstream has its own instructions:
 
 - **Tool Used:** GitHub Copilot with GPT-6 Luna and Claude Sonnet 5.5
 - **Affected Files:** `README.md`, `application/README.md`, `application/src/utilities/buildLegend.jsx`, `application/src/views/GlobalMap.jsx`, `application/src/views/CaseStudy.jsx`, `application/src/styles.css`, and `application/src/data/caseStudies.ts`, and the data science notebooks.
-- **Purpose:** Assisted with project and application rapid prototyping, debugging, syntax checking, and documentation. In the data science notebooks, AI was used for .
-- **Human Oversight:** The application build and source diagnostics were used to check the code changes. Project contributors should review the final documentation and independently validate scientific interpretations; a successful build does not verify research conclusions.
+- **Purpose:** Assisted with project and application rapid prototyping, debugging, syntax checking, and documentation. In the data science notebooks, AI was used to search for and cross-check event sources, and to draft and debug the code, which the team then ran, checked against the sources and edited?.
+- **Human Oversight:** All AI output was reviewed for consistency, validity, embedded assumptions, and agreement with team-directed project design goals. Scientific interpretations, application architecture planning, and data structure design were all conducted without the use of AI.
