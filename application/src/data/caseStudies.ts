@@ -14,7 +14,7 @@ type EventStage = {
     type?: string;
   };
   timeline?: string;
-  replay?: string;
+  replay?: Array<[number, number]>;
   actions?: string[];
 };
 
