@@ -6,16 +6,11 @@ import { TileLayer } from "@deck.gl/geo-layers";
 import { BitmapLayer, IconLayer, LineLayer } from "@deck.gl/layers";
 import { IconWorld, IconMap } from "@tabler/icons-react";
 import { caseStudies } from "../data/caseStudies.ts";
+import { calculateCentroid } from "../utilities.ts";
 
 const globe = new GlobeView({ resolution: 10 });
 const initialView = { longitude: 70, latitude: 25, zoom: 2 };
 const mapView = new MapView({ repeat: true });
-
-const calculateCentroid = (coordinates) => {
-  if (coordinates.length === 2) return coordinates;
-  const [minLng, minLat, maxLng, maxLat] = coordinates;
-  return [(minLng + maxLng) / 2, (minLat + maxLat) / 2];
-};
 
 const basemap = new TileLayer({
   id: "basemap",

@@ -469,3 +469,31 @@ button.secondary {
   text-align: center;
   padding: 1rem;
 }
+
+.raster-controls {
+  display: grid;
+  gap: 0.6rem;
+  color: #c3cbe0;
+  font-size: 0.85rem;
+}
+
+.raster-controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.raster-controls input[type="checkbox"] {
+  accent-color: #ffd27a;
+}
+
+.raster-controls .raster-opacity input {
+  flex: 1;
+  min-width: 0;
+}
+
+.raster-controls p {
+  min-height: 1em;
+  margin: 0;
+  color: #9aa3b5;
+}

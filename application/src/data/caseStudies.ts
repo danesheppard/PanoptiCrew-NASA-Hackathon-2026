@@ -8,6 +8,7 @@ type EventStage = {
   question?: string;
   confidence: string;
   imagery: string;
+  tifLayer?: string;
   actions?: string[];
 };
 
@@ -69,22 +70,52 @@ export const caseStudies = [
     ] as StageArray,
   },
   {
-    id: "sample-flood",
-    title: "Sample Case Study: Flood",
+    id: "gandak-flood",
+    title: "Gandak Flood",
     type: "Flood",
     location: "Placeholder region, South Asia",
-    iconImage: "nepal.jpg",
-    iconSource: "Sample source for flood image",
-    coordinates: [90.4, 23.7],
-    headline: "Sample: river levels signaled the flood in advance",
+    iconImage: "jhenning-flood.jpg",
+    iconSource: "Image from jhenning via pixabay.com",
+    coordinates: [84.15, 26.1, 84.75, 26.6],
+    imageBounds: [
+      84.13646446971275, 26.085576677999846, 84.76620208267364,
+      26.614634172899674,
+    ],
+    headline: "Heavy rain in Nepal causes flooding",
     keyMetric: { label: "Sample inundated area", value: "0,000 km²" },
-    summary: "Sample one-sentence framing of why this flood matters.",
-    timeline: { start: "2025-05-01", event: "2025-06-20", end: "2025-08-01" },
+    summary:
+      "TO VALIDATE! IS THIS CORRECT? Heavy rain in Nepal on September 26-27, 2026 pushed the Gandak River to a record 91.25m at Bagaha. NISAR passed over the region during this period, capturing satellite imagery of the flooding.",
+    timeline: { start: "2026-08-11", event: "2026-09-28", end: "2026-10-10" },
     ...common,
     stages: [
-      placeholderLeadup,
-      placeholderEvent,
-      placeholderTakeaway,
+      {
+        type: "leadUp",
+        headline: "All is calm",
+        metric: { label: "Sample indicator change", value: "−00%" },
+        summary:
+          "On August 11, 2026, the river is clearly visible in the darker parts of the satellite imagery. This is largely unchanged compared to previous months.",
+        confidence: "High",
+        imagery: "hh_clean_2026-08-11.webp",
+      },
+      {
+        type: "event",
+        headline: "Heavy rain triggers flooding (IS THIS CORRECT?)",
+        metric: { label: "Sample event metric", value: "00" },
+        summary:
+          "Flooding occurs as the Gandak River overflows its banks on September 26-27, 2026.",
+        confidence: "High",
+        imagery: "flood_2026-09-04_2026-09-28.png",
+      },
+      {
+        type: "takeaway",
+        headline: "Flood aftermath",
+        metric: { label: "Sample takeaway metric", value: "00" },
+        summary:
+          "The floodwaters recede, leaving behind damaged infrastructure and affected communities.",
+        confidence: "Medium",
+        imagery: "flood_2026-09-28_2026-10-10.png",
+        actions: ["Sample recommended action 1", "Sample recommended action 2"],
+      },
     ] as StageArray,
   },
   {
