@@ -20,36 +20,10 @@
   margin: 0 auto;
 }
 
-.landing-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  align-self: stretch;
+.landing-page .header {
   width: 100%;
-  min-height: 4.5rem;
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.landing-brand {
   padding: 0;
-  border: 0;
   background: transparent;
-  color: var(--text);
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.landing-page button.landing-brand:hover {
-  background: transparent;
-  color: var(--accent);
-}
-
-.landing-challenge {
-  color: var(--muted);
-  font-size: 0.8rem;
-  text-align: right;
 }
 
 /* Hero layout and copy */
@@ -111,7 +85,7 @@
 }
 
 .landing-page button.landing-cta:hover {
-  background: #d7f791;
+  filter: brightness(1.05);
 }
 
 .landing-cta span {
@@ -128,7 +102,11 @@
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 50%;
-  background: radial-gradient(circle, #14221f 0%, var(--bg) 72%);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 10%, var(--bg)) 0%,
+    var(--bg) 72%
+  );
   isolation: isolate;
   animation: landing-enter 800ms 100ms ease-out both;
 }
@@ -147,8 +125,15 @@
   inset: 5%;
   border-radius: 50%;
   background-image:
-    linear-gradient(rgba(170, 179, 200, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(170, 179, 200, 0.055) 1px, transparent 1px);
+    linear-gradient(
+      color-mix(in srgb, var(--muted) 6%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--muted) 6%, transparent) 1px,
+      transparent 1px
+    );
   background-size: 10% 10%;
   mask-image: radial-gradient(circle, #000 48%, transparent 76%);
 }
@@ -168,7 +153,7 @@
   top: 50%;
   left: 50%;
   aspect-ratio: 1;
-  border: 1px solid rgba(198, 243, 107, 0.22);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
   border-radius: 50%;
   transform: translate(-50%, -50%);
 }
@@ -190,7 +175,7 @@
   top: 50%;
   left: 9%;
   width: 82%;
-  border-top: 1px solid rgba(198, 243, 107, 0.14);
+  border-top: 1px solid color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
 .radar-crosshair-vertical {
@@ -204,9 +189,9 @@
   background: conic-gradient(
     from 0deg,
     transparent 0deg 292deg,
-    rgba(198, 243, 107, 0.02) 316deg,
-    rgba(198, 243, 107, 0.2) 350deg,
-    rgba(198, 243, 107, 0.48) 359deg,
+    color-mix(in srgb, var(--accent) 2%, transparent) 316deg,
+    color-mix(in srgb, var(--accent) 20%, transparent) 350deg,
+    color-mix(in srgb, var(--accent) 48%, transparent) 359deg,
     transparent 360deg
   );
   animation: radar-rotate 6s linear infinite;
@@ -218,15 +203,15 @@
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 12px rgba(198, 243, 107, 0.75);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 75%, transparent);
   animation: radar-pulse 2.2s ease-out infinite;
 }
 
 .radar-dot-one {
   top: 32%;
   left: 13%;
-  background: #ef9b55;
-  box-shadow: 0 0 12px rgba(239, 155, 85, 0.8);
+  background: var(--warn-text);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--warn-text) 80%, transparent);
   animation-delay: 0.5s;
 }
 
@@ -318,7 +303,7 @@
   width: 2.3rem;
   aspect-ratio: 1;
   place-items: center;
-  border: 1px solid rgba(198, 243, 107, 0.45);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
   border-radius: 50%;
   color: var(--accent);
   font-size: 0.72rem;
@@ -399,12 +384,8 @@
     padding: 3rem 0;
   }
 
-  .landing-topbar {
+  .landing-page .header {
     min-height: 4rem;
-  }
-
-  .landing-challenge {
-    max-width: 9rem;
   }
 
   .landing-steps {

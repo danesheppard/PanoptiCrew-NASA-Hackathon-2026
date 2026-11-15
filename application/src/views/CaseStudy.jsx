@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { calculateCentroid } from "../utilities.ts";
+import Header from "./Header/Header.jsx";
 
 // `date` maps each chapter to a key in study.timeline; `camera` frames that chapter.
 const chapters = [
@@ -240,7 +241,7 @@ function buildSkirt(plane, base) {
   return geometry;
 }
 
-export default function CaseStudy({ study, onBack }) {
+export default function CaseStudy({ study, onBack, onHome }) {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
   const flyRef = useRef(null);
@@ -510,6 +511,7 @@ export default function CaseStudy({ study, onBack }) {
 
   return (
     <div className="case-view">
+      <Header onHome={onHome} />
       <header className="case-bar">
         <button className="link" onClick={onBack}>
           ← Map

@@ -1,22 +1,22 @@
 export const team = [
   {
-    initials: "S",
-    name: "Sandya",
+    initials: "SVS",
+    name: "Sandya Vaigundam Sadasivam",
     role: "Application Developer",
   },
   {
-    initials: "DS",
-    name: "Data Scientist One",
+    initials: "IM",
+    name: "Israel Maikyau",
+    role: "Data Scientist",
+  },
+  {
+    initials: "EIDT",
+    name: "Elhadj Ibrahima Dit D. Traoré",
     role: "Data Scientist",
   },
   {
     initials: "DS",
-    name: "Data Scientist Two",
-    role: "Data Scientist",
-  },
-  {
-    initials: "PL",
-    name: "Project Lead",
+    name: "Dane Sheppard",
     role: "Project Lead",
   },
 ];

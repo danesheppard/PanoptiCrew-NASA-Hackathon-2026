@@ -1,4 +1,5 @@
 import { team } from "../../data/team.js";
+import Header from "../Header/Header.jsx";
 import RadarScope from "./RadarScope.jsx";
 import "./LandingPage.css";
 
@@ -36,19 +37,9 @@ export default function LandingPage({ onStart }) {
   return (
     <main className="landing-page">
       <div className="landing-first-screen">
-        {/* Top navigation bar with brand and challenge info */}
-        <header className="landing-topbar">
-          <button
-            className="landing-brand"
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          >
-            PanoptiCrew
-          </button>
-          <span className="landing-challenge">
-            NASA Space Apps Challenge 2026
-          </span>
-        </header>
+        <Header
+          onHome={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        />
 
         {/* Hero section with radar scope and introductory copy */}
         <section
