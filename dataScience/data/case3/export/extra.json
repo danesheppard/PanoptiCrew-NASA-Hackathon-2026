@@ -1,0 +1,248 @@
+{
+  "image_corners": [
+    [
+      -120.06630294441175,
+      49.75039621809274
+    ],
+    [
+      -119.6158396089105,
+      49.75039621809274
+    ],
+    [
+      -119.6158396089105,
+      49.469633027938436
+    ],
+    [
+      -120.06630294441175,
+      49.469633027938436
+    ]
+  ],
+  "image_corners_order": "top-left, top-right, bottom-right, bottom-left, as [lon, lat]",
+  "raster_crs": "EPSG:32611",
+  "pixel_m": 20,
+  "product": "NISAR_L2_GCOV_PROVISIONAL_V1",
+  "track": "071D frame 063",
+  "channel": "HV",
+  "dates": [
+    "2026-06-19",
+    "2026-07-01",
+    "2026-07-13",
+    "2026-07-25",
+    "2026-08-18",
+    "2026-08-30",
+    "2026-09-11",
+    "2026-09-23",
+    "2026-10-05",
+    "2026-10-17"
+  ],
+  "fire": {
+    "name": "Bald Range wildfire",
+    "fire_number": "K51490",
+    "start": "2026-08-07",
+    "official_size_ha": 25163.2
+  },
+  "files": {
+    "radar_raw": {
+      "2026-06-19": "case3/hv_raw_2026-06-19.webp",
+      "2026-07-01": "case3/hv_raw_2026-07-01.webp",
+      "2026-07-13": "case3/hv_raw_2026-07-13.webp",
+      "2026-07-25": "case3/hv_raw_2026-07-25.webp",
+      "2026-08-18": "case3/hv_raw_2026-08-18.webp",
+      "2026-08-30": "case3/hv_raw_2026-08-30.webp",
+      "2026-09-11": "case3/hv_raw_2026-09-11.webp",
+      "2026-09-23": "case3/hv_raw_2026-09-23.webp",
+      "2026-10-05": "case3/hv_raw_2026-10-05.webp",
+      "2026-10-17": "case3/hv_raw_2026-10-17.webp"
+    },
+    "radar_clean": {
+      "2026-06-19": "case3/hv_clean_2026-06-19.webp",
+      "2026-07-01": "case3/hv_clean_2026-07-01.webp",
+      "2026-07-13": "case3/hv_clean_2026-07-13.webp",
+      "2026-07-25": "case3/hv_clean_2026-07-25.webp",
+      "2026-08-18": "case3/hv_clean_2026-08-18.webp",
+      "2026-08-30": "case3/hv_clean_2026-08-30.webp",
+      "2026-09-11": "case3/hv_clean_2026-09-11.webp",
+      "2026-09-23": "case3/hv_clean_2026-09-23.webp",
+      "2026-10-05": "case3/hv_clean_2026-10-05.webp",
+      "2026-10-17": "case3/hv_clean_2026-10-17.webp"
+    },
+    "radar_values": {
+      "2026-06-19": "case3/hv_clean_2026-06-19.tif",
+      "2026-07-01": "case3/hv_clean_2026-07-01.tif",
+      "2026-07-13": "case3/hv_clean_2026-07-13.tif",
+      "2026-07-25": "case3/hv_clean_2026-07-25.tif",
+      "2026-08-18": "case3/hv_clean_2026-08-18.tif",
+      "2026-08-30": "case3/hv_clean_2026-08-30.tif",
+      "2026-09-11": "case3/hv_clean_2026-09-11.tif",
+      "2026-09-23": "case3/hv_clean_2026-09-23.tif",
+      "2026-10-05": "case3/hv_clean_2026-10-05.tif",
+      "2026-10-17": "case3/hv_clean_2026-10-17.tif"
+    },
+    "burn_codes": {
+      "2026-08-18": "case3/burn_2026-08-18.tif",
+      "2026-08-30": "case3/burn_2026-08-30.tif",
+      "2026-09-11": "case3/burn_2026-09-11.tif",
+      "2026-09-23": "case3/burn_2026-09-23.tif",
+      "2026-10-05": "case3/burn_2026-10-05.tif",
+      "2026-10-17": "case3/burn_2026-10-17.tif"
+    }
+  },
+  "encodings": {
+    "radar_webp": {
+      "db_min": -25.0,
+      "db_max": -5.0,
+      "formula": "dB = db_min + (db_max - db_min) * grey / 255",
+      "no_data": "alpha 0"
+    },
+    "radar_tif": {
+      "dtype": "uint8",
+      "pixel_m": 40,
+      "formula": "dB = -40.0 + 0.25 * value",
+      "no_data": 255
+    },
+    "burn_tif": {
+      "dtype": "uint8",
+      "codes": {
+        "0": "no canopy change",
+        "1": "canopy loss",
+        "2": "severe canopy loss"
+      },
+      "no_data": 255
+    }
+  },
+  "stats": {
+    "thresholds": {
+      "loss_db": -1.0,
+      "severe_db": -2.0,
+      "noise_db": 0.59,
+      "common_change_db": 0.1,
+      "how": "relative HV change = HV change minus the median change of an unburned ring 1 to 6 km outside the perimeter; loss = 2 x and severe = 3 x the standard deviation in the ring, rounded",
+      "vegetated_min_hv_db": -18.0,
+      "min_patch_pixels": 9
+    },
+    "canopy_loss_km2_by_date": {
+      "2026-08-18": {
+        "canopy loss": 40.5,
+        "severe canopy loss": 7.4
+      },
+      "2026-08-30": {
+        "canopy loss": 65.5,
+        "severe canopy loss": 7.4
+      },
+      "2026-09-11": {
+        "canopy loss": 53.6,
+        "severe canopy loss": 29.0
+      },
+      "2026-09-23": {
+        "canopy loss": 51.5,
+        "severe canopy loss": 39.2
+      },
+      "2026-10-05": {
+        "canopy loss": 47.9,
+        "severe canopy loss": 32.1
+      },
+      "2026-10-17": {
+        "canopy loss": 47.9,
+        "severe canopy loss": 44.2
+      }
+    },
+    "time_series_inside_outside_km2": [
+      {
+        "date": "2026-06-19",
+        "inside perimeter (km²)": 4.9,
+        "outside perimeter (km²)": 7.8,
+        "perimeter covered %": 100.0
+      },
+      {
+        "date": "2026-07-01",
+        "inside perimeter (km²)": 4.0,
+        "outside perimeter (km²)": 6.6,
+        "perimeter covered %": 100.0
+      },
+      {
+        "date": "2026-07-13",
+        "inside perimeter (km²)": 1.2,
+        "outside perimeter (km²)": 2.9,
+        "perimeter covered %": 100.0
+      },
+      {
+        "date": "2026-08-18",
+        "inside perimeter (km²)": 41.0,
+        "outside perimeter (km²)": 6.9,
+        "perimeter covered %": 100.0
+      },
+      {
+        "date": "2026-08-30",
+        "inside perimeter (km²)": 40.6,
+        "outside perimeter (km²)": 32.4,
+        "perimeter covered %": 97.3
+      },
+      {
+        "date": "2026-09-11",
+        "inside perimeter (km²)": 74.2,
+        "outside perimeter (km²)": 8.5,
+        "perimeter covered %": 99.7
+      },
+      {
+        "date": "2026-09-23",
+        "inside perimeter (km²)": 82.5,
+        "outside perimeter (km²)": 8.2,
+        "perimeter covered %": 99.1
+      },
+      {
+        "date": "2026-10-05",
+        "inside perimeter (km²)": 69.9,
+        "outside perimeter (km²)": 10.1,
+        "perimeter covered %": 91.9
+      },
+      {
+        "date": "2026-10-17",
+        "inside perimeter (km²)": 82.5,
+        "outside perimeter (km²)": 9.7,
+        "perimeter covered %": 75.4
+      }
+    ],
+    "perimeter_check": {
+      "inside_pct": 89.7,
+      "perimeter_flagged_pct": 29.6,
+      "outside_km2": 8.5
+    },
+    "optical_validation": [
+      {
+        "optical burn severity (dNBR)": "unburned",
+        "area in the box (km²)": 477.7,
+        "radar relative ΔHV, median (dB)": 0.02,
+        "flagged canopy loss by the radar %": 1.9,
+        "flagged severe by the radar %": 0.1
+      },
+      {
+        "optical burn severity (dNBR)": "low",
+        "area in the box (km²)": 106.4,
+        "radar relative ΔHV, median (dB)": -0.16,
+        "flagged canopy loss by the radar %": 6.2,
+        "flagged severe by the radar %": 0.5
+      },
+      {
+        "optical burn severity (dNBR)": "moderate-low",
+        "area in the box (km²)": 54.9,
+        "radar relative ΔHV, median (dB)": -0.41,
+        "flagged canopy loss by the radar %": 16.8,
+        "flagged severe by the radar %": 2.4
+      },
+      {
+        "optical burn severity (dNBR)": "moderate-high",
+        "area in the box (km²)": 42.0,
+        "radar relative ΔHV, median (dB)": -1.01,
+        "flagged canopy loss by the radar %": 48.5,
+        "flagged severe by the radar %": 15.2
+      },
+      {
+        "optical burn severity (dNBR)": "high",
+        "area in the box (km²)": 45.9,
+        "radar relative ΔHV, median (dB)": -1.86,
+        "flagged canopy loss by the radar %": 81.7,
+        "flagged severe by the radar %": 44.0
+      }
+    ]
+  }
+}
