@@ -36,7 +36,36 @@ const MIN_ICON_ALTITUDE_METERS = 5000;
 const MIN_ZOOM = 2;
 const MAX_ZOOM = 10;
 
-// Center-crops the image into a circle with a white ring; a missing image leaves a blue disc.
+/**
+ * Theme for the map icons and other UI elements.
+ *
+ * @param {string} token - The CSS variable token representing the theme color.
+ * @returns {string} The computed color value.
+ */
+const getThemeColor = (token) =>
+  getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+
+/**
+ * Converts a CSS theme color to its RGB representation.
+ *
+ * @param {string} token - The CSS variable token representing the theme color.
+ *
+ * @returns {Array<number>} The RGB representation of the theme color.
+ */
+const getThemeRgb = (token) => {
+  const hex = getThemeColor(token).slice(1);
+  return [0, 2, 4].map((index) =>
+    Number.parseInt(hex.slice(index, index + 2), 16),
+  );
+};
+
+/**
+ * Creates a circular icon for a case study, optionally overlaying an image.
+ *
+ * @param {Object} options
+ * @param {string} options.iconImage - The filename of the image to overlay on the icon.
+ * @returns {Promise<string>} A data URL representing the generated icon.
+ */
 async function circleIcon({ iconImage }) {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = ICON_PX;
@@ -45,7 +74,7 @@ async function circleIcon({ iconImage }) {
 
   ctx.beginPath();
   ctx.arc(r, r, r - RING / 2, 0, Math.PI * 2);
-  ctx.fillStyle = "#0b3d91";
+  ctx.fillStyle = getThemeColor("--accent");
   ctx.fill();
   try {
     const img = new Image();
@@ -70,7 +99,7 @@ async function circleIcon({ iconImage }) {
     // keep the plain disc
   }
   ctx.lineWidth = RING;
-  ctx.strokeStyle = "#fff";
+  ctx.strokeStyle = getThemeColor("--text");
   ctx.stroke();
   return canvas.toDataURL();
 }
@@ -101,7 +130,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
       ...calculateCentroid(coordinates),
       iconAltitude,
     ],
-    getColor: [255, 255, 255, 200],
+    getColor: [...getThemeRgb("--accent"), 200],
     getWidth: 2,
     widthUnits: "pixels",
     parameters: { depthTest: true, cullMode: "none" },
