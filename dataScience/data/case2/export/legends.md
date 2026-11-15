@@ -4,7 +4,7 @@ The standard `Legend` in `caseStudies.ts` is a colour **gradient** with a low-en
 
 Transparent pixels on these images mean no change or no data.
 
-### Flood maps (`flood/flood_*.png`): event and takeaway stages
+### Flood maps (`flood_*.png`): event and takeaway stages
 
 | Hex | RGB | Label |
 |---|---|---|
@@ -14,12 +14,12 @@ Transparent pixels on these images mean no change or no data.
 | `#6a51a3` | `[106, 81, 163]` | Brighter: villages, crops, trees standing in water |
 | `#5ab4ac` | `[90, 180, 172]` | Darker: possibly submerged vegetation |
 
-### Open water per date (`water/water_*.png`)
+### Open water per date (`water_*.png`)
 
 | Hex | RGB | Label |
 |---|---|---|
 | `#c6dbef` | `[198, 219, 239]` | Open water on this date |
 
-### Radar images (`radar/*.webp`): a real gradient
+### Radar images (`hh_*.webp`): a real gradient
 
 Grey from black (-25 dB, calm water) to white (0 dB, villages and dense crops); the standard gradient legend is enough.
