@@ -1,0 +1,143 @@
+{
+  "fire": {
+    "name": "Bald Range wildfire",
+    "fire_number": "K51490",
+    "start": "2026-08-07",
+    "official_size_ha": 25163.2
+  },
+  "thresholds": {
+    "loss_db": -1.0,
+    "severe_db": -2.0,
+    "how": "relative HV change = HV change minus the median change of an unburned ring 1 to 6 km outside the perimeter; normal movement (standard deviation) in the ring 0.59 dB; loss = 2 x, severe = 3 x, rounded",
+    "common_change_db": 0.1,
+    "vegetated_min_hv_db": -18.0,
+    "min_patch_pixels": 9
+  },
+  "main_result": {
+    "before": "2026-07-25",
+    "after": "2026-09-11",
+    "canopy loss": 53.6,
+    "severe canopy loss": 29.0,
+    "inside_perimeter_pct": 89.7,
+    "perimeter_flagged_pct": 29.6
+  },
+  "canopy_loss_km2_by_date": {
+    "2026-08-18": {
+      "canopy loss": 40.5,
+      "severe canopy loss": 7.4
+    },
+    "2026-08-30": {
+      "canopy loss": 65.5,
+      "severe canopy loss": 7.4
+    },
+    "2026-09-11": {
+      "canopy loss": 53.6,
+      "severe canopy loss": 29.0
+    },
+    "2026-09-23": {
+      "canopy loss": 51.5,
+      "severe canopy loss": 39.2
+    },
+    "2026-10-05": {
+      "canopy loss": 47.9,
+      "severe canopy loss": 32.1
+    },
+    "2026-10-17": {
+      "canopy loss": 47.9,
+      "severe canopy loss": 44.2
+    }
+  },
+  "time_series_inside_outside_km2": [
+    {
+      "date": "2026-06-19",
+      "inside perimeter (km\u00b2)": 4.9,
+      "outside perimeter (km\u00b2)": 7.8,
+      "perimeter covered %": 100.0
+    },
+    {
+      "date": "2026-07-01",
+      "inside perimeter (km\u00b2)": 4.0,
+      "outside perimeter (km\u00b2)": 6.6,
+      "perimeter covered %": 100.0
+    },
+    {
+      "date": "2026-07-13",
+      "inside perimeter (km\u00b2)": 1.2,
+      "outside perimeter (km\u00b2)": 2.9,
+      "perimeter covered %": 100.0
+    },
+    {
+      "date": "2026-08-18",
+      "inside perimeter (km\u00b2)": 41.0,
+      "outside perimeter (km\u00b2)": 6.9,
+      "perimeter covered %": 100.0
+    },
+    {
+      "date": "2026-08-30",
+      "inside perimeter (km\u00b2)": 40.6,
+      "outside perimeter (km\u00b2)": 32.4,
+      "perimeter covered %": 97.3
+    },
+    {
+      "date": "2026-09-11",
+      "inside perimeter (km\u00b2)": 74.2,
+      "outside perimeter (km\u00b2)": 8.5,
+      "perimeter covered %": 99.7
+    },
+    {
+      "date": "2026-09-23",
+      "inside perimeter (km\u00b2)": 82.5,
+      "outside perimeter (km\u00b2)": 8.2,
+      "perimeter covered %": 99.1
+    },
+    {
+      "date": "2026-10-05",
+      "inside perimeter (km\u00b2)": 69.9,
+      "outside perimeter (km\u00b2)": 10.1,
+      "perimeter covered %": 91.9
+    },
+    {
+      "date": "2026-10-17",
+      "inside perimeter (km\u00b2)": 82.5,
+      "outside perimeter (km\u00b2)": 9.7,
+      "perimeter covered %": 75.4
+    }
+  ],
+  "optical_validation": [
+    {
+      "optical burn severity (dNBR)": "unburned",
+      "area in the box (km\u00b2)": 477.7,
+      "radar relative \u0394HV, median (dB)": 0.02,
+      "flagged canopy loss by the radar %": 1.9,
+      "flagged severe by the radar %": 0.1
+    },
+    {
+      "optical burn severity (dNBR)": "low",
+      "area in the box (km\u00b2)": 106.4,
+      "radar relative \u0394HV, median (dB)": -0.16,
+      "flagged canopy loss by the radar %": 6.2,
+      "flagged severe by the radar %": 0.5
+    },
+    {
+      "optical burn severity (dNBR)": "moderate-low",
+      "area in the box (km\u00b2)": 54.9,
+      "radar relative \u0394HV, median (dB)": -0.41,
+      "flagged canopy loss by the radar %": 16.8,
+      "flagged severe by the radar %": 2.4
+    },
+    {
+      "optical burn severity (dNBR)": "moderate-high",
+      "area in the box (km\u00b2)": 42.0,
+      "radar relative \u0394HV, median (dB)": -1.01,
+      "flagged canopy loss by the radar %": 48.5,
+      "flagged severe by the radar %": 15.2
+    },
+    {
+      "optical burn severity (dNBR)": "high",
+      "area in the box (km\u00b2)": 45.9,
+      "radar relative \u0394HV, median (dB)": -1.86,
+      "flagged canopy loss by the radar %": 81.7,
+      "flagged severe by the radar %": 44.0
+    }
+  ]
+}
