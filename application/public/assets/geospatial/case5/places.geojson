@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "places",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "name": "Namaygoosisagagun First Nation (Collins)", "kind": "community" }, "geometry": { "type": "Point", "coordinates": [ -89.445996, 50.295157 ] } },
+{ "type": "Feature", "properties": { "name": "Whitewater Lake First Nation", "kind": "community" }, "geometry": { "type": "Point", "coordinates": [ -89.16825, 50.789812 ] } },
+{ "type": "Feature", "properties": { "name": "Armstrong and Whitesand First Nation", "kind": "community" }, "geometry": { "type": "Point", "coordinates": [ -89.041809, 50.304886 ] } },
+{ "type": "Feature", "properties": { "name": "Wabakimi Provincial Park", "kind": "park" }, "geometry": { "type": "Point", "coordinates": [ -89.61903, 50.62167 ] } }
+]
+}
