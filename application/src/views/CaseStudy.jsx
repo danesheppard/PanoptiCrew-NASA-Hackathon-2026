@@ -249,6 +249,17 @@ export default function CaseStudy({ study, onBack, onHome }) {
   const [index, setIndex] = useState(0);
   const chapter = chapters[index];
   const stage = study.stages.find((item) => item.type === chapter.key);
+  const legend = stage?.legend;
+  const hasLegend =
+    Array.isArray(legend?.gradient) &&
+    legend.gradient.length >= 2 &&
+    typeof legend.labels?.lowEnd === "string" &&
+    typeof legend.labels?.highEnd === "string";
+  const legendGradient = hasLegend
+    ? `linear-gradient(to right, ${legend.gradient
+        .map(([red, green, blue]) => `rgb(${red} ${green} ${blue})`)
+        .join(", ")})`
+    : undefined;
   const overlayAvailable = Boolean(
     study.imageBounds && stage?.imagery && /\.(png|webp)$/i.test(stage.imagery),
   );
@@ -344,10 +355,11 @@ export default function CaseStudy({ study, onBack, onHome }) {
       })
       .catch((err) => err.name !== "AbortError" && console.warn(err));
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
-    sun.position.set(5, 10, 5);
-    scene.add(sun);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x8a877d, 1.8));
+    scene.add(new THREE.AmbientLight(0xffffff, 2.95));
+    // const sun = new THREE.DirectionalLight(0xffffff, 5.2);
+    // sun.position.set(5, 10, 5);
+    // scene.add(sun);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.mouseButtons = {
@@ -543,6 +555,24 @@ export default function CaseStudy({ study, onBack, onHome }) {
           role="img"
           aria-label={`3D terrain of ${study.location}, ${chapter.label} view`}
         />
+        {hasLegend && (
+          <div
+            className="stage-legend case-legend"
+            role="group"
+            aria-label={`${chapter.label} map legend`}
+          >
+            <span className="stage-legend-title">Map legend</span>
+            <div
+              className="stage-legend-gradient"
+              style={{ background: legendGradient }}
+              aria-hidden="true"
+            />
+            <div className="stage-legend-labels">
+              <span>{legend.labels.lowEnd}</span>
+              <span>{legend.labels.highEnd}</span>
+            </div>
+          </div>
+        )}
 
         <article
           key={chapter.key}

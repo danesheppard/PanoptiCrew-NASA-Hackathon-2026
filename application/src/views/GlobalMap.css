@@ -186,7 +186,7 @@
 .toggle-view {
   position: absolute;
   left: 1rem;
-  bottom: 1rem;
+  top: 1rem;
   z-index: 1;
   display: inline-flex;
   align-items: center;
@@ -196,6 +196,13 @@
   border-radius: 8px;
   background: rgba(11, 16, 32, 0.94);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.map-legend {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  z-index: 1;
 }
 
 .toggle-view-option {

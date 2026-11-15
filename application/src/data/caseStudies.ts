@@ -8,7 +8,12 @@ type EventStage = {
   question?: string;
   confidence: string;
   imagery: string;
-  tifLayer?: string;
+  legend?: {
+    gradient: [number, number, number][];
+    labels: { lowEnd: string; highEnd: string };
+  };
+  timeline?: string;
+  replay?: string;
   actions?: string[];
 };
 
@@ -126,6 +131,7 @@ export const caseStudies = [
     iconImage: "nepal.jpg",
     iconSource: "Arjay Neyra via pexels.com",
     coordinates: [85.25, 28.1, 85.6, 28.4],
+    imageBounds: [85.25, 28.1, 85.6, 28.4],
     headline: "Devestating landslide in Bhotekoshi, Nepal",
     keyMetric: { label: "Sample area affected", value: "00 ha" },
     summary:
@@ -137,28 +143,73 @@ export const caseStudies = [
     stages: [
       {
         type: "leadUp",
-        headline: "Sample warning signal headline",
-        metric: { label: "Sample indicator change", value: "−00%" },
-        summary: "Sample text describing conditions before the event.",
+        headline: "NISAR was watching the valley every few days",
+        metric: {
+          label: "Last pass before the collapse",
+          value: "7 days before",
+        },
+        summary:
+          "Before 26 August, NISAR passed over the valley every few days. Each pass is compared with the one 12 days earlier: where the ground stays the same, the radar picture stays the same too. Through June, July and August the valley looked normal, steady on the slopes and always changing on the snow and ice. The last pass before the collapse was on 19 August.",
         confidence: "Medium",
-        imagery: 'Placeholder: "before" satellite imagery',
+        imagery: "coherence_baseline.png",
+        legend: {
+          gradient: [
+            [68, 1, 84],
+            [59, 82, 139],
+            [33, 145, 140],
+            [94, 201, 98],
+            [253, 231, 37],
+          ],
+          labels: { lowEnd: "Always changing", highEnd: "Stable" },
+        },
+        timeline: "coherence/pairs",
       },
       {
         type: "event",
-        headline: "Sample event headline",
-        metric: { label: "Sample event metric", value: "00" },
-        summary: "Sample text describing the event.",
+        headline: "The flood path shows up as ground that changed",
+        metric: {
+          label: "Ground that changed more than usual",
+          value: "11 km²",
+        },
+        summary:
+          "Comparing the passes on 19 August and 31 August, the valley floor changed along a 44 km line, from the collapse site below Langtang Lirung, through Rasuwagadhi and Timure, to Syabrubesi. That is the path of the debris flood: ground torn up, buried or scoured between the two passes.",
         confidence: "High",
-        imagery: 'Placeholder: "during" satellite imagery',
+        imagery: "coherence_change.png",
+        legend: {
+          gradient: [
+            [252, 171, 143],
+            [248, 93, 66],
+            [197, 23, 28],
+            [103, 0, 13],
+          ],
+          labels: { lowEnd: "Small decrease", highEnd: "Large decrease" },
+        },
+        replay: "flood_path.geojson",
       },
       {
         type: "takeaway",
-        headline: "Sample takeaway headline",
-        metric: { label: "Sample takeaway metric", value: "00" },
-        summary: "Sample text describing the aftermath and lessons learned.",
+        headline: "Radar maps the damage through cloud, within days",
+        metric: { label: "Urgent Response started", value: "2 days after" },
+        summary:
+          "Radar sees through monsoon cloud, day or night, so within a week of the collapse NISAR had mapped the whole flood path. Along the river, the radar signal from vegetation dropped over about 15 km², where trees and plants were stripped away. Two days after the collapse, NISAR moved the area to Urgent Response, processing new passes faster.",
         confidence: "Medium",
-        imagery: 'Placeholder: "after" satellite imagery',
-        actions: ["Sample recommended action 1", "Sample recommended action 2"],
+        imagery: "hv_darkening.png",
+        legend: {
+          gradient: [
+            [157, 202, 225],
+            [79, 155, 203],
+            [25, 102, 173],
+            [8, 48, 107],
+          ],
+          labels: {
+            lowEnd: "Slightly darker (",
+            highEnd: "Much darker (vegetation lost)",
+          },
+        },
+        actions: [
+          "Use 12-day coherence to map damage along a valley soon after a collapse, even under monsoon cloud",
+          "Keep regular passes over hanging glaciers above inhabited valleys",
+        ],
       },
     ] as StageArray,
     // Example usage:

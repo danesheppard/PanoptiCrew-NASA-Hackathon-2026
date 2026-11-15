@@ -142,6 +142,54 @@ button.secondary {
   inset: 0;
 }
 
+.stage-legend {
+  position: absolute;
+  z-index: 1;
+  width: min(20rem, calc(100% - 2rem));
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #4a5878;
+  border-radius: 4px;
+  background: rgba(11, 16, 32, 0.94);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  color: #e8ebf3;
+  font-size: 0.75rem;
+}
+
+.stage-legend-title {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: #aab3c8;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.stage-legend-gradient {
+  height: 0.65rem;
+  border: 1px solid rgba(232, 235, 243, 0.45);
+  border-radius: 2px;
+}
+
+.stage-legend-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+}
+
+.stage-legend-labels span {
+  max-width: 50%;
+  overflow-wrap: anywhere;
+}
+
+.stage-legend-labels span:last-child {
+  text-align: right;
+}
+
+.case-legend {
+  top: 1rem;
+  right: 1rem;
+}
+
 .story-card {
   position: absolute;
   top: 1rem;
