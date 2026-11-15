@@ -872,7 +872,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
         </article>
 
         <p className="scene-hint">
-          Drag to orbit · Scroll to zoom · ← → to navigate
+          Drag to pan · Scroll to zoom · ← → to navigate
         </p>
       </div>
 

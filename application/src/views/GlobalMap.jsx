@@ -36,6 +36,13 @@ const MIN_ZOOM = 2;
 const MAX_ZOOM = 13;
 const GLOBE_MIN_ZOOM = 4; // was MAX_ZOOM / 2 (4)
 
+// Story stages in order; `date` maps to a key in study.key_dates.
+const STAGE_LABELS = [
+  { type: "leadUp", label: "Lead-up", date: "before" },
+  { type: "event", label: "Event", date: "event" },
+  { type: "takeaway", label: "Takeaway", date: "after" },
+];
+
 // Case studies are static, so their centroids are computed once instead of on every render.
 const centroids = new Map(
   caseStudies.map((study) => [
@@ -212,6 +219,8 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     radarStages.find((stage) => stage.name.includes(radarStageType)) ??
     radarStages[0];
   const radarLegend = radarStage?.legend;
+  const eventStage = selected?.stages.find((s) => s.type === "event");
+  const takeawayStage = selected?.stages.find((s) => s.type === "takeaway");
   /**
    * Builds the main basemap layer for high-detail tiles.
    * Change from projected to globe view requires updating the TileLayer id for a fresh retrieval of tiles.
@@ -263,6 +272,8 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     //   transitionInterpolator: isGlobe ? globeInterpolator : flatInterpolator,
     //   transitionEasing: easeInOut,
     // });
+    // When moving the camera, enforce a minimum zoom to ensure a good view of the target area
+    target.zoom = Math.max(target.zoom ?? 0, MAX_ZOOM / 1.5);
     setViewState((prev) => ({
       ...prev,
       ...target,
@@ -271,6 +282,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
         : target.longitude,
       pitch: 0,
       bearing: 0,
+      zoom: target.zoom,
       transitionInterpolator: new FlyToInterpolator({ speed: 1.2 }),
       transitionDuration: duration,
     }));
@@ -396,6 +408,40 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
             {selected ? (
               <>
                 <h2>{selected.title}</h2>
+                <p className="panel-meta">
+                  {[selected.type, selected.location]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+                {eventStage && (
+                  <p className="metric">
+                    <strong>{eventStage.metric.value}</strong>{" "}
+                    {eventStage.metric.label}
+                  </p>
+                )}
+                {takeawayStage && (
+                  <section aria-labelledby="why-it-matters">
+                    <h3 id="why-it-matters">Why it matters</h3>
+                    <p className="panel-headline">{takeawayStage.headline}</p>
+                    <p>{takeawayStage.summary}</p>
+                  </section>
+                )}
+                <h3>The story</h3>
+                <ol className="stage-preview">
+                  {STAGE_LABELS.map(({ type, label, date }) => {
+                    const stage = selected.stages.find((s) => s.type === type);
+                    return (
+                      stage && (
+                        <li key={type}>
+                          <span className="stage-preview-label">
+                            {label} · {selected.key_dates[date]}
+                          </span>
+                          {stage.headline}
+                        </li>
+                      )
+                    );
+                  })}
+                </ol>
                 <label className="radar-layer-select">
                   <span>Radar layer</span>
                   <div className="map-study-select-control">
@@ -424,28 +470,42 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
                     />
                   </div>
                 </label>
-                <dl>
-                  <dt>Type</dt>
-                  <dd>{selected.type}</dd>
-                  <dt>Location</dt>
-                  <dd>{selected.location}</dd>
-                  <dt>Timeline</dt>
-                  <dd>
-                    {selected.key_dates.before} → {selected.key_dates.after}
-                  </dd>
-                </dl>
-                <p>
-                  {
-                    selected.stages.find((stage) => stage.type === "takeaway")
-                      ?.summary
-                  }
-                </p>
-                <button className="launch" onClick={onLaunch}>
-                  Launch Case Study
-                </button>
+                <div className="panel-footer">
+                  <button className="launch" onClick={onLaunch}>
+                    Launch Case Study
+                  </button>
+                </div>
               </>
             ) : (
-              <p>Select a case study on the map to see its summary.</p>
+              <>
+                <p>Select a case study on the map or from the list below.</p>
+                <ul className="study-list">
+                  {caseStudies.map((study) => (
+                    <li key={study.case}>
+                      <button
+                        className="study-list-item"
+                        type="button"
+                        onClick={() => selectStudy(study)}
+                      >
+                        {study.iconImage && (
+                          <img
+                            src={`/assets/eventIcons/${study.iconImage}`}
+                            alt=""
+                          />
+                        )}
+                        <span>
+                          <strong>{study.title}</strong>
+                          <small>
+                            {[study.type, study.location]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </small>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
           </aside>
         )}
