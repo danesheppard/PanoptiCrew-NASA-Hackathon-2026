@@ -20,36 +20,10 @@
   margin: 0 auto;
 }
 
-.landing-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  align-self: stretch;
+.landing-page .header {
   width: 100%;
-  min-height: 4.5rem;
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.landing-brand {
   padding: 0;
-  border: 0;
   background: transparent;
-  color: var(--text);
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.landing-page button.landing-brand:hover {
-  background: transparent;
-  color: var(--accent);
-}
-
-.landing-challenge {
-  color: var(--muted);
-  font-size: 0.8rem;
-  text-align: right;
 }
 
 /* Hero layout and copy */
@@ -410,12 +384,8 @@
     padding: 3rem 0;
   }
 
-  .landing-topbar {
+  .landing-page .header {
     min-height: 4rem;
-  }
-
-  .landing-challenge {
-    max-width: 9rem;
   }
 
   .landing-steps {

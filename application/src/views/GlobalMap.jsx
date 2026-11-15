@@ -4,28 +4,21 @@ import DeckGL from "@deck.gl/react";
 import { MapView, _GlobeView as GlobeView } from "@deck.gl/core";
 import { TileLayer } from "@deck.gl/geo-layers";
 import { BitmapLayer, IconLayer, LineLayer } from "@deck.gl/layers";
-import { IconWorld, IconMap } from "@tabler/icons-react";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronDown,
+  IconWorld,
+  IconMap,
+} from "@tabler/icons-react";
 import { caseStudies } from "../data/caseStudies.ts";
 import { calculateCentroid } from "../utilities.ts";
+import Header from "./Header/Header.jsx";
+import "./GlobalMap.css";
 
 const globe = new GlobeView({ resolution: 10 });
 const initialView = { longitude: 70, latitude: 25, zoom: 2 };
 const mapView = new MapView({ repeat: true });
-
-const basemap = new TileLayer({
-  id: "basemap",
-  data: import.meta.env.VITE_SAT_TILES,
-  maxZoom: 19,
-  tileSize: 256,
-  renderSubLayers: (props) => {
-    const { west, south, east, north } = props.tile.bbox;
-    return new BitmapLayer(props, {
-      data: null,
-      image: props.data,
-      bounds: [west, south, east, north],
-    });
-  },
-});
 
 const ICON_PX = 128;
 const RING = 6;
@@ -104,6 +97,7 @@ async function circleIcon({ iconImage }) {
 
 export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const [icons, setIcons] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [viewState, setViewState] = useLocalStorage("viewState", initialView);
   const zoom = viewState.zoom;
   const iconAltitude = Math.max(
@@ -126,12 +120,37 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     }));
   }, [isGlobe]);
 
+  /**
+   * Handles the generation of circular icons for all case studies.
+   */
   useEffect(() => {
     Promise.all(
       caseStudies.map(async (study) => [study.id, await circleIcon(study)]),
     ).then((entries) => setIcons(Object.fromEntries(entries)));
   }, []);
 
+  /**
+   * Builds the basemap layer using satellite tiles.
+   */
+  const basemap = new TileLayer({
+    id: "basemap",
+    data: import.meta.env.VITE_SAT_TILES,
+    maxZoom: 19,
+    tileSize: 256,
+    renderSubLayers: (props) => {
+      if (!props.data) return null;
+      const { west, south, east, north } = props.tile.bbox;
+      return new BitmapLayer(props, {
+        data: null,
+        image: props.data,
+        bounds: [west, south, east, north],
+      });
+    },
+  });
+
+  /**
+   * Places pointers from the base of each case study to its icon.
+   */
   const pointers = new LineLayer({
     id: "case-study-pointers",
     data: caseStudies,
@@ -150,6 +169,9 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     updateTriggers: { getTargetPosition: iconAltitude },
   });
 
+  /**
+   * Builds the icon layer for all case studies.
+   */
   const markers =
     icons &&
     new IconLayer({
@@ -176,77 +198,144 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     });
 
   return (
-    <div className="map-view">
-      <aside className="panel">
-        <button className="link" onClick={onHome}>
-          ← Home
-        </button>
-        {selected ? (
-          <>
-            <span className="badge">Sample content</span>
-            <h2>{selected.title}</h2>
-            <dl>
-              <dt>Type</dt>
-              <dd>{selected.type}</dd>
-              <dt>Location</dt>
-              <dd>{selected.location}</dd>
-              <dt>Timeline</dt>
-              <dd>
-                {selected.timeline.start} → {selected.timeline.end}
-              </dd>
-            </dl>
-            <p>
-              {
-                selected.stages.find((stage) => stage.type === "takeaway")
-                  ?.summary
-              }
-            </p>
-            <button className="launch" onClick={onLaunch}>
-              Launch Case Study
-            </button>
-          </>
-        ) : (
-          <p>Select a case study on the map to see its summary.</p>
+    <div className="map-screen">
+      {/* Project navigation */}
+      <Header onHome={onHome} />
+
+      <div className="map-view">
+        {/* Selected case study details */}
+        {isSidebarOpen && (
+          <aside className="panel">
+            <div className="panel-heading">
+              <h2>Case study</h2>
+              <button
+                className="sidebar-toggle"
+                type="button"
+                aria-label="Close case study sidebar"
+                title="Close sidebar"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <IconChevronLeft aria-hidden="true" focusable="false" />
+              </button>
+            </div>
+            {selected ? (
+              <>
+                <span className="badge">Sample content</span>
+                <h2>{selected.title}</h2>
+                <dl>
+                  <dt>Type</dt>
+                  <dd>{selected.type}</dd>
+                  <dt>Location</dt>
+                  <dd>{selected.location}</dd>
+                  <dt>Timeline</dt>
+                  <dd>
+                    {selected.timeline.start} → {selected.timeline.end}
+                  </dd>
+                </dl>
+                <p>
+                  {
+                    selected.stages.find((stage) => stage.type === "takeaway")
+                      ?.summary
+                  }
+                </p>
+                <button className="launch" onClick={onLaunch}>
+                  Launch Case Study
+                </button>
+              </>
+            ) : (
+              <p>Select a case study on the map to see its summary.</p>
+            )}
+          </aside>
         )}
-      </aside>
-      <div className="map">
-        <DeckGL
-          views={isGlobe ? globe : mapView}
-          viewState={viewState}
-          parameters={{ clearColor: [0, 0, 0, 0] }}
-          controller={{
-            minZoom: MIN_ZOOM,
-            maxZoom: isGlobe ? MAX_ZOOM / 2 : MAX_ZOOM,
-          }}
-          onViewStateChange={({ viewState: nextViewState }) => {
-            const { longitude, latitude, zoom, pitch, bearing } = nextViewState;
-            setViewState({ longitude, latitude, zoom, pitch, bearing });
-          }}
-          layers={[basemap, pointers, markers]}
-          getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
-        />
-        <div className="toggle-view" role="group" aria-label="Map view">
-          <button
-            className="toggle-view-option"
-            type="button"
-            aria-label="Map view"
-            aria-pressed={!isGlobe}
-            onClick={() => setIsGlobe(false)}
-          >
-            <IconMap aria-hidden="true" focusable="false" />
-          </button>
-          <span className="toggle-view-divider" aria-hidden="true" />
-          <button
-            className="toggle-view-option"
-            type="button"
-            aria-label="Globe view"
-            aria-pressed={isGlobe}
-            onClick={() => setIsGlobe(true)}
-          >
-            <IconWorld aria-hidden="true" focusable="false" />
-          </button>
-        </div>
-        <span className="attribution">© OpenStreetMap contributors</span>
+
+        <main className="map-main">
+          {/* Case study selection and sidebar controls */}
+          <div className="map-toolbar">
+            {!isSidebarOpen && (
+              <button
+                className="sidebar-toggle"
+                type="button"
+                aria-label="Open case study sidebar"
+                title="Open sidebar"
+                onClick={() => setIsSidebarOpen(true)}
+              >
+                <IconChevronRight aria-hidden="true" focusable="false" />
+              </button>
+            )}
+            <label className="map-study-select">
+              <div className="map-study-select-control">
+                <select
+                  aria-label="Select a case study"
+                  value={selected?.id ?? ""}
+                  onChange={(event) => {
+                    const study = caseStudies.find(
+                      (item) => item.id === event.target.value,
+                    );
+                    if (study) onSelect(study);
+                  }}
+                >
+                  <option value="">Choose a case study</option>
+                  {caseStudies.map((study) => (
+                    <option key={study.id} value={study.id}>
+                      {study.title}
+                    </option>
+                  ))}
+                </select>
+                <IconChevronDown
+                  className="map-study-chevron"
+                  aria-hidden="true"
+                  focusable="false"
+                />
+              </div>
+            </label>
+          </div>
+
+          {/* Interactive map and view controls */}
+          <div className="map">
+            <DeckGL
+              key={isGlobe ? "globe" : "map"}
+              views={isGlobe ? globe : mapView}
+              viewState={viewState}
+              parameters={{ clearColor: [0, 0, 0, 0] }}
+              controller={{
+                minZoom: MIN_ZOOM,
+                maxZoom: isGlobe ? MAX_ZOOM / 2 : MAX_ZOOM,
+              }}
+              onViewStateChange={({ viewState: nextViewState }) => {
+                const { longitude, latitude, zoom, pitch, bearing } =
+                  nextViewState;
+                setViewState({ longitude, latitude, zoom, pitch, bearing });
+              }}
+              layers={[basemap, pointers, markers]}
+              getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
+            />
+            <div className="toggle-view" role="group" aria-label="Map view">
+              <button
+                className="toggle-view-option"
+                type="button"
+                aria-label="Map view"
+                aria-pressed={!isGlobe}
+                onClick={() => setIsGlobe(false)}
+              >
+                <IconMap aria-hidden="true" focusable="false" />
+              </button>
+              <span className="toggle-view-divider" aria-hidden="true" />
+              <button
+                className="toggle-view-option"
+                type="button"
+                aria-label="Globe view"
+                aria-pressed={isGlobe}
+                onClick={() => setIsGlobe(true)}
+              >
+                <IconWorld aria-hidden="true" focusable="false" />
+              </button>
+            </div>
+            <span className="attribution">
+              Imagery: Esri, Maxar, Earthstar Geographics, and the GIS User
+              Community
+            </span>
+          </div>
+        </main>
       </div>
     </div>
   );
