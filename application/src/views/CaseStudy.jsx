@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { calculateCentroid } from "../utilities.ts";
 
 // `date` maps each chapter to a key in study.timeline; `camera` frames that chapter.
 const chapters = [
@@ -36,14 +37,17 @@ const reducedMotion = () =>
 const TILE_URL = import.meta.env.VITE_TERRAIN_TILES;
 const SAT_URL = import.meta.env.VITE_SAT_TILES;
 const ZOOM = 12;
+const RASTER_ZOOM = 10;
+const TILE_SIZE = 256;
 const EXAGGERATION = 1;
 const SIZE = 10;
 // Chapter colors multiply the imagery, so keep them close to white.
 const tint = (hex) => new THREE.Color(0xffffff).lerp(new THREE.Color(hex), 0.3);
 
-function lonLatToTile([lon, lat], z) {
+function lonLatToTile([lon, lat], z = ZOOM) {
   const n = 2 ** z;
-  const rad = (lat * Math.PI) / 180;
+  const clampedLat = Math.max(-85.0511, Math.min(85.0511, lat));
+  const rad = (clampedLat * Math.PI) / 180;
   return {
     x: Math.floor(((lon + 180) / 360) * n),
     y: Math.floor(
@@ -52,38 +56,147 @@ function lonLatToTile([lon, lat], z) {
   };
 }
 
-const tileUrl = (template, { x, y }) =>
-  template.replace("{z}", ZOOM).replace("{x}", x).replace("{y}", y);
+const mercatorY = (lat) => {
+  const rad = (Math.max(-85.0511, Math.min(85.0511, lat)) * Math.PI) / 180;
+  return (1 - Math.asinh(Math.tan(rad)) / Math.PI) / 2;
+};
+
+const tileUrl = (template, { x, y, z = ZOOM }) =>
+  template.replace("{z}", z).replace("{x}", x).replace("{y}", y);
+
+function createTileGrid(bounds, zoom) {
+  const [west, south, east, north] = bounds;
+  const northWest = lonLatToTile([west, north], zoom);
+  const southEast = lonLatToTile([east - 1e-10, south + 1e-10], zoom);
+  const minX = Math.min(northWest.x, southEast.x);
+  const maxX = Math.max(northWest.x, southEast.x);
+  const minY = Math.min(northWest.y, southEast.y);
+  const maxY = Math.max(northWest.y, southEast.y);
+  return {
+    zoom,
+    minX,
+    minY,
+    cols: maxX - minX + 1,
+    rows: maxY - minY + 1,
+  };
+}
+
+async function loadTileMosaic(template, grid, signal) {
+  const canvas = document.createElement("canvas");
+  canvas.width = grid.cols * TILE_SIZE;
+  canvas.height = grid.rows * TILE_SIZE;
+  const ctx = canvas.getContext("2d");
+
+  await Promise.all(
+    Array.from({ length: grid.rows * grid.cols }, async (_, index) => {
+      const col = index % grid.cols;
+      const row = Math.floor(index / grid.cols);
+      const tile = {
+        x: grid.minX + col,
+        y: grid.minY + row,
+        z: grid.zoom,
+      };
+      const response = await fetch(tileUrl(template, tile), { signal });
+      if (!response.ok) throw new Error(`Map tile ${response.status}`);
+      const image = await createImageBitmap(await response.blob());
+      ctx.drawImage(
+        image,
+        col * TILE_SIZE,
+        row * TILE_SIZE,
+        TILE_SIZE,
+        TILE_SIZE,
+      );
+      image.close();
+    }),
+  );
+
+  return canvas;
+}
+
+function getBoundsPixelFrame(bounds, grid) {
+  const worldSize = 2 ** grid.zoom * TILE_SIZE;
+  const xAt = (lon) => ((lon + 180) / 360) * worldSize - grid.minX * TILE_SIZE;
+  const yAt = (lat) => mercatorY(lat) * worldSize - grid.minY * TILE_SIZE;
+  const [west, south, east, north] = bounds;
+  const left = xAt(west);
+  const top = yAt(north);
+  const right = xAt(east);
+  const bottom = yAt(south);
+
+  return {
+    left,
+    top,
+    width: right - left,
+    height: bottom - top,
+    metersPerPixel:
+      (40075016.686 * Math.cos((((south + north) / 2) * Math.PI) / 180)) /
+      worldSize,
+  };
+}
+
+function cropTileMosaic(source, frame) {
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(frame.width);
+  canvas.height = Math.ceil(frame.height);
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(
+    source,
+    frame.left,
+    frame.top,
+    frame.width,
+    frame.height,
+    0,
+    0,
+    canvas.width,
+    canvas.height,
+  );
+  return canvas;
+}
+
+async function loadRasterTexture(url, signal) {
+  const response = await fetch(url, { signal });
+  if (!response.ok) throw new Error(`Raster image ${response.status}`);
+  const image = await createImageBitmap(await response.blob());
+  const canvas = document.createElement("canvas");
+  canvas.width = image.width;
+  canvas.height = image.height;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(image, 0, 0);
+  image.close();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
 
 // Terrarium PNG: height (m) = R * 256 + G + B / 256 - 32768.
-async function loadTerrain(tile, lat, signal) {
-  const res = await fetch(tileUrl(TILE_URL, tile), { signal });
-  if (!res.ok) throw new Error(`Elevation tile ${res.status}`);
-  const img = await createImageBitmap(await res.blob());
-
-  const canvas = document.createElement("canvas");
-  canvas.width = img.width;
-  canvas.height = img.height;
+async function loadTerrain(grid, bounds, lat, signal) {
+  const mosaic = await loadTileMosaic(TILE_URL, grid, signal);
+  const frame = bounds ? getBoundsPixelFrame(bounds, grid) : null;
+  const canvas = frame ? cropTileMosaic(mosaic, frame) : mosaic;
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  ctx.drawImage(img, 0, 0);
-  const { data } = ctx.getImageData(0, 0, img.width, img.height);
+  const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-  const heights = new Float32Array(img.width * img.height);
+  const heights = new Float32Array(canvas.width * canvas.height);
   for (let i = 0; i < heights.length; i++)
     heights[i] =
       data[i * 4] * 256 + data[i * 4 + 1] + data[i * 4 + 2] / 256 - 32768;
   const min = heights.reduce((a, b) => Math.min(a, b));
 
   const tileMeters =
-    (40075016.686 * Math.cos((lat * Math.PI) / 180)) / 2 ** ZOOM;
-  const scale = (SIZE / tileMeters) * EXAGGERATION;
+    (40075016.686 * Math.cos((lat * Math.PI) / 180)) / 2 ** grid.zoom;
+  const gridScale = Math.max(grid.cols, grid.rows);
+  const scale = frame
+    ? (SIZE / (frame.width * frame.metersPerPixel)) * EXAGGERATION
+    : (SIZE / (tileMeters * gridScale)) * EXAGGERATION;
 
-  // One vertex per pixel; PlaneGeometry vertex order matches image row order.
   const geometry = new THREE.PlaneGeometry(
-    SIZE,
-    SIZE,
-    img.width - 1,
-    img.height - 1,
+    frame ? SIZE : (SIZE * grid.cols) / gridScale,
+    frame
+      ? (SIZE * frame.height) / frame.width
+      : (SIZE * grid.rows) / gridScale,
+    canvas.width - 1,
+    canvas.height - 1,
   );
   const pos = geometry.attributes.position;
   for (let i = 0; i < pos.count; i++) pos.setZ(i, (heights[i] - min) * scale);
@@ -132,6 +245,13 @@ export default function CaseStudy({ study, onBack }) {
   const tabRefs = useRef([]);
   const [index, setIndex] = useState(0);
   const chapter = chapters[index];
+  const stage = study.stages.find((item) => item.type === chapter.key);
+  const overlayAvailable = Boolean(
+    study.imageBounds && stage?.imagery && /\.(png|webp)$/i.test(stage.imagery),
+  );
+  const [overlayVisible, setOverlayVisible] = useState(true);
+  const [overlayOpacity, setOverlayOpacity] = useState(0.85);
+  const [overlayStatus, setOverlayStatus] = useState("idle");
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -151,12 +271,21 @@ export default function CaseStudy({ study, onBack }) {
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     mount.appendChild(renderer.domElement);
 
-    const tile = lonLatToTile(study.coordinates, ZOOM);
-    const satTexture = new THREE.TextureLoader().load(tileUrl(SAT_URL, tile));
-    satTexture.colorSpace = THREE.SRGBColorSpace;
+    const center = calculateCentroid(study.coordinates);
+    const grid = study.imageBounds
+      ? createTileGrid(study.imageBounds, RASTER_ZOOM)
+      : (() => {
+          const tile = lonLatToTile(center);
+          return {
+            zoom: ZOOM,
+            minX: tile.x,
+            minY: tile.y,
+            cols: 1,
+            rows: 1,
+          };
+        })();
     const material = new THREE.MeshStandardMaterial({
       color: tint(chapters[0].color),
-      map: satTexture,
     });
     const terrain = new THREE.Mesh(
       new THREE.PlaneGeometry(SIZE, SIZE),
@@ -164,6 +293,18 @@ export default function CaseStudy({ study, onBack }) {
     );
     terrain.rotation.x = -Math.PI / 2;
     scene.add(terrain);
+
+    const overlayMaterial = new THREE.MeshBasicMaterial({
+      transparent: true,
+      depthWrite: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      side: THREE.DoubleSide,
+    });
+    const overlayMesh = new THREE.Mesh(terrain.geometry, overlayMaterial);
+    overlayMesh.rotation.x = -Math.PI / 2;
+    overlayMesh.visible = false;
+    scene.add(overlayMesh);
 
     // Child of terrain so it shares the rotation; flat shading avoids smeared normals.
     const skirtMaterial = new THREE.MeshStandardMaterial({
@@ -176,12 +317,27 @@ export default function CaseStudy({ study, onBack }) {
     terrain.add(skirt);
 
     const loader = new AbortController();
-    loadTerrain(tile, study.coordinates[1], loader.signal)
+    loadTerrain(grid, study.imageBounds, center[1], loader.signal)
       .then((geometry) => {
         terrain.geometry.dispose();
         terrain.geometry = geometry;
+        overlayMesh.geometry = geometry;
         skirt.geometry.dispose();
         skirt.geometry = buildSkirt(geometry, -0.5);
+      })
+      .catch((err) => err.name !== "AbortError" && console.warn(err));
+
+    loadTileMosaic(SAT_URL, grid, loader.signal)
+      .then((mosaic) => {
+        if (loader.signal.aborted) return;
+        const canvas = study.imageBounds
+          ? cropTileMosaic(mosaic, getBoundsPixelFrame(study.imageBounds, grid))
+          : mosaic;
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        material.map = texture;
+        material.needsUpdate = true;
+        sceneRef.current.satTexture = texture;
       })
       .catch((err) => err.name !== "AbortError" && console.warn(err));
 
@@ -191,6 +347,11 @@ export default function CaseStudy({ study, onBack }) {
     scene.add(sun);
 
     const controls = new OrbitControls(camera, renderer.domElement);
+    controls.mouseButtons = {
+      LEFT: THREE.MOUSE.PAN,
+      MIDDLE: THREE.MOUSE.DOLLY,
+      RIGHT: THREE.MOUSE.ROTATE,
+    };
     controls.enableDamping = true;
     controls.minDistance = 4;
     controls.maxDistance = 20;
@@ -200,7 +361,15 @@ export default function CaseStudy({ study, onBack }) {
       if (flyRef.current) material.color.copy(flyRef.current.colorTo);
       flyRef.current = null;
     });
-    sceneRef.current = { camera, controls, material };
+    sceneRef.current = {
+      camera,
+      controls,
+      material,
+      overlayMaterial,
+      overlayMesh,
+      grid,
+      satTexture: null,
+    };
 
     const resizer = new ResizeObserver(() => {
       camera.aspect = mount.clientWidth / mount.clientHeight;
@@ -233,12 +402,68 @@ export default function CaseStudy({ study, onBack }) {
       terrain.geometry.dispose();
       skirt.geometry.dispose();
       skirtMaterial.dispose();
-      satTexture.dispose();
+      sceneRef.current.satTexture?.dispose();
+      overlayMaterial.map?.dispose();
+      overlayMaterial.dispose();
       material.dispose();
       renderer.dispose();
       mount.removeChild(renderer.domElement);
     };
   }, []);
+
+  useEffect(() => {
+    const sceneState = sceneRef.current;
+    if (!sceneState) return undefined;
+
+    const controller = new AbortController();
+    const { overlayMaterial, overlayMesh, grid } = sceneState;
+    overlayMaterial.map?.dispose();
+    overlayMaterial.map = null;
+    overlayMaterial.needsUpdate = true;
+    overlayMesh.visible = false;
+
+    if (!overlayAvailable) {
+      setOverlayStatus("idle");
+      return () => controller.abort();
+    }
+
+    setOverlayVisible(true);
+    setOverlayStatus("loading");
+    const url = stage.imagery.startsWith("/")
+      ? stage.imagery
+      : `/assets/geospatial/${stage.imagery}`;
+
+    loadRasterTexture(url, controller.signal)
+      .then((texture) => {
+        if (controller.signal.aborted) {
+          texture.dispose();
+          return;
+        }
+        overlayMaterial.map = texture;
+        overlayMaterial.opacity = overlayOpacity;
+        overlayMaterial.needsUpdate = true;
+        overlayMesh.visible = overlayVisible;
+        setOverlayStatus("ready");
+      })
+      .catch((err) => {
+        if (err.name !== "AbortError") {
+          console.warn(err);
+          setOverlayStatus("error");
+        }
+      });
+
+    return () => controller.abort();
+  }, [study.id, chapter.key, stage?.imagery, overlayAvailable]);
+
+  useEffect(() => {
+    const sceneState = sceneRef.current;
+    if (!sceneState) return;
+    sceneState.overlayMaterial.opacity = overlayOpacity;
+    sceneState.overlayMesh.visible =
+      overlayAvailable &&
+      overlayVisible &&
+      Boolean(sceneState.overlayMaterial.map);
+  }, [overlayAvailable, overlayVisible, overlayOpacity]);
 
   useEffect(() => {
     const { camera, material } = sceneRef.current;
@@ -279,7 +504,6 @@ export default function CaseStudy({ study, onBack }) {
   const time = (k) => new Date(study.timeline[k]).getTime();
   const span = time("end") - time("start");
   const pos = (c) => ((time(c.date) - time("start")) / span) * 100;
-  const stage = study.stages[chapter.key];
   const isLast = index === chapters.length - 1;
 
   return (
@@ -291,7 +515,6 @@ export default function CaseStudy({ study, onBack }) {
         <h1>
           {study.type} · <span className="meta">{study.location}</span>
         </h1>
-        <span className="badge">Sample data</span>
         <details className="about">
           <summary>About this data</summary>
           <div className="about-body">
@@ -338,6 +561,38 @@ export default function CaseStudy({ study, onBack }) {
               </p>
               <p>{stage.summary}</p>
               <div className="imagery">{stage.imagery}</div>
+              {overlayAvailable && (
+                <div className="raster-controls">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={overlayVisible}
+                      onChange={(event) =>
+                        setOverlayVisible(event.target.checked)
+                      }
+                    />
+                    Show map overlay
+                  </label>
+                  <label className="raster-opacity">
+                    Opacity
+                    <input
+                      type="range"
+                      min="0.2"
+                      max="1"
+                      step="0.05"
+                      value={overlayOpacity}
+                      onChange={(event) =>
+                        setOverlayOpacity(Number(event.target.value))
+                      }
+                    />
+                  </label>
+                  <p aria-live="polite">
+                    {overlayStatus === "loading" && "Loading overlay…"}
+                    {overlayStatus === "error" &&
+                      "Overlay could not be loaded."}
+                  </p>
+                </div>
+              )}
               {stage.actions && (
                 <>
                   <h3>What to do with this</h3>

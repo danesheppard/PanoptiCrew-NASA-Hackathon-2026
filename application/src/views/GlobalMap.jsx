@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react";
+import { useLocalStorage } from "../customHooks.ts";
 import DeckGL from "@deck.gl/react";
-import { _GlobeView as GlobeView } from "@deck.gl/core";
+import { MapView, _GlobeView as GlobeView } from "@deck.gl/core";
 import { TileLayer } from "@deck.gl/geo-layers";
 import { BitmapLayer, IconLayer, LineLayer } from "@deck.gl/layers";
+import { IconWorld, IconMap } from "@tabler/icons-react";
 import { caseStudies } from "../data/caseStudies.ts";
+import { calculateCentroid } from "../utilities.ts";
 
 const globe = new GlobeView({ resolution: 10 });
 const initialView = { longitude: 70, latitude: 25, zoom: 2 };
-
-const calculateCentroid = (coordinates) => {
-  if (coordinates.length === 2) return coordinates;
-  const [minLng, minLat, maxLng, maxLat] = coordinates;
-  return [(minLng + maxLng) / 2, (minLat + maxLat) / 2];
-};
+const mapView = new MapView({ repeat: true });
 
 const basemap = new TileLayer({
   id: "basemap",
@@ -34,7 +32,7 @@ const RING = 6;
 const BASE_ICON_ALTITUDE_METERS = 600000;
 const MIN_ICON_ALTITUDE_METERS = 5000;
 const MIN_ZOOM = 2;
-const MAX_ZOOM = 10;
+const MAX_ZOOM = 8;
 
 /**
  * Theme for the map icons and other UI elements.
@@ -106,12 +104,27 @@ async function circleIcon({ iconImage }) {
 
 export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const [icons, setIcons] = useState(null);
-  const [viewState, setViewState] = useState(initialView);
+  const [viewState, setViewState] = useLocalStorage("viewState", initialView);
   const zoom = viewState.zoom;
   const iconAltitude = Math.max(
     MIN_ICON_ALTITUDE_METERS,
     BASE_ICON_ALTITUDE_METERS * 2 ** (initialView.zoom - zoom),
   );
+  const [isGlobe, setIsGlobe] = useLocalStorage("isGlobe", false);
+
+  useEffect(() => {
+    // When globe is toggled on, make sure that the new max zoom state is applied,
+    // and reset pitch and bearing to 0
+    setViewState((prev) => ({
+      ...prev,
+      zoom: Math.min(
+        prev.zoom,
+        isGlobe ? Math.min(MAX_ZOOM / 2, prev.zoom) : MIN_ZOOM,
+      ),
+      pitch: 0,
+      bearing: 0,
+    }));
+  }, [isGlobe]);
 
   useEffect(() => {
     Promise.all(
@@ -198,15 +211,41 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
       </aside>
       <div className="map">
         <DeckGL
-          views={globe}
+          views={isGlobe ? globe : mapView}
           viewState={viewState}
-          controller={{ minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM }}
-          onViewStateChange={({ viewState: nextViewState }) =>
-            setViewState(nextViewState)
-          }
+          parameters={{ clearColor: [0, 0, 0, 0] }}
+          controller={{
+            minZoom: MIN_ZOOM,
+            maxZoom: isGlobe ? MAX_ZOOM / 2 : MAX_ZOOM,
+          }}
+          onViewStateChange={({ viewState: nextViewState }) => {
+            const { longitude, latitude, zoom, pitch, bearing } = nextViewState;
+            setViewState({ longitude, latitude, zoom, pitch, bearing });
+          }}
           layers={[basemap, pointers, markers]}
           getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
         />
+        <div className="toggle-view" role="group" aria-label="Map view">
+          <button
+            className="toggle-view-option"
+            type="button"
+            aria-label="Map view"
+            aria-pressed={!isGlobe}
+            onClick={() => setIsGlobe(false)}
+          >
+            <IconMap aria-hidden="true" focusable="false" />
+          </button>
+          <span className="toggle-view-divider" aria-hidden="true" />
+          <button
+            className="toggle-view-option"
+            type="button"
+            aria-label="Globe view"
+            aria-pressed={isGlobe}
+            onClick={() => setIsGlobe(true)}
+          >
+            <IconWorld aria-hidden="true" focusable="false" />
+          </button>
+        </div>
         <span className="attribution">© OpenStreetMap contributors</span>
       </div>
     </div>

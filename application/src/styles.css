@@ -108,6 +108,70 @@ button.link:hover {
   flex: 1;
 }
 
+.map {
+  isolation: isolate;
+  background-color: #0b1020;
+}
+
+.map::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url("/assets/PanoptiCrew.png") center / cover no-repeat;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.toggle-view {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid #4a5878;
+  border-radius: 8px;
+  background: rgba(11, 16, 32, 0.94);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.toggle-view-option {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  aspect-ratio: 1;
+  place-items: center;
+  padding: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #aab3c8;
+}
+
+.toggle-view-option svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  stroke-width: 1.8;
+}
+
+.toggle-view-option[aria-pressed="true"] {
+  background: #c6f36b;
+  color: #0b1020;
+}
+
+.toggle-view-option:hover:not([aria-pressed="true"]) {
+  background: #24304f;
+  color: #e8ebf3;
+}
+
+.toggle-view-divider {
+  width: 1px;
+  height: 1.5rem;
+  background: #4a5878;
+}
+
 .attribution {
   position: absolute;
   right: 0.5rem;
@@ -408,4 +472,32 @@ button.secondary {
   color: var(--muted);
   text-align: center;
   padding: 1rem;
+}
+
+.raster-controls {
+  display: grid;
+  gap: 0.6rem;
+  color: #c3cbe0;
+  font-size: 0.85rem;
+}
+
+.raster-controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.raster-controls input[type="checkbox"] {
+  accent-color: #ffd27a;
+}
+
+.raster-controls .raster-opacity input {
+  flex: 1;
+  min-width: 0;
+}
+
+.raster-controls p {
+  min-height: 1em;
+  margin: 0;
+  color: #9aa3b5;
 }
