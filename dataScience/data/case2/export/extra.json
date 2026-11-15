@@ -39,49 +39,49 @@
   },
   "files": {
     "photo": {
-      "path": "case2/reference/sentinel2_2026-06-25.webp",
+      "path": "case2/sentinel2_2026-06-25.webp",
       "date": "2026-06-25"
     },
-    "places": "case2/reference/places.geojson",
+    "places": "case2/places.geojson",
     "radar_raw": {
-      "2026-06-24": "case2/radar/hh_raw_2026-06-24.webp",
-      "2026-07-06": "case2/radar/hh_raw_2026-07-06.webp",
-      "2026-07-18": "case2/radar/hh_raw_2026-07-18.webp",
-      "2026-08-11": "case2/radar/hh_raw_2026-08-11.webp",
-      "2026-09-04": "case2/radar/hh_raw_2026-09-04.webp",
-      "2026-09-28": "case2/radar/hh_raw_2026-09-28.webp",
-      "2026-10-10": "case2/radar/hh_raw_2026-10-10.webp"
+      "2026-06-24": "case2/hh_raw_2026-06-24.webp",
+      "2026-07-06": "case2/hh_raw_2026-07-06.webp",
+      "2026-07-18": "case2/hh_raw_2026-07-18.webp",
+      "2026-08-11": "case2/hh_raw_2026-08-11.webp",
+      "2026-09-04": "case2/hh_raw_2026-09-04.webp",
+      "2026-09-28": "case2/hh_raw_2026-09-28.webp",
+      "2026-10-10": "case2/hh_raw_2026-10-10.webp"
     },
     "radar_clean": {
-      "2026-06-24": "case2/radar/hh_clean_2026-06-24.webp",
-      "2026-07-06": "case2/radar/hh_clean_2026-07-06.webp",
-      "2026-07-18": "case2/radar/hh_clean_2026-07-18.webp",
-      "2026-08-11": "case2/radar/hh_clean_2026-08-11.webp",
-      "2026-09-04": "case2/radar/hh_clean_2026-09-04.webp",
-      "2026-09-28": "case2/radar/hh_clean_2026-09-28.webp",
-      "2026-10-10": "case2/radar/hh_clean_2026-10-10.webp"
+      "2026-06-24": "case2/hh_clean_2026-06-24.webp",
+      "2026-07-06": "case2/hh_clean_2026-07-06.webp",
+      "2026-07-18": "case2/hh_clean_2026-07-18.webp",
+      "2026-08-11": "case2/hh_clean_2026-08-11.webp",
+      "2026-09-04": "case2/hh_clean_2026-09-04.webp",
+      "2026-09-28": "case2/hh_clean_2026-09-28.webp",
+      "2026-10-10": "case2/hh_clean_2026-10-10.webp"
     },
     "radar_values": {
-      "2026-06-24": "case2/radar/hh_clean_2026-06-24.tif",
-      "2026-07-06": "case2/radar/hh_clean_2026-07-06.tif",
-      "2026-07-18": "case2/radar/hh_clean_2026-07-18.tif",
-      "2026-08-11": "case2/radar/hh_clean_2026-08-11.tif",
-      "2026-09-04": "case2/radar/hh_clean_2026-09-04.tif",
-      "2026-09-28": "case2/radar/hh_clean_2026-09-28.tif",
-      "2026-10-10": "case2/radar/hh_clean_2026-10-10.tif"
+      "2026-06-24": "case2/hh_clean_2026-06-24.tif",
+      "2026-07-06": "case2/hh_clean_2026-07-06.tif",
+      "2026-07-18": "case2/hh_clean_2026-07-18.tif",
+      "2026-08-11": "case2/hh_clean_2026-08-11.tif",
+      "2026-09-04": "case2/hh_clean_2026-09-04.tif",
+      "2026-09-28": "case2/hh_clean_2026-09-28.tif",
+      "2026-10-10": "case2/hh_clean_2026-10-10.tif"
     },
     "water": {
-      "2026-06-24": "case2/water/water_2026-06-24.png",
-      "2026-07-06": "case2/water/water_2026-07-06.png",
-      "2026-07-18": "case2/water/water_2026-07-18.png",
-      "2026-08-11": "case2/water/water_2026-08-11.png",
-      "2026-09-04": "case2/water/water_2026-09-04.png",
-      "2026-09-28": "case2/water/water_2026-09-28.png",
-      "2026-10-10": "case2/water/water_2026-10-10.png"
+      "2026-06-24": "case2/water_2026-06-24.png",
+      "2026-07-06": "case2/water_2026-07-06.png",
+      "2026-07-18": "case2/water_2026-07-18.png",
+      "2026-08-11": "case2/water_2026-08-11.png",
+      "2026-09-04": "case2/water_2026-09-04.png",
+      "2026-09-28": "case2/water_2026-09-28.png",
+      "2026-10-10": "case2/water_2026-10-10.png"
     },
     "flood_codes": {
-      "2026-09-04_2026-09-28": "case2/flood/flood_2026-09-04_2026-09-28.tif",
-      "2026-09-28_2026-10-10": "case2/flood/flood_2026-09-28_2026-10-10.tif"
+      "2026-09-04_2026-09-28": "case2/flood_2026-09-04_2026-09-28.tif",
+      "2026-09-28_2026-10-10": "case2/flood_2026-09-28_2026-10-10.tif"
     }
   },
   "encodings": {
