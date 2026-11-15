@@ -48,18 +48,16 @@ export default function LandingPage({ onStart }) {
           aria-labelledby="landing-title"
         >
           <div className="landing-copy">
-            <p className="landing-eyebrow">
-              RADAR EVIDENCE OF A CHANGING PLANET
-            </p>
+            <p className="landing-eyebrow">THE PANOPTIC EXPLORER</p>
             <h1 id="landing-title">
               See what changed.
               <br />
               <span>Even through the clouds.</span>
             </h1>
             <p className="landing-tagline">
-              Explore environmental events through satellite evidence: where
-              they happened, how the landscape changed, and what the data can
-              and cannot tell us.
+              Explore examples of a changing planet through satellite evidence:
+              where they happened, how the landscape changed, and what the data
+              can and cannot tell us.
             </p>
             <button className="landing-cta" onClick={onStart}>
               Explore the map <span aria-hidden="true">→</span>
