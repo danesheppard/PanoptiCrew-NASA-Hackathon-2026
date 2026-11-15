@@ -1,0 +1,75 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     85.49932,
+     28.30593
+    ]
+   },
+   "properties": {
+    "name": "Collapse site",
+    "km_along_path": 0.0
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     85.517,
+     28.256
+    ]
+   },
+   "properties": {
+    "name": "Langtang Lirung (7,227 m)",
+    "km_along_path": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     85.3778,
+     28.2778
+    ]
+   },
+   "properties": {
+    "name": "Rasuwagadhi",
+    "km_along_path": 18.7
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     85.3667,
+     28.2528
+    ]
+   },
+   "properties": {
+    "name": "Timure",
+    "km_along_path": 22.3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     85.3373,
+     28.1637
+    ]
+   },
+   "properties": {
+    "name": "Syabrubesi",
+    "km_along_path": 33.8
+   }
+  }
+ ]
+}
