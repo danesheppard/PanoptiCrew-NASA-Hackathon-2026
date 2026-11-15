@@ -505,31 +505,10 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
               controller={{
                 minZoom: isGlobe ? GLOBE_MIN_ZOOM : MIN_ZOOM,
                 maxZoom: MAX_ZOOM,
+                dragRotate: !isGlobe,
               }}
-              onViewStateChange={({ viewState: next, interactionState }) => {
-                // Skip in-between frames only during our own moveCamera flight
-                if (
-                  interactionState?.inTransition &&
-                  viewState.transitionInterpolator
-                )
-                  return;
-                // Saving only these fields drops the FlyTo settings once the user takes over
-                const { longitude, latitude, zoom, pitch, bearing } = next;
-                setViewState({
-                  longitude,
-                  latitude,
-                  zoom: Math.max(zoom, isGlobe ? GLOBE_MIN_ZOOM : MIN_ZOOM),
-                  pitch: isGlobe ? 0 : pitch,
-                  bearing: isGlobe ? 0 : bearing,
-                });
-              }}
-              // Flight over: drop the FlyTo settings so normal zoom and drag work again
-              onTransitionEnd={() =>
-                setViewState(
-                  ({ transitionInterpolator, transitionDuration, ...view }) =>
-                    view,
-                )
-              }
+              // Stored unmodified: deck cancels a flight if the state differs from its current frame
+              onViewStateChange={({ viewState: next }) => setViewState(next)}
               layers={[basemap, radarLayer, pointers, pingRings, pingDots]}
               getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
             />
