@@ -47,7 +47,10 @@ const easeInOut = (t) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
 
 // Case studies are static, so their centroids are computed once instead of on every render.
 const centroids = new Map(
-  caseStudies.map((study) => [study.id, calculateCentroid(study.coordinates)]),
+  caseStudies.map((study) => [
+    study.case,
+    calculateCentroid(study.coordinates),
+  ]),
 );
 
 /**
@@ -209,7 +212,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     MIN_ICON_ALTITUDE_METERS,
     BASE_ICON_ALTITUDE_METERS * 2 ** (initialView.zoom - viewState.zoom),
   );
-  const radarStages = selected?.imageBounds
+  const radarStages = selected?.coordinates
     ? selected.stages.filter(
         (stage) => stage.imagery && !stage.imagery.startsWith("Placeholder:"),
       )
@@ -261,7 +264,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   // Build the marker icons, then prefetch case study tiles once the first frame has painted
   useEffect(() => {
     Promise.all(
-      caseStudies.map(async (study) => [study.id, await circleIcon(study)]),
+      caseStudies.map(async (study) => [study.case, await circleIcon(study)]),
     ).then((entries) => setIcons(Object.fromEntries(entries)));
     const timer = setTimeout(prefetchStudyTiles, 1500);
     return () => clearTimeout(timer);
@@ -299,8 +302,8 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const selectStudy = (study) => {
     onSelect(study);
     if (!study) return moveCamera(initialView, 1000);
-    const [longitude, latitude] = centroids.get(study.id);
-    const zoom = isGlobe ? 3 : study.imageBounds ? 9.5 : 6; // was 6 on the flat map
+    const [longitude, latitude] = centroids.get(study.case);
+    const zoom = isGlobe ? 3 : study.coordinates ? 9.5 : 6; // was 6 on the flat map
     moveCamera({ longitude, latitude, zoom }, 1200);
   };
 
@@ -324,14 +327,14 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
    * @returns {BitmapLayer|null} The radar layer, or null if not available.
    */
   const radarLayer =
-    selected?.imageBounds && radarStage
+    selected?.coordinates && radarStage
       ? new BitmapLayer({
-          id: `radar-layer-${selected.id}-${radarStage.type}`,
+          id: `radar-layer-${selected.case}-${radarStage.type}`,
           data: null,
           image: radarStage.imagery.startsWith("/")
             ? radarStage.imagery
             : `/assets/geospatial/${radarStage.imagery}`,
-          bounds: selected.imageBounds,
+          bounds: selected.coordinates,
           opacity: 0.75,
           parameters: {
             depthTest: isGlobe,
@@ -343,7 +346,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
 
   // Filter out the selected case study from the marker data if a radar layer is present.
   const markerData = radarLayer
-    ? caseStudies.filter(({ id }) => id !== selected?.id)
+    ? caseStudies.filter(({ case: c }) => c !== selected?.case)
     : caseStudies;
 
   /**
@@ -352,8 +355,8 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const pointers = new LineLayer({
     id: "case-study-pointers",
     data: markerData,
-    getSourcePosition: ({ id }) => [...centroids.get(id), 0],
-    getTargetPosition: ({ id }) => [...centroids.get(id), iconAltitude],
+    getSourcePosition: ({ case: c }) => [...centroids.get(c), 0],
+    getTargetPosition: ({ case: c }) => [...centroids.get(c), iconAltitude],
     getColor: [...accentRgb, 200],
     getWidth: 2,
     widthUnits: "pixels",
@@ -369,21 +372,21 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     icons &&
     new IconLayer({
       id: "case-studies",
-      data: markerData, // was data: caseStudies
-      getPosition: ({ id }) => [...centroids.get(id), iconAltitude],
-      getIcon: ({ id }) => ({
-        id,
-        url: icons[id],
+      data: markerData,
+      getPosition: ({ case: c }) => [...centroids.get(c), iconAltitude],
+      getIcon: ({ case: c }) => ({
+        id: c,
+        url: icons[c],
         width: ICON_PX,
         height: ICON_PX,
       }),
-      getSize: ({ id }) => (id === selected?.id ? 64 : 44),
+      getSize: ({ case: c }) => (c === selected?.case ? 64 : 44),
       parameters: { depthTest: true, cullMode: "none" },
       pickable: true,
       onClick: ({ object }) => selectStudy(object),
       updateTriggers: {
         getPosition: iconAltitude,
-        getSize: selected?.id,
+        getSize: selected?.case,
       },
     });
 
@@ -487,7 +490,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
               <div className="map-study-select-control">
                 <select
                   aria-label="Select a case study"
-                  value={selected?.id ?? ""}
+                  value={selected?.case ?? ""}
                   onChange={(event) =>
                     selectStudy(
                       caseStudies.find(({ id }) => id === event.target.value) ??
@@ -497,7 +500,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
                 >
                   <option value="">Choose a case study</option>
                   {caseStudies.map((study) => (
-                    <option key={study.id} value={study.id}>
+                    <option key={study.case} value={study.case}>
                       {study.title}
                     </option>
                   ))}

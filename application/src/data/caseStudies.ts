@@ -8,14 +8,10 @@ type EventStage = {
   question?: string;
   confidence: string;
   imagery: string;
-  legend?: {
-    gradient: [number, number, number][];
-    labels: { lowEnd: string; highEnd: string };
-    type?: string;
-  };
+  legend?: Legend;
   timeline?: string;
   replay?: Array<[number, number]>;
-  actions?: string[];
+  actions?: string[]; // Recommended actions or responses following the event stage
 };
 
 type Legend = {
@@ -27,13 +23,18 @@ type Legend = {
 type CaseStudy = {
   case: string;
   title: string;
+  location: string; // General location of the case study
   event_date: string;
+  iconImage?: string; // Optional image representing the case study
+  iconSource?: string; // Source or attribution for the icon image
   story: string; // Intro slide for case study
   method: string; // Description of how the case study was conducted
+  keyMetric: { label: string; value: string }; // Key metric for the case study
   limitations: string; // Limitations of the case study, e.g., data quality or coverage
   coordinates: Array<number>; // [longitude, latitude] or [minLon, minLat, maxLon, maxLat] depending on the case study
   image_crs: string; // Coordinate reference system of the imagery
   satellite: string; // Satellite used for the imagery
+  timeline: { start: string; event: string; end: string }; // Key timeline for the case study: before, during, and after the event
   sources: string[]; // List of sources for the case study
   key_dates: { before: string; event: string; after: string }; // Key dates for the case study: before, during, and after the event
   scene?: {};
@@ -48,81 +49,20 @@ type CaseStudy = {
   stages: StageArray;
 };
 
-const placeholderLeadup: EventStage = {
-  type: "leadUp",
-  headline: "Sample warning signal headline",
-  metric: { label: "Sample indicator change", value: "−00%" },
-  summary: "Sample text describing conditions before the event.",
-  confidence: "Medium",
-  imagery: 'Placeholder: "before" satellite imagery',
-};
-
-const placeholderEvent: EventStage = {
-  type: "event",
-  headline: "Sample impact headline",
-  metric: { label: "Sample affected area", value: "0,000 ha" },
-  summary: "Sample text describing what changed during the event.",
-  confidence: "Medium",
-  imagery: 'Placeholder: "during" satellite imagery',
-};
-
-const placeholderTakeaway: EventStage = {
-  type: "takeaway",
-  headline: "Sample lesson headline",
-  metric: { label: "Sample warning lead time", value: "0 weeks" },
-  summary: "Sample text summarizing what the evidence shows.",
-  confidence: "Low",
-  imagery: 'Placeholder: "after" satellite imagery',
-  actions: [
-    "Sample action: monitor the leading indicator",
-    "Sample action: prioritize exposed communities",
-  ],
-};
-
-const common = {
-  sources: ["Sample source A (placeholder)", "Sample source B (placeholder)"],
-  methods: "Placeholder description of how imagery was processed and compared.",
-  limitations: "Placeholder note on resolution, cloud cover, and timing gaps.",
-};
-
 export const caseStudies = [
   {
-    id: "sample-wildfire",
-    title: "Sample Case Study: Wildfire",
-    type: "Wildfire",
-    location: "Placeholder region, North America",
-    iconImage: "nepal.jpg",
-    iconSource: "Sample source for wildfire image",
-    coordinates: [-120.5, 38.5],
-    headline: "Sample: weeks of warning before the fire spread",
-    keyMetric: { label: "Sample burned area", value: "0,000 ha" },
-    summary: "Sample one-sentence framing of why this wildfire matters.",
-    timeline: { start: "2025-07-01", event: "2025-08-15", end: "2025-10-01" },
-    ...common,
-    stages: [
-      placeholderLeadup,
-      placeholderEvent,
-      placeholderTakeaway,
-    ] as StageArray,
-  },
-  {
-    id: "gandak-flood",
+    case: "gandak-flood",
     title: "Gandak Flood",
-    type: "Flood",
     location: "Placeholder region, South Asia",
     iconImage: "jhenning-flood.jpg",
     iconSource: "Image from jhenning via pixabay.com",
     coordinates: [84.15, 26.1, 84.75, 26.6],
-    imageBounds: [
-      84.13646446971275, 26.085576677999846, 84.76620208267364,
-      26.614634172899674,
-    ],
     headline: "Heavy rain in Nepal causes flooding",
     keyMetric: { label: "Sample inundated area", value: "0,000 km²" },
     summary:
       "TO VALIDATE! IS THIS CORRECT? Heavy rain in Nepal on September 26-27, 2026 pushed the Gandak River to a record 91.25m at Bagaha. NISAR passed over the region during this period, capturing satellite imagery of the flooding.",
     timeline: { start: "2026-08-11", event: "2026-09-28", end: "2026-10-10" },
-    ...common,
+    sources: ["Sample source 1", "Sample source 2"],
     stages: [
       {
         type: "leadUp",
@@ -155,22 +95,17 @@ export const caseStudies = [
     ] as StageArray,
   },
   {
-    id: "bhotekoshi-landslide",
+    case: "bhotekoshi-landslide",
     title: "Bhotekoshi landslide, Nepal (August 2026)",
-    type: "Landslide",
     location: "Bhotekoshi, Nepal",
     iconImage: "nepal.jpg",
     iconSource: "Arjay Neyra via pexels.com",
     coordinates: [85.25, 28.1, 85.6, 28.4],
-    imageBounds: [85.25, 28.1, 85.6, 28.4],
-    headline: "Devestating landslide in Bhotekoshi, Nepal",
-    keyMetric: { label: "Sample area affected", value: "00 ha" },
-    summary:
+    keyMetric: { label: "Sample inundated area", value: "0,000 km²" },
+    story:
       "On 25 August 2026, part of a glacier on Langtang Lirung broke off and fell into the valley below, damming the river. The next morning the dam burst, and a flood of water and debris swept down the Bhote Koshi, through Rasuwagadhi, Timure and Syabrubesi, killing more than 1,400 people.",
-    question:
-      "Were there early warning signs of the landslide that could have given the region time to prepare?",
     timeline: { start: "2026-07-01", event: "2026-08-15", end: "2026-09-01" },
-    ...common,
+    sources: ["Sample source 1", "Sample source 2"],
     stages: [
       {
         type: "leadUp",
@@ -250,4 +185,4 @@ export const caseStudies = [
     //   { type: "takeaway", headline: "...", metric: { label: "...", value: "..." }, summary: "...", confidence: "...", imagery: "...", actions: ["..."] }
     // ],
   },
-];
+] as CaseStudy[];

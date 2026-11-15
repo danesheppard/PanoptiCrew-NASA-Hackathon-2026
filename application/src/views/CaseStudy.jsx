@@ -261,7 +261,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
         .join(", ")})`
     : undefined;
   const overlayAvailable = Boolean(
-    study.imageBounds && stage?.imagery && /\.(png|webp)$/i.test(stage.imagery),
+    study.coordinates && stage?.imagery && /\.(png|webp)$/i.test(stage.imagery),
   );
   const [overlayVisible, setOverlayVisible] = useState(true);
   const [overlayOpacity, setOverlayOpacity] = useState(0.85);
@@ -286,8 +286,8 @@ export default function CaseStudy({ study, onBack, onHome }) {
     mount.appendChild(renderer.domElement);
 
     const center = calculateCentroid(study.coordinates);
-    const grid = study.imageBounds
-      ? createTileGrid(study.imageBounds, RASTER_ZOOM)
+    const grid = study.coordinates
+      ? createTileGrid(study.coordinates, RASTER_ZOOM)
       : (() => {
           const tile = lonLatToTile(center);
           return {
@@ -331,7 +331,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
     terrain.add(skirt);
 
     const loader = new AbortController();
-    loadTerrain(grid, study.imageBounds, center[1], loader.signal)
+    loadTerrain(grid, study.coordinates, center[1], loader.signal)
       .then((geometry) => {
         terrain.geometry.dispose();
         terrain.geometry = geometry;
@@ -344,8 +344,8 @@ export default function CaseStudy({ study, onBack, onHome }) {
     loadTileMosaic(SAT_URL, grid, loader.signal)
       .then((mosaic) => {
         if (loader.signal.aborted) return;
-        const canvas = study.imageBounds
-          ? cropTileMosaic(mosaic, getBoundsPixelFrame(study.imageBounds, grid))
+        const canvas = study.coordinates
+          ? cropTileMosaic(mosaic, getBoundsPixelFrame(study.coordinates, grid))
           : mosaic;
         const texture = new THREE.CanvasTexture(canvas);
         texture.colorSpace = THREE.SRGBColorSpace;
@@ -651,7 +651,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
               <p className="metric">
                 <strong>{study.keyMetric.value}</strong> {study.keyMetric.label}
               </p>
-              <p>{study.summary}</p>
+              <p>{study.story}</p>
               <button onClick={() => go(1)}>Begin the story →</button>
             </>
           )}
