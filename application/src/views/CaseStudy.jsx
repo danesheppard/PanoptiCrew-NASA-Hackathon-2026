@@ -592,19 +592,20 @@ export default function CaseStudy({ study, onBack, onHome }) {
                 <strong>{stage.metric.value}</strong> {stage.metric.label}
               </p>
               <p>{stage.summary}</p>
-              <div className="imagery">{stage.imagery}</div>
+              {stage.chart && (
+                <div className="chart-insert">
+                  <img
+                    src={
+                      stage.chart.startsWith("/")
+                        ? stage.chart
+                        : `/assets/geospatial/${stage.chart}`
+                    }
+                    alt={`${stage.headline} chart`}
+                  />
+                </div>
+              )}
               {overlayAvailable && (
                 <div className="raster-controls">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={overlayVisible}
-                      onChange={(event) =>
-                        setOverlayVisible(event.target.checked)
-                      }
-                    />
-                    Show map overlay
-                  </label>
                   <label className="raster-opacity">
                     Opacity
                     <input
@@ -617,6 +618,16 @@ export default function CaseStudy({ study, onBack, onHome }) {
                         setOverlayOpacity(Number(event.target.value))
                       }
                     />
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={overlayVisible}
+                      onChange={(event) =>
+                        setOverlayVisible(event.target.checked)
+                      }
+                    />
+                    Show map overlay
                   </label>
                   <p aria-live="polite">
                     {overlayStatus === "loading" && "Loading overlay…"}

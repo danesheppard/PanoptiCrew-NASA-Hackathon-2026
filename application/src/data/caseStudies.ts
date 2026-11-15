@@ -12,6 +12,7 @@ type EventStage = {
   timeline?: string;
   replay?: Array<[number, number]>;
   actions?: string[]; // Recommended actions or responses following the event stage
+  chart?: string; // Optional chart associated with the event stage
 };
 
 type Legend = {
@@ -637,7 +638,7 @@ export const caseStudies = [
       },
       {
         type: "takeaway",
-        headline: "Radar maps the damage through cloud, within days",
+        headline: "Radar maps the damage through cloud cover, within days",
         metric: {
           label: "Urgent Response started",
           value: "2 days after",
