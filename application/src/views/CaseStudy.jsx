@@ -536,8 +536,8 @@ export default function CaseStudy({ study, onBack, onHome }) {
           <div className="about-body">
             <h3>Limitations</h3>
             <p>{study.limitations}</p>
-            <h3>Methods</h3>
-            <p>{study.methods}</p>
+            <h3>Method</h3>
+            <p>{study.method}</p>
             <h3>Sources</h3>
             <ul>
               {study.sources.map((s) => (

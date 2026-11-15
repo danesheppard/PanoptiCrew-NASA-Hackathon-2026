@@ -63,6 +63,7 @@ export const caseStudies = [
       "TO VALIDATE! IS THIS CORRECT? Heavy rain in Nepal on September 26-27, 2026 pushed the Gandak River to a record 91.25m at Bagaha. NISAR passed over the region during this period, capturing satellite imagery of the flooding.",
     timeline: { start: "2026-08-11", event: "2026-09-28", end: "2026-10-10" },
     sources: ["Sample source 1", "Sample source 2"],
+    method: "Satellite imagery analysis",
     stages: [
       {
         type: "leadUp",
@@ -71,7 +72,7 @@ export const caseStudies = [
         summary:
           "On August 11, 2026, the river is clearly visible in the darker parts of the satellite imagery. This is largely unchanged compared to previous months.",
         confidence: "High",
-        imagery: "hh_clean_2026-08-11.webp",
+        imagery: "case2/hh_clean_2026-08-11.webp",
       },
       {
         type: "event",
@@ -80,7 +81,7 @@ export const caseStudies = [
         summary:
           "Flooding occurs as the Gandak River overflows its banks on September 26-27, 2026.",
         confidence: "High",
-        imagery: "flood_2026-09-04_2026-09-28.png",
+        imagery: "case2/flood_2026-09-04_2026-09-28.png",
       },
       {
         type: "takeaway",
@@ -89,7 +90,7 @@ export const caseStudies = [
         summary:
           "The floodwaters recede, leaving behind damaged infrastructure and affected communities.",
         confidence: "Medium",
-        imagery: "flood_2026-09-28_2026-10-10.png",
+        imagery: "case2/flood_2026-09-28_2026-10-10.png",
         actions: ["Sample recommended action 1", "Sample recommended action 2"],
       },
     ] as StageArray,
@@ -102,6 +103,7 @@ export const caseStudies = [
     iconSource: "Arjay Neyra via pexels.com",
     coordinates: [85.25, 28.1, 85.6, 28.4],
     keyMetric: { label: "Sample inundated area", value: "0,000 km²" },
+    method: "Satellite imagery analysis",
     story:
       "On 25 August 2026, part of a glacier on Langtang Lirung broke off and fell into the valley below, damming the river. The next morning the dam burst, and a flood of water and debris swept down the Bhote Koshi, through Rasuwagadhi, Timure and Syabrubesi, killing more than 1,400 people.",
     timeline: { start: "2026-07-01", event: "2026-08-15", end: "2026-09-01" },
@@ -117,7 +119,7 @@ export const caseStudies = [
         summary:
           "Before 26 August, NISAR passed over the valley every few days. Each pass is compared with the one 12 days earlier: where the ground stays the same, the radar picture stays the same too. Through June, July and August the valley looked normal, steady on the slopes and always changing on the snow and ice. The last pass before the collapse was on 19 August.",
         confidence: "Medium",
-        imagery: "coherence_baseline.png",
+        imagery: "case1/coherence_baseline.png",
         legend: {
           gradient: [
             [68, 1, 84],
@@ -140,7 +142,7 @@ export const caseStudies = [
         summary:
           "Comparing the passes on 19 August and 31 August, the valley floor changed along a 44 km line, from the collapse site below Langtang Lirung, through Rasuwagadhi and Timure, to Syabrubesi. That is the path of the debris flood: ground torn up, buried or scoured between the two passes.",
         confidence: "High",
-        imagery: "coherence_change.png",
+        imagery: "case1/coherence_change.png",
         legend: {
           gradient: [
             [252, 171, 143],
@@ -159,7 +161,7 @@ export const caseStudies = [
         summary:
           "Radar sees through monsoon cloud, day or night, so within a week of the collapse NISAR had mapped the whole flood path. Along the river, the radar signal from vegetation dropped over about 15 km², where trees and plants were stripped away. Two days after the collapse, NISAR moved the area to Urgent Response, processing new passes faster.",
         confidence: "Medium",
-        imagery: "hv_darkening.png",
+        imagery: "case1/hv_darkening.png",
         legend: {
           gradient: [
             [157, 202, 225],
