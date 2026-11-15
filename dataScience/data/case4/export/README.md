@@ -10,6 +10,6 @@ Every image covers the box in `manifest.json` → `coordinates`, in Web Mercator
 | `slick_event.png` | slick on that pass, red |
 | `slick_footprint.png` | how many passes saw a slick at each spot |
 | `slick_<date>_<stack>.png` | slick on each pass, for a timeline |
-| `places.geojson`, `drift_path.geojson` | labels and the main drift line (0 km) |
+| `places.geojson` | labels for the 3D view |
 | `lead_up.png`, `event.png`, `takeaway.png` | mini chart for each stage |
 | `manifest.json` | the case study for the app, same structure as `CaseStudy` in `caseStudies.ts` |
