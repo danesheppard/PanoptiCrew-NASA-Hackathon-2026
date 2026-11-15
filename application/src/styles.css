@@ -28,8 +28,14 @@ body,
   background: var(--bg);
 }
 
-button {
+button,
+input,
+select,
+textarea {
   font: inherit;
+}
+
+button {
   cursor: pointer;
   border: none;
   border-radius: 6px;

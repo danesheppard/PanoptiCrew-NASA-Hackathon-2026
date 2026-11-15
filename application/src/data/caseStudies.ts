@@ -28,6 +28,7 @@ type Legend = {
 
 type CaseStudy = {
   case: string;
+  type: string; // e.g., "flood", "earthquake", "storm"
   title: string;
   location: string; // General location of the case study, e.g., river and country
   event_date: string;
@@ -55,7 +56,9 @@ type CaseStudy = {
 export const caseStudies = [
   {
     case: "case2",
+    type: "Flood",
     title: "Gandak River flood, Bihar (September 2026)",
+    location: "Gandak River, Bihar",
     event_date: "2026-09-28",
     story:
       "Heavy rain over Nepal's Gandak basin in late September 2026 sent the river to record levels in Bihar: 91.25 m at Bagaha and 64.64 m at Dumariaghat, in Gopalganj. On the morning of September 28 the Valmikinagar barrage released about 543,500 cusecs. NISAR's L-band radar passed over the Gopalganj floodplain that evening: monsoon clouds blind optical satellites, but radar sees through them.",
@@ -379,6 +382,7 @@ export const caseStudies = [
   },
   {
     case: "case1",
+    type: "Flood",
     title: "Bhotekoshi glacier collapse and debris flood, Nepal (August 2026)",
     location: "Bhotekoshi River, Nepal",
     event_date: "2026-08-26",
@@ -675,7 +679,9 @@ export const caseStudies = [
   },
   {
     case: "case3",
+    type: "Wildfire",
     title: "Bald Range wildfire, Summerland, British Columbia (August 2026)",
+    location: "Summerland, British Columbia",
     event_date: "2026-08-07",
     story:
       "On the evening of August 7, 2026 a wildfire started in the hills west of Summerland, in British Columbia's Okanagan valley. After a long drought, strong westerly winds pushed it downhill towards Okanagan Lake: about 5,000 ha burned in three hours and 15,600 ha by August 10. More than 20,000 people in Summerland and Peachland were ordered to leave, an 80-year-old woman died while evacuating, and about 150 structures were damaged or destroyed; in Faulder only 8 of 81 homes survived. The fire was held on August 28 at about 25,200 ha. NISAR's L-band radar sees through the smoke and into the forest canopy.",
