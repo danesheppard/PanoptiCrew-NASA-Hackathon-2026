@@ -6,30 +6,32 @@ import Header from "./Header/Header.jsx";
 
 // `key` matches a study stage type; `date` maps to a key in study.key_dates.
 const chapters = [
-  { key: "intro", label: "Overview", color: 0x5a6b8a, camera: [0, 12, 12] },
+  { key: "intro", label: "Overview", color: 0x5a6b8a },
   {
     key: "leadUp",
     label: "Lead-up",
     date: "before",
     color: 0x4f8a3c,
-    camera: [0, 8, 9],
   },
   {
     key: "event",
     label: "Event",
     date: "event",
     color: 0xc0502e,
-    camera: [5, 5, 6],
   },
   {
     key: "takeaway",
     label: "Takeaway",
     date: "after",
     color: 0x8a7a4f,
-    camera: [-6, 9, 7],
   },
 ];
 const steps = chapters.slice(1);
+// Default view for every chapter: from the west, high enough to see the whole block and its sides.
+// A stage (or the whole study) can override it with `camera: [x, y, z]`.
+const DEFAULT_CAMERA = [-9.5, 9.5, 3.5];
+// The overview looks at the block from its north-west corner, so both cut sides show; the story then moves to the default view.
+const OVERVIEW_CAMERA = [-7.6, 10, -7.6];
 const FLY_SECONDS = 1.2;
 const ease = (t) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
 const reducedMotion = () =>
@@ -207,6 +209,35 @@ async function loadTerrain(grid, bounds, lat, signal) {
   return geometry;
 }
 
+// Bands of rock for the block's sides, the cut-away diorama look.
+function strataTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 8;
+  canvas.height = 256;
+  const ctx = canvas.getContext("2d");
+  const bands = [
+    "#8a949b",
+    "#7a858d",
+    "#93887a",
+    "#827768",
+    "#6e7a83",
+    "#9aa2a6",
+    "#77706a",
+    "#66717a",
+    "#5b656d",
+  ];
+  for (let y = 0, i = 0; y < canvas.height; i++) {
+    const h = 10 + ((i * 37) % 23);
+    ctx.fillStyle = bands[i % bands.length];
+    ctx.fillRect(0, y, canvas.width, h);
+    y += h;
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  return texture;
+}
+
 // Walls from the terrain's perimeter down to a flat base, plus a bottom cap.
 function buildSkirt(plane, base) {
   const { widthSegments, heightSegments } = plane.parameters;
@@ -224,11 +255,19 @@ function buildSkirt(plane, base) {
   // Vertices: top 2k, bottom 2k+1, cap center 2n.
   const n = ring.length;
   const verts = new Float32Array((2 * n + 1) * 3);
+  // u runs around the block, v from the base (0) to the highest point (1), so the strata stay level
+  const uvs = new Float32Array((2 * n + 1) * 2);
+  let top = base;
+  for (const v of ring) top = Math.max(top, src.getZ(v));
   const index = [];
   ring.forEach((v, k) => {
     const x = src.getX(v);
     const y = src.getY(v);
     verts.set([x, y, src.getZ(v), x, y, base], k * 6);
+    uvs.set(
+      [(k / n) * 20, (src.getZ(v) - base) / (top - base), (k / n) * 20, 0],
+      k * 4,
+    );
     const m = (k + 1) % n;
     index.push(2 * k, 2 * k + 1, 2 * m, 2 * k + 1, 2 * m + 1, 2 * m);
     index.push(2 * n, 2 * k + 1, 2 * m + 1);
@@ -237,6 +276,7 @@ function buildSkirt(plane, base) {
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+  geometry.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
   geometry.setIndex(index);
   return geometry;
 }
@@ -288,6 +328,79 @@ function buildLegend(legendProps) {
   );
 }
 
+// Place labels and the flood path replay: a glowing dot runs down the path and labels light up as it reaches them.
+const REPLAY_SECONDS = 8;
+const LIFT = 0.04;
+const PATH_COLOR = 0xffa31a;
+const RIVER_COLOR = 0x3fa9ff;
+const assetUrl = (path) =>
+  path.startsWith("/") ? path : `/assets/geospatial/${path}`;
+const fetchJson = (path, signal) =>
+  fetch(assetUrl(path), { signal }).then((response) => {
+    if (!response.ok) throw new Error(`GeoJSON ${response.status}`);
+    return response.json();
+  });
+
+// Position on the terrain plane (its local x, y, z) for a longitude and latitude inside the bounds.
+function terrainPoint(geometry, bounds, [lon, lat]) {
+  const [west, south, east, north] = bounds;
+  const { width, height, widthSegments, heightSegments } = geometry.parameters;
+  const u = (lon - west) / (east - west);
+  const v =
+    (mercatorY(lat) - mercatorY(north)) / (mercatorY(south) - mercatorY(north));
+  const col = Math.round(Math.min(1, Math.max(0, u)) * widthSegments);
+  const row = Math.round(Math.min(1, Math.max(0, v)) * heightSegments);
+  const z = geometry.attributes.position.getZ(row * (widthSegments + 1) + col);
+  return new THREE.Vector3(
+    -width / 2 + u * width,
+    height / 2 - v * height,
+    z + LIFT,
+  );
+}
+
+// Text label drawn on a canvas, always facing the camera.
+function makeLabel(text) {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  const font = "600 40px Inter, system-ui, sans-serif";
+  ctx.font = font;
+  canvas.width = Math.ceil(ctx.measureText(text).width) + 48;
+  canvas.height = 64;
+  ctx.font = font;
+  ctx.fillStyle = "rgba(245, 247, 250, 0.92)";
+  ctx.beginPath();
+  ctx.roundRect(0, 0, canvas.width, canvas.height, 14);
+  ctx.fill();
+  ctx.fillStyle = "#1a2133";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, 24, canvas.height / 2 + 2);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: texture,
+      depthTest: false,
+      transparent: true,
+    }),
+  );
+  const h = 0.3;
+  sprite.scale.set((h * canvas.width) / canvas.height, h, 1);
+  sprite.center.set(0.5, 0);
+  sprite.renderOrder = 10;
+  return sprite;
+}
+
+// Nudge the block to the right on wide screens, so it sits beside the story card instead of behind it.
+// `shift` is the share of the width to move it by: none for the overview, which stays centred.
+const STAGE_SHIFT = 0.12;
+function frameBlock(camera, mount, shift = STAGE_SHIFT) {
+  const w = mount.clientWidth;
+  const h = mount.clientHeight;
+  if (w > 760) camera.setViewOffset(w, h, -w * shift, 0, w, h);
+  else camera.clearViewOffset();
+  camera.updateProjectionMatrix();
+}
+
 export default function CaseStudy({ study, onBack, onHome }) {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
@@ -326,7 +439,8 @@ export default function CaseStudy({ study, onBack, onHome }) {
       0.1,
       100,
     );
-    camera.position.set(...chapters[0].camera);
+    camera.position.set(...OVERVIEW_CAMERA);
+    frameBlock(camera, mount, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -370,13 +484,81 @@ export default function CaseStudy({ study, onBack, onHome }) {
 
     // Child of terrain so it shares the rotation; flat shading avoids smeared normals.
     const skirtMaterial = new THREE.MeshStandardMaterial({
-      color: 0x51483b,
+      map: strataTexture(),
       roughness: 0.95,
       flatShading: true,
       side: THREE.DoubleSide,
     });
     const skirt = new THREE.Mesh(new THREE.BufferGeometry(), skirtMaterial);
     terrain.add(skirt);
+
+    // Places and flood path, children of the terrain so they share its rotation
+    const replay = {
+      group: new THREE.Group(),
+      labels: [],
+      path: null,
+      dot: null,
+      lengthKm: 0,
+      active: false,
+    };
+    terrain.add(replay.group);
+    const replayStage = study.stages.find((item) => item.replay);
+    const buildReplay = async (geometry) => {
+      const bounds = study.coordinates;
+      if (!geometry || bounds?.length !== 4) return;
+      const [places, line] = await Promise.all([
+        study.scene?.places
+          ? fetchJson(study.scene.places, loader.signal)
+          : null,
+        typeof replayStage?.replay === "string"
+          ? fetchJson(replayStage.replay, loader.signal)
+          : null,
+      ]);
+      const coords = Array.isArray(replayStage?.replay)
+        ? replayStage.replay
+        : line?.features?.[0]?.geometry?.coordinates;
+      if (coords?.length > 1) {
+        const points = coords.map((c) => terrainPoint(geometry, bounds, c));
+        replay.path = new THREE.CatmullRomCurve3(points);
+        replay.lengthKm =
+          line?.features?.[0]?.properties?.length_km ??
+          study.scene?.flood_path_km ??
+          0;
+        replay.tube = new THREE.Mesh(
+          new THREE.TubeGeometry(replay.path, points.length * 2, 0.025, 6),
+          new THREE.MeshBasicMaterial({ color: PATH_COLOR }),
+        );
+        replay.dot = new THREE.Mesh(
+          new THREE.SphereGeometry(0.08, 16, 16),
+          new THREE.MeshBasicMaterial({ color: 0xfff1a8 }),
+        );
+        replay.group.add(replay.tube, replay.dot);
+      }
+      (places?.features ?? []).forEach((feature) => {
+        const label = makeLabel(feature.properties.name);
+        label.position.copy(
+          terrainPoint(geometry, bounds, feature.geometry.coordinates),
+        );
+        label.position.z += 0.12;
+        label.userData.km = feature.properties.km_along_path;
+        replay.group.add(label);
+        replay.labels.push(label);
+      });
+      showReplay(sceneRef.current?.replayMode ?? "river");
+    };
+    // "river": the overview shows the path as the river in blue
+    // "replay": the stage with a replay shows it in orange with the moving dot
+    // "none": the other stages hide it. Labels show everywhere
+    const showReplay = (mode) => {
+      replay.active = mode === "replay";
+      if (replay.tube) {
+        replay.tube.visible = mode !== "none";
+        replay.tube.material.color.set(
+          mode === "river" ? RIVER_COLOR : PATH_COLOR,
+        );
+      }
+      if (replay.dot) replay.dot.visible = replay.active;
+    };
 
     const loader = new AbortController();
     loadTerrain(grid, study.coordinates, center[1], loader.signal)
@@ -386,7 +568,9 @@ export default function CaseStudy({ study, onBack, onHome }) {
         overlayMesh.geometry = geometry;
         skirt.geometry.dispose();
         skirt.geometry = buildSkirt(geometry, -0.5);
+        return geometry;
       })
+      .then((geometry) => buildReplay(geometry))
       .catch((err) => err.name !== "AbortError" && console.warn(err));
 
     loadTileMosaic(SAT_URL, grid, loader.signal)
@@ -421,7 +605,11 @@ export default function CaseStudy({ study, onBack, onHome }) {
     controls.maxPolarAngle = Math.PI / 2.2;
     // User takes the camera: finish the color change but stop flying.
     controls.addEventListener("start", () => {
-      if (flyRef.current) material.color.copy(flyRef.current.colorTo);
+      if (flyRef.current) {
+        material.color.copy(flyRef.current.colorTo);
+        sceneRef.current.shift = flyRef.current.shiftTo;
+        frameBlock(camera, mount, sceneRef.current.shift);
+      }
       flyRef.current = null;
     });
     sceneRef.current = {
@@ -432,10 +620,14 @@ export default function CaseStudy({ study, onBack, onHome }) {
       overlayMesh,
       grid,
       satTexture: null,
+      showReplay,
+      replayMode: "river",
+      shift: 0,
     };
 
     const resizer = new ResizeObserver(() => {
       camera.aspect = mount.clientWidth / mount.clientHeight;
+      frameBlock(camera, mount, sceneRef.current?.shift ?? 0);
       camera.updateProjectionMatrix();
       renderer.setSize(mount.clientWidth, mount.clientHeight);
     });
@@ -449,9 +641,29 @@ export default function CaseStudy({ study, onBack, onHome }) {
         const k = ease(fly.t);
         camera.position.lerpVectors(fly.from, fly.to, k);
         material.color.lerpColors(fly.colorFrom, fly.colorTo, k);
+        // slide the block sideways along with the camera
+        sceneRef.current.shift =
+          fly.shiftFrom + (fly.shiftTo - fly.shiftFrom) * k;
+        frameBlock(camera, mount, sceneRef.current.shift);
         if (fly.t === 1) flyRef.current = null;
       } else {
         clock.getDelta();
+      }
+      if (replay.active && replay.path) {
+        // loop the run, with a short pause at the end so the lit labels can be read
+        const t = Math.min(
+          1,
+          (clock.elapsedTime % (REPLAY_SECONDS + 2)) / REPLAY_SECONDS,
+        );
+        replay.dot.position.copy(replay.path.getPointAt(t));
+        replay.labels.forEach((label) => {
+          const reached =
+            label.userData.km == null ||
+            label.userData.km <= t * replay.lengthKm;
+          label.material.opacity = reached ? 1 : 0.45;
+        });
+      } else {
+        replay.labels.forEach((label) => (label.material.opacity = 1));
       }
       controls.update();
       renderer.render(scene, camera);
@@ -464,6 +676,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
       controls.dispose();
       terrain.geometry.dispose();
       skirt.geometry.dispose();
+      skirtMaterial.map?.dispose();
       skirtMaterial.dispose();
       sceneRef.current.satTexture?.dispose();
       overlayMaterial.map?.dispose();
@@ -529,12 +742,25 @@ export default function CaseStudy({ study, onBack, onHome }) {
   }, [overlayAvailable, overlayVisible, overlayOpacity, overlayStatus]);
 
   useEffect(() => {
+    const sceneState = sceneRef.current;
+    sceneState.replayMode =
+      index === 0 ? "river" : stage?.replay ? "replay" : "none";
+    sceneState.showReplay(sceneState.replayMode);
+  }, [index, stage?.replay]);
+
+  useEffect(() => {
     const { camera, material } = sceneRef.current;
     flyRef.current = {
       from: camera.position.clone(),
-      to: new THREE.Vector3(...chapter.camera),
+      to: new THREE.Vector3(
+        ...(index === 0
+          ? OVERVIEW_CAMERA
+          : (stage?.camera ?? study.camera ?? DEFAULT_CAMERA)),
+      ),
       colorFrom: material.color.clone(),
       colorTo: tint(chapter.color),
+      shiftFrom: sceneRef.current.shift ?? 0,
+      shiftTo: index === 0 ? 0 : STAGE_SHIFT,
       t: reducedMotion() ? 1 : 0,
     };
   }, [chapter]);
@@ -617,6 +843,12 @@ export default function CaseStudy({ study, onBack, onHome }) {
               <span>{legend.labels.lowEnd}</span>
               <span>{legend.labels.highEnd}</span>
             </div>
+            {stage?.replay && (
+              <div className="stage-legend-path">
+                <span className="stage-legend-line" aria-hidden="true" />
+                Traced flood path
+              </div>
+            )}
           </div>
         )}
 

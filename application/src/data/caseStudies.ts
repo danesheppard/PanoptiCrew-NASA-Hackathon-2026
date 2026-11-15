@@ -10,9 +10,10 @@ type EventStage = {
   imagery: string;
   legend?: Legend;
   timeline?: string;
-  replay?: Array<[number, number]>;
+  replay?: Array<[number, number]> | string; // ADDED: string option, a GeoJSON line file under public/assets/geospatial
   actions?: string[]; // Recommended actions or responses following the event stage
   chart?: string; // Optional chart associated with the event stage
+  camera?: [number, number, number]; // ADDED: optional camera position for this stage, defaults to the shared view in CaseStudy.jsx
 };
 
 type Legend = {
@@ -36,13 +37,14 @@ type CaseStudy = {
   satellite: string; // Satellite used for the imagery
   sources: string[]; // List of sources for the case study
   key_dates: { before: string; event: string; after: string }; // Key dates for the case study: before, during, and after the event
-  scene?: {};
+  scene?: { places?: string; flood_path_km?: number; [key: string]: unknown }; // ADDED: places (GeoJSON of labels) and flood_path_km are read by CaseStudy.jsx
   layers?: Array<{
     name: string;
     file: string;
     legend: Legend;
   }>;
   pairs?: Array<object>;
+  camera?: [number, number, number]; // ADDED: optional camera position for every stage of this study
   stages: StageArray;
 };
 

@@ -236,6 +236,24 @@ button.secondary {
   color: var(--text);
 }
 
+.chart-insert {
+  margin-bottom: 1.25rem;
+}
+
+.stage-legend-path {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.stage-legend-line {
+  width: 1.5rem;
+  height: 3px;
+  border-radius: 2px;
+  background: #ffa31a;
+}
+
 .chart-insert img {
   display: block;
   width: 100%;
