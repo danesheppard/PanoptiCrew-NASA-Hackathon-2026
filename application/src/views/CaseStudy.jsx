@@ -139,6 +139,8 @@ function cropTileMosaic(source, frame) {
   canvas.width = Math.ceil(frame.width);
   canvas.height = Math.ceil(frame.height);
   const ctx = canvas.getContext("2d");
+  // Turn off image smoothing to avoid false elevation artifacts when cropping the tile mosaic
+  ctx.imageSmoothingEnabled = false;
   ctx.drawImage(
     source,
     frame.left,
@@ -463,7 +465,7 @@ export default function CaseStudy({ study, onBack }) {
       overlayAvailable &&
       overlayVisible &&
       Boolean(sceneState.overlayMaterial.map);
-  }, [overlayAvailable, overlayVisible, overlayOpacity]);
+  }, [overlayAvailable, overlayVisible, overlayOpacity, overlayStatus]);
 
   useEffect(() => {
     const { camera, material } = sceneRef.current;

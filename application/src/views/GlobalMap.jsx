@@ -90,10 +90,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     // and reset pitch and bearing to 0
     setViewState((prev) => ({
       ...prev,
-      zoom: Math.min(
-        prev.zoom,
-        isGlobe ? Math.min(MAX_ZOOM / 2, prev.zoom) : MIN_ZOOM,
-      ),
+      zoom: Math.min(prev.zoom, isGlobe ? MAX_ZOOM : MIN_ZOOM),
       pitch: 0,
       bearing: 0,
     }));
