@@ -30,6 +30,7 @@ type CaseStudy = {
   event_date: string;
   story: string; // Intro slide for case study
   method: string; // Description of how the case study was conducted
+  limitations: string; // Limitations of the case study, e.g., data quality or coverage
   coordinates: Array<number>; // [longitude, latitude] or [minLon, minLat, maxLon, maxLat] depending on the case study
   image_crs: string; // Coordinate reference system of the imagery
   satellite: string; // Satellite used for the imagery
