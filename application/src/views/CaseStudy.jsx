@@ -500,6 +500,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
       dot: null,
       lengthKm: 0,
       active: false,
+      elapsed: 0,
     };
     terrain.add(replay.group);
     const replayStage = study.stages.find((item) => item.replay);
@@ -550,6 +551,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
     // "replay": the stage with a replay shows it in orange with the moving dot
     // "none": the other stages hide it. Labels show everywhere
     const showReplay = (mode) => {
+      if (mode === "replay" && !replay.active) replay.elapsed = 0;
       replay.active = mode === "replay";
       if (replay.tube) {
         replay.tube.visible = mode !== "none";
@@ -636,8 +638,9 @@ export default function CaseStudy({ study, onBack, onHome }) {
     const clock = new THREE.Clock();
     renderer.setAnimationLoop(() => {
       const fly = flyRef.current;
+      const delta = clock.getDelta();
       if (fly) {
-        fly.t = Math.min(1, fly.t + clock.getDelta() / FLY_SECONDS);
+        fly.t = Math.min(1, fly.t + delta / FLY_SECONDS);
         const k = ease(fly.t);
         camera.position.lerpVectors(fly.from, fly.to, k);
         material.color.lerpColors(fly.colorFrom, fly.colorTo, k);
@@ -646,16 +649,16 @@ export default function CaseStudy({ study, onBack, onHome }) {
           fly.shiftFrom + (fly.shiftTo - fly.shiftFrom) * k;
         frameBlock(camera, mount, sceneRef.current.shift);
         if (fly.t === 1) flyRef.current = null;
-      } else {
-        clock.getDelta();
       }
       if (replay.active && replay.path) {
         // loop the run, with a short pause at the end so the lit labels can be read
+        replay.elapsed += delta;
         const t = Math.min(
           1,
-          (clock.elapsedTime % (REPLAY_SECONDS + 2)) / REPLAY_SECONDS,
+          (replay.elapsed % (REPLAY_SECONDS + 2)) / REPLAY_SECONDS,
         );
-        replay.dot.position.copy(replay.path.getPointAt(t));
+        const point = replay.path.getPointAt(t);
+        replay.dot.position.copy(point);
         replay.labels.forEach((label) => {
           const reached =
             label.userData.km == null ||
