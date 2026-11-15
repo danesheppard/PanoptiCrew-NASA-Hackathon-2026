@@ -397,7 +397,6 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
             </div>
             {selected ? (
               <>
-                <span className="badge">Sample content</span>
                 <h2>{selected.title}</h2>
                 <label className="radar-layer-select">
                   <span>Radar layer</span>
