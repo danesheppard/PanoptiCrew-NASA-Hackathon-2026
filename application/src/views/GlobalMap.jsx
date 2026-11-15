@@ -1,7 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocalStorage } from "../customHooks.ts";
 import DeckGL from "@deck.gl/react";
-import { MapView, _GlobeView as GlobeView } from "@deck.gl/core";
+import {
+  FlyToInterpolator,
+  LinearInterpolator,
+  MapView,
+  _GlobeView as GlobeView,
+} from "@deck.gl/core";
 import { TileLayer } from "@deck.gl/geo-layers";
 import { BitmapLayer, IconLayer, LineLayer } from "@deck.gl/layers";
 import {
@@ -16,9 +21,11 @@ import { calculateCentroid } from "../utilities.ts";
 import Header from "./Header/Header.jsx";
 import "./GlobalMap.css";
 
+const TILE_URL = import.meta.env.VITE_SAT_TILES;
+
 const globe = new GlobeView({ resolution: 10 });
-const initialView = { longitude: 70, latitude: 25, zoom: 2 };
 const mapView = new MapView({ repeat: true });
+const initialView = { longitude: 70, latitude: 25, zoom: 2 };
 
 const ICON_PX = 128;
 const RING = 6;
@@ -26,36 +33,126 @@ const BASE_ICON_ALTITUDE_METERS = 600000;
 const MIN_ICON_ALTITUDE_METERS = 5000;
 const MIN_ZOOM = 2;
 const MAX_ZOOM = 8;
+const GLOBE_MAX_ZOOM = MAX_ZOOM / 2;
+
+// Interpolators are stateless, so one instance of each is reused for every transition.
+// Globe: plain rotation. Flat map: FlyTo (zoom out, pan, zoom in), which is built for Web Mercator.
+const globeInterpolator = new LinearInterpolator([
+  "longitude",
+  "latitude",
+  "zoom",
+]);
+const flatInterpolator = new FlyToInterpolator();
+const easeInOut = (t) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
+
+// Case studies are static, so their centroids are computed once instead of on every render.
+const centroids = new Map(
+  caseStudies.map((study) => [study.id, calculateCentroid(study.coordinates)]),
+);
 
 /**
- * Theme for the map icons and other UI elements.
+ * Reads a CSS theme variable (e.g. "--accent") from the document root.
  *
- * @param {string} token - The CSS variable token representing the theme color.
- * @returns {string} The computed color value.
+ * @param {string} token - The CSS variable name.
+ * @returns {string} The computed colour value.
  */
 const getThemeColor = (token) =>
   getComputedStyle(document.documentElement).getPropertyValue(token).trim();
 
 /**
- * Converts a CSS theme color to its RGB representation.
+ * Converts a hex CSS theme colour to an [r, g, b] array for deck.gl.
  *
- * @param {string} token - The CSS variable token representing the theme color.
- *
- * @returns {Array<number>} The RGB representation of the theme color.
+ * @param {string} token - The CSS variable name.
+ * @returns {number[]} The RGB components.
  */
 const getThemeRgb = (token) => {
   const hex = getThemeColor(token).slice(1);
-  return [0, 2, 4].map((index) =>
-    Number.parseInt(hex.slice(index, index + 2), 16),
-  );
+  return [0, 2, 4].map((i) => Number.parseInt(hex.slice(i, i + 2), 16));
 };
 
 /**
- * Creates a circular icon for a case study, optionally overlaying an image.
+ * Returns the longitude equivalent to `target` that is closest to `current`,
+ * so the globe spins the short way round instead of the long way.
+ *
+ * @param {number} current - The current longitude.
+ * @param {number} target - The desired longitude.
+ * @returns {number} The adjusted target longitude.
+ */
+const nearestLongitude = (current, target) =>
+  current + (((target - current + 540) % 360) - 180);
+
+/**
+ * Draws one satellite tile. Returns null when the tile was cancelled or failed,
+ * because a BitmapLayer without an image throws "deck.gl: assertion failed".
+ *
+ * @param {Object} props - Sub-layer props provided by TileLayer.
+ * @returns {BitmapLayer|null} The tile layer, or null if there's no image.
+ */
+const renderTile = (props) => {
+  if (!props.data) return null;
+  const { west, south, east, north } = props.tile.bbox;
+  return new BitmapLayer(props, {
+    data: null,
+    image: props.data,
+    bounds: [west, south, east, north],
+  });
+};
+
+/**
+ * Converts a longitude/latitude to the x/y index of the Web Mercator tile containing it.
+ *
+ * @param {number} lon - Longitude in degrees.
+ * @param {number} lat - Latitude in degrees.
+ * @param {number} z - Zoom level.
+ * @returns {number[]} The [x, y] tile index.
+ */
+const tileIndex = (lon, lat, z) => {
+  const n = 2 ** z;
+  const rad = (lat * Math.PI) / 180;
+  return [
+    Math.floor(((lon + 180) / 360) * n),
+    Math.floor(
+      ((1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2) * n,
+    ),
+  ];
+};
+
+// Zoom levels to prefetch around each case study, with the tile radius for each:
+// zoom 3 is where the globe lands, zoom 6 is where the flat map lands.
+const PREFETCH_LEVELS = [
+  [3, 1],
+  [6, 2],
+];
+let hasPrefetched = false;
+
+/**
+ * Downloads the tiles around each case study in the background. Esri allows
+ * tiles to be cached for 24 hours, so when deck.gl later requests the same URLs
+ * they come from the browser cache and the map lands sharp, with no blur.
+ * Runs once per page load, even if the map screen is opened again.
+ */
+const prefetchStudyTiles = () => {
+  if (hasPrefetched || !TILE_URL) return;
+  hasPrefetched = true;
+  for (const [lon, lat] of centroids.values()) {
+    for (const [z, r] of PREFETCH_LEVELS) {
+      const [cx, cy] = tileIndex(lon, lat, z);
+      for (let x = cx - r; x <= cx + r; x++)
+        for (let y = cy - r; y <= cy + r; y++)
+          fetch(
+            TILE_URL.replace("{z}", z).replace("{x}", x).replace("{y}", y),
+          ).catch(() => {});
+    }
+  }
+};
+
+/**
+ * Creates a circular marker icon for a case study, with its photo cropped inside.
+ * Falls back to a plain accent-coloured disc if the image can't be loaded.
  *
  * @param {Object} options
- * @param {string} options.iconImage - The filename of the image to overlay on the icon.
- * @returns {Promise<string>} A data URL representing the generated icon.
+ * @param {string} options.iconImage - Filename in /public/assets/eventIcons.
+ * @returns {Promise<string>} A data URL of the generated icon.
  */
 async function circleIcon({ iconImage }) {
   const canvas = document.createElement("canvas");
@@ -71,6 +168,7 @@ async function circleIcon({ iconImage }) {
     const img = new Image();
     img.src = `/assets/eventIcons/${iconImage}`;
     await img.decode();
+    // Centre-crop to a square so the photo fills the circle without stretching
     const side = Math.min(img.width, img.height);
     ctx.save();
     ctx.clip();
@@ -87,7 +185,7 @@ async function circleIcon({ iconImage }) {
     );
     ctx.restore();
   } catch {
-    // keep the plain disc
+    // Keep the plain disc
   }
   ctx.lineWidth = RING;
   ctx.strokeStyle = getThemeColor("--text");
@@ -98,71 +196,114 @@ async function circleIcon({ iconImage }) {
 export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const [icons, setIcons] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isGlobe, setIsGlobe] = useLocalStorage("isGlobe", false);
   const [viewState, setViewState] = useLocalStorage("viewState", initialView);
-  const zoom = viewState.zoom;
+  const [transitionProps, setTransitionProps] = useState(null);
+  const deckViewState = transitionProps
+    ? { ...viewState, ...transitionProps }
+    : viewState;
+
+  // Theme colours only change on reload, so read them once
+  const accentRgb = useMemo(() => getThemeRgb("--accent"), []);
+
+  // Markers float above the surface; the height shrinks as you zoom in so they stay close to their spot
   const iconAltitude = Math.max(
     MIN_ICON_ALTITUDE_METERS,
-    BASE_ICON_ALTITUDE_METERS * 2 ** (initialView.zoom - zoom),
+    BASE_ICON_ALTITUDE_METERS * 2 ** (initialView.zoom - viewState.zoom),
   );
-  const [isGlobe, setIsGlobe] = useLocalStorage("isGlobe", false);
 
+  // On switching views: clamp zoom to that view's limit and reset any tilt or rotation
   useEffect(() => {
-    // When globe is toggled on, make sure that the new max zoom state is applied,
-    // and reset pitch and bearing to 0
     setViewState((prev) => ({
       ...prev,
-      zoom: Math.min(
-        prev.zoom,
-        isGlobe ? Math.min(MAX_ZOOM / 2, prev.zoom) : MIN_ZOOM,
-      ),
+      zoom: Math.min(prev.zoom, isGlobe ? GLOBE_MAX_ZOOM : MIN_ZOOM),
       pitch: 0,
       bearing: 0,
     }));
   }, [isGlobe]);
 
-  /**
-   * Handles the generation of circular icons for all case studies.
-   */
+  // Build the marker icons, then prefetch case study tiles once the first frame has painted
   useEffect(() => {
     Promise.all(
       caseStudies.map(async (study) => [study.id, await circleIcon(study)]),
     ).then((entries) => setIcons(Object.fromEntries(entries)));
+    const timer = setTimeout(prefetchStudyTiles, 1500);
+    return () => clearTimeout(timer);
   }, []);
 
   /**
-   * Builds the basemap layer using satellite tiles.
+   * Animates the camera to a target: a spin on the globe, a fly-to on the flat map.
+   *
+   * @param {Object} target - { longitude, latitude, zoom } to move to.
+   * @param {number} duration - Animation length in milliseconds.
    */
-  const basemap = new TileLayer({
-    id: "basemap",
-    data: import.meta.env.VITE_SAT_TILES,
-    maxZoom: 19,
+  const moveCamera = (target, duration) => {
+    setTransitionProps({
+      transitionDuration: duration,
+      transitionInterpolator: isGlobe ? globeInterpolator : flatInterpolator,
+      transitionEasing: easeInOut,
+    });
+    setViewState((prev) => ({
+      ...prev,
+      ...target,
+      longitude: isGlobe
+        ? nearestLongitude(prev.longitude, target.longitude)
+        : target.longitude,
+      pitch: 0,
+      bearing: 0,
+    }));
+  };
+
+  /**
+   * Selects a case study and moves the camera to it, or back out to the
+   * starting view when the selection is cleared.
+   *
+   * @param {Object|null} study - The case study to select, or null to clear.
+   */
+  const selectStudy = (study) => {
+    onSelect(study);
+    if (!study) return moveCamera(initialView, 1000);
+    const [longitude, latitude] = centroids.get(study.id);
+    moveCamera({ longitude, latitude, zoom: isGlobe ? 3 : 6 }, 1200);
+  };
+
+  /**
+   * Builds the fallback basemap layer for low-detail tiles.
+   */
+  const fallbackBasemap = new TileLayer({
+    id: "basemap-fallback",
+    data: TILE_URL,
+    minZoom: 0,
+    maxZoom: 2, // above zoom 2 these tiles are stretched, never re-downloaded
     tileSize: 256,
-    renderSubLayers: (props) => {
-      if (!props.data) return null;
-      const { west, south, east, north } = props.tile.bbox;
-      return new BitmapLayer(props, {
-        data: null,
-        image: props.data,
-        bounds: [west, south, east, north],
-      });
-    },
+    maxCacheSize: 50,
+    parameters: { depthTest: isGlobe }, // Enable depth testing only for the globe to hide the far side of the Earth.
+    renderSubLayers: renderTile,
   });
 
   /**
-   * Places pointers from the base of each case study to its icon.
+   * Builds the main basemap layer for high-detail tiles.
+   */
+  const basemap = new TileLayer({
+    id: "basemap",
+    data: TILE_URL,
+    maxZoom: 19,
+    tileSize: 256,
+    maxRequests: 20, // default is 6; Esri handles more parallel requests
+    maxCacheSize: 300, // keep visited areas so returning to them is instant
+    refinementStrategy: "best-available", // show a lower-zoom tile until the sharp one arrives
+    renderSubLayers: renderTile,
+  });
+
+  /**
+   * Builds the vertical line layer from the ground up to each floating marker.
    */
   const pointers = new LineLayer({
     id: "case-study-pointers",
     data: caseStudies,
-    getSourcePosition: ({ coordinates }) => [
-      ...calculateCentroid(coordinates),
-      0,
-    ],
-    getTargetPosition: ({ coordinates }) => [
-      ...calculateCentroid(coordinates),
-      iconAltitude,
-    ],
-    getColor: [...getThemeRgb("--accent"), 200],
+    getSourcePosition: ({ id }) => [...centroids.get(id), 0],
+    getTargetPosition: ({ id }) => [...centroids.get(id), iconAltitude],
+    getColor: [...accentRgb, 200],
     getWidth: 2,
     widthUnits: "pixels",
     parameters: { depthTest: true, cullMode: "none" },
@@ -170,17 +311,15 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   });
 
   /**
-   * Builds the icon layer for all case studies.
+   * Builds the photo marker layer for each case study.
+   * Skipped until the icons have been generated.
    */
   const markers =
     icons &&
     new IconLayer({
       id: "case-studies",
       data: caseStudies,
-      getPosition: ({ coordinates }) => [
-        ...calculateCentroid(coordinates),
-        iconAltitude,
-      ],
+      getPosition: ({ id }) => [...centroids.get(id), iconAltitude],
       getIcon: ({ id }) => ({
         id,
         url: icons[id],
@@ -190,7 +329,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
       getSize: ({ id }) => (id === selected?.id ? 64 : 44),
       parameters: { depthTest: true, cullMode: "none" },
       pickable: true,
-      onClick: ({ object }) => onSelect(object),
+      onClick: ({ object }) => selectStudy(object),
       updateTriggers: {
         getPosition: iconAltitude,
         getSize: selected?.id,
@@ -267,12 +406,12 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
                 <select
                   aria-label="Select a case study"
                   value={selected?.id ?? ""}
-                  onChange={(event) => {
-                    const study = caseStudies.find(
-                      (item) => item.id === event.target.value,
-                    );
-                    if (study) onSelect(study);
-                  }}
+                  onChange={(event) =>
+                    selectStudy(
+                      caseStudies.find(({ id }) => id === event.target.value) ??
+                        null,
+                    )
+                  }
                 >
                   <option value="">Choose a case study</option>
                   {caseStudies.map((study) => (
@@ -293,20 +432,27 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
           {/* Interactive map and view controls */}
           <div className="map">
             <DeckGL
-              key={isGlobe ? "globe" : "map"}
               views={isGlobe ? globe : mapView}
-              viewState={viewState}
+              viewState={deckViewState}
               parameters={{ clearColor: [0, 0, 0, 0] }}
               controller={{
                 minZoom: MIN_ZOOM,
-                maxZoom: isGlobe ? MAX_ZOOM / 2 : MAX_ZOOM,
+                maxZoom: isGlobe ? GLOBE_MAX_ZOOM : MAX_ZOOM,
               }}
-              onViewStateChange={({ viewState: nextViewState }) => {
-                const { longitude, latitude, zoom, pitch, bearing } =
-                  nextViewState;
+              /**
+               * Handles view state changes for the map or globe.
+               * Updates the view state unless the interaction is in transition.
+               */
+              onViewStateChange={({ viewState: next, interactionState }) => {
+                if (interactionState.inTransition) return;
+
+                if (transitionProps) setTransitionProps(null);
+                const { longitude, latitude, zoom, pitch, bearing } = next;
                 setViewState({ longitude, latitude, zoom, pitch, bearing });
               }}
-              layers={[basemap, pointers, markers]}
+              onTransitionEnd={() => setTransitionProps(null)}
+              onTransitionInterrupt={() => setTransitionProps(null)}
+              layers={[fallbackBasemap, basemap, pointers, markers]}
               getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
             />
             <div className="toggle-view" role="group" aria-label="Map view">
