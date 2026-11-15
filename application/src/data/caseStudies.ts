@@ -997,20 +997,15 @@ export const caseStudies = [
   },
   {
     case: "case4",
-    title:
-      "Caroline Bezengi oil spill, Hallaniyat Islands, Oman (June to September 2026)",
+    title: "Caroline Bezengi oil spill, Hallaniyat Islands, Oman (June to September 2026)",
     location: "Hallaniyat Islands, Oman",
     event_date: "2026-06-23",
-    story:
-      "On 8 June 2026 an explosion disabled the Caroline Bezengi, a sanctioned tanker carrying close to a million barrels of Russian crude. Around 23 June it ended up on the rocks at Jazirat Al Qibliyyah, one of the Hallaniyat Islands off Oman, and leaked through the monsoon. By 10 August Oman put the slick at about 390 km², and on 13 August oil reached the beaches at Ras Madrakah",
-    method:
-      "Oil smooths the small wind ripples on the sea, so it sends less of the radar pulse back and looks darker than the water around it. On every NISAR pass over the wreck, sea pixels at least 3 dB darker than the sea within about 12 km, in patches of 1 km² or more, are marked as slick. Frequency B images at 80 m, HH or VV",
-    limitations:
-      "Calm patches of sea with little wind also look dark, so some marked areas may not be oil. At L-band the slicks here are only 1 to 2 dB darker than the sea on most passes. The box covers the wreck and the coast up to Ras Madrakah, not the whole slick, and passes are about 6 days apart, with no data from 27 July to 10 August",
-    coordinates: [55.8, 17.2, 58.0, 19.2],
+    story: "On 8 June 2026 an explosion disabled the Caroline Bezengi, a sanctioned tanker carrying close to a million barrels of Russian crude. Around 23 June it ended up on the rocks at Jazirat Al Qibliyyah, one of the Hallaniyat Islands off Oman, and leaked through the monsoon. By 10 August Oman put the slick at about 390 km², and on 13 August oil reached the beaches at Ras Madrakah",
+    method: "Oil smooths the small wind ripples on the sea, so it sends less of the radar pulse back and looks darker than the water around it. On every NISAR pass over the wreck, sea pixels at least 1.5 dB darker than the sea within about 12 km, in patches of 2 km² or more, are marked as slick. Frequency B images at 80 m, HH or VV",
+    limitations: "Calm patches of sea with little wind also look dark, so some marked areas may not be oil. At L-band the slicks here are only 1 to 2 dB darker than the sea on most passes. The box covers the wreck and the coast up to Ras Madrakah, not the whole slick, and passes are about 6 days apart, with no data from 27 July to 10 August",
+    coordinates: [55.8, 17.2, 58, 19.2],
     image_crs: "EPSG:3857",
-    satellite:
-      "NISAR (NASA-ISRO), L-band, track 150 descending (HH) and track 56 ascending (VV)",
+    satellite: "NISAR (NASA-ISRO), L-band, track 150 descending (HH) and track 56 ascending (VV)",
     sources: [
       "NISAR L2 GCOV, Provisional (NISAR_L2_GCOV_PROVISIONAL_V1), NASA Earthdata / ASF",
       "NISAR Data User Guide: https://nisar-docs.asf.alaska.edu/",
@@ -1022,12 +1017,11 @@ export const caseStudies = [
     ],
     key_dates: {
       before: "2026-06-18",
-      event: "2026-09-10",
+      event: "2026-09-16",
       after: "2026-10-10",
     },
     scene: {
       places: "case4/places.geojson",
-      flood_path_km: 0,
     },
     layers: [
       {
@@ -1045,7 +1039,7 @@ export const caseStudies = [
         },
       },
       {
-        name: "NISAR radar, Sep 10",
+        name: "NISAR radar, Sep 16",
         file: "case4/radar_event.png",
         legend: {
           gradient: [
@@ -1059,11 +1053,13 @@ export const caseStudies = [
         },
       },
       {
-        name: "Slick, Sep 10",
+        name: "Slick, Sep 16",
         file: "case4/slick_event.png",
         legend: {
           type: "categories",
-          gradient: [[220, 40, 40]],
+          gradient: [
+            [220, 40, 40],
+          ],
           labels: {
             lowEnd: "Slick",
             highEnd: "Slick",
@@ -1071,7 +1067,7 @@ export const caseStudies = [
           categories: [
             {
               color: [220, 40, 40],
-              label: "Slick: sea at least 3 dB darker than around it",
+              label: "Slick: sea at least 1.5 dB darker than around it",
             },
           ],
         },
@@ -1088,7 +1084,7 @@ export const caseStudies = [
           ],
           labels: {
             lowEnd: "Slick on 1 pass",
-            highEnd: "Slick on 2 passes",
+            highEnd: "Slick on 4 passes",
           },
         },
       },
@@ -1098,120 +1094,120 @@ export const caseStudies = [
         date: "2026-06-18",
         stack: "056_A",
         file: "case4/slick_20260618_056_A.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 5.8,
+        farthest_from_wreck_km: 207.4,
       },
       {
         date: "2026-06-24",
         stack: "150_D",
         file: "case4/slick_20260624_150_D.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 8.8,
+        farthest_from_wreck_km: 51.1,
       },
       {
         date: "2026-06-30",
         stack: "056_A",
         file: "case4/slick_20260630_056_A.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 0,
+        farthest_from_wreck_km: 0,
       },
       {
         date: "2026-07-06",
         stack: "150_D",
         file: "case4/slick_20260706_150_D.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 0,
+        farthest_from_wreck_km: 0,
       },
       {
         date: "2026-07-12",
         stack: "056_A",
         file: "case4/slick_20260712_056_A.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 2,
+        farthest_from_wreck_km: 4.4,
       },
       {
         date: "2026-07-18",
         stack: "150_D",
         file: "case4/slick_20260718_150_D.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 0,
+        farthest_from_wreck_km: 0,
       },
       {
         date: "2026-07-24",
         stack: "056_A",
         file: "case4/slick_20260724_056_A.png",
-        slick_km2: 1.0,
-        farthest_from_wreck_km: 123.0,
+        slick_km2: 78.9,
+        farthest_from_wreck_km: 121.9,
       },
       {
         date: "2026-08-11",
         stack: "150_D",
         file: "case4/slick_20260811_150_D.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 0,
+        farthest_from_wreck_km: 0,
       },
       {
         date: "2026-08-17",
         stack: "056_A",
         file: "case4/slick_20260817_056_A.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 104,
+        farthest_from_wreck_km: 96.5,
       },
       {
         date: "2026-08-23",
         stack: "150_D",
         file: "case4/slick_20260823_150_D.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 23.6,
+        farthest_from_wreck_km: 54.9,
       },
       {
         date: "2026-08-29",
         stack: "056_A",
         file: "case4/slick_20260829_056_A.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 11.8,
+        farthest_from_wreck_km: 48.3,
       },
       {
         date: "2026-09-04",
         stack: "150_D",
         file: "case4/slick_20260904_150_D.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 192.4,
+        farthest_from_wreck_km: 200,
       },
       {
         date: "2026-09-10",
         stack: "056_A",
         file: "case4/slick_20260910_056_A.png",
-        slick_km2: 27.2,
-        farthest_from_wreck_km: 74.4,
+        slick_km2: 238,
+        farthest_from_wreck_km: 224,
       },
       {
         date: "2026-09-16",
         stack: "150_D",
         file: "case4/slick_20260916_150_D.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 295.2,
+        farthest_from_wreck_km: 156.6,
       },
       {
         date: "2026-09-22",
         stack: "056_A",
         file: "case4/slick_20260922_056_A.png",
-        slick_km2: 9.8,
-        farthest_from_wreck_km: 212.7,
+        slick_km2: 241.5,
+        farthest_from_wreck_km: 73.4,
       },
       {
         date: "2026-09-28",
         stack: "150_D",
         file: "case4/slick_20260928_150_D.png",
-        slick_km2: 0.0,
-        farthest_from_wreck_km: 0.0,
+        slick_km2: 23.1,
+        farthest_from_wreck_km: 195.9,
       },
       {
         date: "2026-10-10",
         stack: "150_D",
         file: "case4/slick_20261010_150_D.png",
-        slick_km2: 1.4,
-        farthest_from_wreck_km: 43.4,
+        slick_km2: 0,
+        farthest_from_wreck_km: 0,
       },
     ],
     stages: [
@@ -1222,8 +1218,7 @@ export const caseStudies = [
           label: "first pass after the tanker went aground",
           value: "1 day",
         },
-        summary:
-          "An explosion disabled the Caroline Bezengi, carrying close to a million barrels of crude, on 8 June. Around 23 June it ended up on the rocks at the southwest tip of Jazirat Al Qibliyyah, in the Hallaniyat Islands. NISAR passed over the islands on 18 June and again on 24 June. On radar the sea is grey, the wind's small ripples sending part of the pulse back",
+        summary: "An explosion disabled the Caroline Bezengi, carrying close to a million barrels of crude, on 8 June. Around 23 June it ended up on the rocks at the southwest tip of Jazirat Al Qibliyyah, in the Hallaniyat Islands. NISAR passed over the islands on 18 June and again on 24 June. On radar the sea is grey, the wind's small ripples sending part of the pulse back",
         confidence: "Medium",
         imagery: "case4/radar_before.png",
         legend: {
@@ -1242,17 +1237,17 @@ export const caseStudies = [
         type: "event",
         headline: "The slick shows up as calm, dark water",
         metric: {
-          label: "of slick in view on 10 September",
-          value: "27 km²",
+          label: "of slick in view on 16 September",
+          value: "295 km²",
         },
-        summary:
-          "Oil smooths the ripples on the sea, so less of the radar pulse comes back and the slick looks darker than the water around it. On 10 September, dark streaks run north-east from the wreck for up to 74 km. Oman put the whole slick at about 390 km² on 10 August, and on 13 August oil reached the beaches at Ras Madrakah",
+        summary: "Oil smooths the ripples on the sea, so less of the radar pulse comes back and the slick looks darker than the water around it. On 16 September, dark streaks run north-east from the wreck for up to 157 km. Oman put the whole slick at about 390 km² on 10 August, and on 13 August oil reached the beaches at Ras Madrakah",
         confidence: "Medium",
         imagery: "case4/slick_event.png",
-        replay: "case4/drift_path.geojson",
         legend: {
           type: "categories",
-          gradient: [[220, 40, 40]],
+          gradient: [
+            [220, 40, 40],
+          ],
           labels: {
             lowEnd: "Slick",
             highEnd: "Slick",
@@ -1260,7 +1255,7 @@ export const caseStudies = [
           categories: [
             {
               color: [220, 40, 40],
-              label: "Slick: sea at least 3 dB darker than around it",
+              label: "Slick: sea at least 1.5 dB darker than around it",
             },
           ],
         },
@@ -1273,8 +1268,7 @@ export const caseStudies = [
           label: "passes over the wreck, June to October",
           value: "17",
         },
-        summary:
-          "NISAR never switched this area to emergency processing, yet its regular passes saw the wreck about every 6 days. Put together, they show where the oil went: 39 km² of sea had a slick on at least one pass, mostly north-east of the islands. Radar sees the sea day or night and through cloud, so it can follow a spill when the weather keeps boats and planes away",
+        summary: "NISAR never switched this area to emergency processing, yet its regular passes saw the wreck about every 6 days. Put together, they show where the oil went: 1086 km² of sea had a slick on at least one pass, mostly north-east of the islands. Radar sees the sea day or night and through cloud, so it can follow a spill when the weather keeps boats and planes away",
         confidence: "Medium",
         imagery: "case4/slick_footprint.png",
         legend: {
@@ -1286,7 +1280,7 @@ export const caseStudies = [
           ],
           labels: {
             lowEnd: "Slick on 1 pass",
-            highEnd: "Slick on 2 passes",
+            highEnd: "Slick on 4 passes",
           },
         },
         chart: "case4/takeaway.png",
