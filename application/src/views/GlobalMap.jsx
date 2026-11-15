@@ -9,7 +9,7 @@ import { caseStudies } from "../data/caseStudies.ts";
 
 const globe = new GlobeView({ resolution: 10 });
 const initialView = { longitude: 70, latitude: 25, zoom: 2 };
-const mapView = new MapView();
+const mapView = new MapView({ repeat: true });
 
 const calculateCentroid = (coordinates) => {
   if (coordinates.length === 2) return coordinates;
@@ -87,6 +87,14 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     BASE_ICON_ALTITUDE_METERS * 2 ** (initialView.zoom - zoom),
   );
   const [isGlobe, setIsGlobe] = useLocalStorage("isGlobe", false);
+
+  useEffect(() => {
+    // When globe is toggled on, make sure that the new max zoom state is applied
+    setViewState((prev) => ({
+      ...prev,
+      zoom: Math.min(prev.zoom, isGlobe ? MAX_ZOOM : MIN_ZOOM),
+    }));
+  }, [isGlobe]);
 
   useEffect(() => {
     Promise.all(
@@ -175,6 +183,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
         <DeckGL
           views={isGlobe ? globe : mapView}
           viewState={viewState}
+          parameters={{ clearColor: [0, 0, 0, 0] }}
           controller={{
             minZoom: MIN_ZOOM,
             maxZoom: isGlobe ? MAX_ZOOM / 2 : MAX_ZOOM,

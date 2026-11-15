@@ -103,6 +103,22 @@ button.link {
   position: relative;
   flex: 1;
 }
+
+.map {
+  isolation: isolate;
+  background-color: #0b1020;
+}
+
+.map::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url("/assets/PanoptiCrew.png") center / cover no-repeat;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
 .toggle-view {
   position: absolute;
   left: 1rem;
