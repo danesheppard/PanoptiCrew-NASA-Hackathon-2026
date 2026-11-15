@@ -89,10 +89,16 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const [isGlobe, setIsGlobe] = useLocalStorage("isGlobe", false);
 
   useEffect(() => {
-    // When globe is toggled on, make sure that the new max zoom state is applied
+    // When globe is toggled on, make sure that the new max zoom state is applied,
+    // and reset pitch and bearing to 0
     setViewState((prev) => ({
       ...prev,
-      zoom: Math.min(prev.zoom, isGlobe ? MAX_ZOOM : MIN_ZOOM),
+      zoom: Math.min(
+        prev.zoom,
+        isGlobe ? Math.min(MAX_ZOOM / 2, prev.zoom) : MIN_ZOOM,
+      ),
+      pitch: 0,
+      bearing: 0,
     }));
   }, [isGlobe]);
 
