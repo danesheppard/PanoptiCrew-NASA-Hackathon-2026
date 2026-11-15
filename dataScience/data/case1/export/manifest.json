@@ -165,7 +165,41 @@
       "summary": "Before 26 August, NISAR passed over the valley every few days. Each pass is compared with the one 12 days earlier: where the ground stays the same, the radar picture stays the same too. Through June, July and August the valley looked normal, steady on the slopes and always changing on the snow and ice. The last pass before the collapse was on 19 August",
       "confidence": "Medium",
       "imagery": "coherence/coherence_baseline.png",
-      "timeline": "coherence/pairs"
+      "timeline": "coherence/pairs",
+      "legend": {
+        "gradient": [
+          [
+            68,
+            1,
+            84
+          ],
+          [
+            59,
+            82,
+            139
+          ],
+          [
+            33,
+            145,
+            140
+          ],
+          [
+            94,
+            201,
+            98
+          ],
+          [
+            253,
+            231,
+            37
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Always changing",
+          "highEnd": "Stable"
+        }
+      },
+      "chart": "charts/lead_up.png"
     },
     {
       "type": "event",
@@ -177,7 +211,36 @@
       "summary": "Comparing the passes on 19 August and 31 August, the valley floor changed along a 44 km line, from the collapse site below Langtang Lirung, through Rasuwagadhi and Timure, to Syabrubesi. That is the path of the debris flood: ground torn up, buried or scoured between the two passes",
       "confidence": "High",
       "imagery": "coherence/coherence_change.png",
-      "replay": "flood_path.geojson"
+      "replay": "flood_path.geojson",
+      "legend": {
+        "gradient": [
+          [
+            252,
+            171,
+            143
+          ],
+          [
+            248,
+            93,
+            66
+          ],
+          [
+            197,
+            23,
+            28
+          ],
+          [
+            103,
+            0,
+            13
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Small drop",
+          "highEnd": "Large drop"
+        }
+      },
+      "chart": "charts/event.png"
     },
     {
       "type": "takeaway",
@@ -192,7 +255,36 @@
       "actions": [
         "Use 12-day coherence to map damage along a valley soon after a collapse, even under monsoon cloud",
         "Keep regular passes over hanging glaciers above inhabited valleys"
-      ]
+      ],
+      "legend": {
+        "gradient": [
+          [
+            157,
+            202,
+            225
+          ],
+          [
+            79,
+            155,
+            203
+          ],
+          [
+            25,
+            102,
+            173
+          ],
+          [
+            8,
+            48,
+            107
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Slightly darker",
+          "highEnd": "Much darker (vegetation lost)"
+        }
+      },
+      "chart": "charts/takeaway.png"
     }
   ]
 }

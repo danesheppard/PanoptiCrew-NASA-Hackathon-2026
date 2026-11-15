@@ -13,4 +13,5 @@ Every image covers the same box in Web Mercator (EPSG:3857), corners in `manifes
 | `coherence/coherence_baseline.png`, `coherence_event.png`, `coherence_change.png` | coherence layers, legend in the manifest |
 | `coherence/pairs/*.png` | one coherence layer per 12-day pair, for a timeline |
 | `backscatter/hv_darkening.png`, `hh_change.png` | backscatter change at 50 m |
+| `charts/*.png` | mini chart for each stage, shown on the story card |
 | `manifest.json` | dates, corners, legend, and the text for each stage |
