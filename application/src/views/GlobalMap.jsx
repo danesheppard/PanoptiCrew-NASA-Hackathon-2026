@@ -32,8 +32,8 @@ const RING = 6;
 const BASE_ICON_ALTITUDE_METERS = 600000;
 const MIN_ICON_ALTITUDE_METERS = 5000;
 const MIN_ZOOM = 2;
-const MAX_ZOOM = 13; // was 8
-const GLOBE_MAX_ZOOM = 7; // was MAX_ZOOM / 2 (4)
+const MAX_ZOOM = 13;
+const GLOBE_MIN_ZOOM = 4; // was MAX_ZOOM / 2 (4)
 
 // Interpolators are stateless, so one instance of each is reused for every transition.
 // Globe: plain rotation. Flat map: FlyTo (zoom out, pan, zoom in), which is built for Web Mercator.
@@ -507,8 +507,8 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
               viewState={viewState}
               parameters={{ clearColor: [0, 0, 0, 0] }}
               controller={{
-                minZoom: MIN_ZOOM,
-                maxZoom: isGlobe ? GLOBE_MAX_ZOOM : MAX_ZOOM,
+                minZoom: isGlobe ? GLOBE_MIN_ZOOM : MIN_ZOOM,
+                maxZoom: MAX_ZOOM,
               }}
               /**
                * Handles view state changes for the map or globe.
@@ -520,7 +520,9 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
                 setViewState({
                   longitude,
                   latitude,
-                  zoom,
+                  zoom: isGlobe
+                    ? Math.max(zoom, GLOBE_MIN_ZOOM)
+                    : Math.max(zoom, MIN_ZOOM),
                   pitch: isGlobe ? 0 : pitch,
                   bearing: isGlobe ? 0 : bearing,
                 });
