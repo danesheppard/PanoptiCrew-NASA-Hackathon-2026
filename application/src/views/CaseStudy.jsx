@@ -532,7 +532,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
           {study.type} · <span className="meta">{study.location}</span>
         </h1>
         <details className="about">
-          <summary>About this data</summary>
+          <summary>About this dataset</summary>
           <div className="about-body">
             <h3>Limitations</h3>
             <p>{study.limitations}</p>

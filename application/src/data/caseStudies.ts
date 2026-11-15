@@ -11,10 +11,40 @@ type EventStage = {
   legend?: {
     gradient: [number, number, number][];
     labels: { lowEnd: string; highEnd: string };
+    type?: string;
   };
   timeline?: string;
   replay?: string;
   actions?: string[];
+};
+
+type Legend = {
+  gradient: [number, number, number][];
+  labels: { lowEnd: string; highEnd: string };
+  type?: string;
+};
+
+type CaseStudy = {
+  case: string;
+  title: string;
+  event_date: string;
+  story: string; // Intro slide for case study
+  method: string; // Description of how the case study was conducted
+  coordinates: Array<number>; // [longitude, latitude] or [minLon, minLat, maxLon, maxLat] depending on the case study
+  image_crs: string; // Coordinate reference system of the imagery
+  satellite: string; // Satellite used for the imagery
+  sources: string[]; // List of sources for the case study
+  key_dates: { before: string; event: string; after: string }; // Key dates for the case study: before, during, and after the event
+  scene?: {};
+  layers?: [
+    {
+      name: string;
+      file: string;
+      legend: Legend;
+    },
+  ];
+  pairs?: Array<object>;
+  stages: StageArray;
 };
 
 const placeholderLeadup: EventStage = {
