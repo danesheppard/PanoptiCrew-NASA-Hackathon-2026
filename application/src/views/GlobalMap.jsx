@@ -200,9 +200,6 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const [viewState, setViewState] = useLocalStorage("viewState", initialView);
   const [radarStageType, setRadarStageType] = useState("leadUp");
   const [transitionProps, setTransitionProps] = useState(null);
-  const deckViewState = transitionProps
-    ? { ...viewState, ...transitionProps }
-    : viewState;
 
   // Theme colours only change on reload, so read them once
   const accentRgb = useMemo(() => getThemeRgb("--accent"), []);
@@ -220,12 +217,31 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const radarStage =
     radarStages.find((stage) => stage.type === radarStageType) ??
     radarStages[0];
+  /**
+   * Builds the main basemap layer for high-detail tiles.
+   * Change from projected to globe view requires updating the TileLayer id for a fresh retrieval of tiles.
+   */
+  const basemap = new TileLayer({
+    id: isGlobe ? "basemap-globe" : "basemap-map",
+    data: import.meta.env.VITE_SAT_TILES,
+    maxZoom: 19,
+    tileSize: 256,
+    refinementStrategy: isGlobe ? "never" : "best-available",
+    renderSubLayers: (props) => {
+      const { west, south, east, north } = props.tile.bbox;
+      return new BitmapLayer(props, {
+        data: null,
+        image: props.data,
+        bounds: [west, south, east, north],
+      });
+    },
+  });
 
   // On switching views: clamp zoom to that view's limit and reset any tilt or rotation
   useEffect(() => {
     setViewState((prev) => ({
       ...prev,
-      zoom: Math.min(prev.zoom, isGlobe ? GLOBE_MAX_ZOOM : MIN_ZOOM),
+      zoom: Math.min(prev.zoom, isGlobe ? MAX_ZOOM : MIN_ZOOM),
       pitch: 0,
       bearing: 0,
     }));
@@ -288,20 +304,6 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     tileSize: 256,
     maxCacheSize: 50,
     parameters: { depthTest: isGlobe }, // Enable depth testing only for the globe to hide the far side of the Earth.
-    renderSubLayers: renderTile,
-  });
-
-  /**
-   * Builds the main basemap layer for high-detail tiles.
-   */
-  const basemap = new TileLayer({
-    id: "basemap",
-    data: TILE_URL,
-    maxZoom: 19,
-    tileSize: 256,
-    maxRequests: 20, // default is 6; Esri handles more parallel requests
-    maxCacheSize: 300, // keep visited areas so returning to them is instant
-    refinementStrategy: "best-available", // show a lower-zoom tile until the sharp one arrives
     renderSubLayers: renderTile,
   });
 
@@ -502,7 +504,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
           <div className="map">
             <DeckGL
               views={isGlobe ? globe : mapView}
-              viewState={deckViewState}
+              viewState={viewState}
               parameters={{ clearColor: [0, 0, 0, 0] }}
               controller={{
                 minZoom: MIN_ZOOM,
@@ -512,15 +514,17 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
                * Handles view state changes for the map or globe.
                * Updates the view state unless the interaction is in transition.
                */
-              onViewStateChange={({ viewState: next, interactionState }) => {
-                if (interactionState.inTransition) return;
-
-                if (transitionProps) setTransitionProps(null);
-                const { longitude, latitude, zoom, pitch, bearing } = next;
-                setViewState({ longitude, latitude, zoom, pitch, bearing });
+              onViewStateChange={({ viewState: nextViewState }) => {
+                const { longitude, latitude, zoom, pitch, bearing } =
+                  nextViewState;
+                setViewState({
+                  longitude,
+                  latitude,
+                  zoom,
+                  pitch: isGlobe ? 0 : pitch,
+                  bearing: isGlobe ? 0 : bearing,
+                });
               }}
-              onTransitionEnd={() => setTransitionProps(null)}
-              onTransitionInterrupt={() => setTransitionProps(null)}
               layers={[fallbackBasemap, basemap, radarLayer, pointers, markers]}
               getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
             />
