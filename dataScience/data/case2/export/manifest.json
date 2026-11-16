@@ -1,158 +1,526 @@
 {
   "case": "case2",
-  "title": "Gandak River flood, Bihar, India",
+  "title": "Gandak River flood, Bihar (September 2026)",
   "event_date": "2026-09-28",
-  "story": "Record flood of the Gandak River on Sep 28, 2026 (91.25 m at Bagaha, 543,500 cusecs from the Valmikinagar barrage, embankment breach at Sheetalpur, Gopalganj).",
-  "bbox_lonlat": [
-    84.15,
-    26.1,
-    84.75,
-    26.6
+  "story": "Heavy rain over Nepal's Gandak basin in late September 2026 sent the river to record levels in Bihar: 91.25 m at Bagaha and 64.64 m at Dumariaghat, in Gopalganj. On the morning of September 28 the Valmikinagar barrage released about 543,500 cusecs. NISAR's L-band radar passed over the Gopalganj floodplain that evening: monsoon clouds blind optical satellites, but radar sees through them.",
+  "method": "Each radar image is converted to decibels and cleaned with a 5 x 5 median filter (speckle). Open water: HH darker than -16 dB, the value that catches 9 river pixels in 10 and no dry-field pixels in two test areas. Brighter or darker: HH changed by 3 dB or more, three times the normal movement of dry fields, kept only in patches of 9 or more pixels within 500 m of new water. Areas are counted in 20 m pixels (2,500 pixels = 1 km²).",
+  "limitations": "Provisional NISAR data (calibrated, not yet officially validated). Thresholds were measured on this scene only. A 2 to 3 km noise stripe was blanked on Sep 4 and Sep 28 (about 200 km²) and 6% of the area is outside the radar swath, so flooding there is not counted. Violet and teal areas are possibly flooded, not certain.",
+  "coordinates": [
+    84.136464,
+    26.085577,
+    84.766202,
+    26.614634
   ],
   "image_crs": "EPSG:3857",
-  "image_corners": [
-    [
-      84.13646446971275,
-      26.614634172899674
-    ],
-    [
-      84.76620208267364,
-      26.614634172899674
-    ],
-    [
-      84.76620208267364,
-      26.085576677999846
-    ],
-    [
-      84.13646446971275,
-      26.085576677999846
-    ]
-  ],
-  "image_corners_order": "top-left, top-right, bottom-right, bottom-left, as [lon, lat]",
-  "raster_crs": "EPSG:32644",
-  "pixel_m": 20,
-  "satellite": "NISAR (NASA-ISRO), L-band",
-  "product": "NISAR_L2_GCOV_PROVISIONAL_V1",
-  "track": "149D frame 075",
-  "channel": "HH",
-  "dates": [
-    "2026-06-24",
-    "2026-07-06",
-    "2026-07-18",
-    "2026-08-11",
-    "2026-09-04",
-    "2026-09-28",
-    "2026-10-10"
+  "satellite": "NISAR (NASA-ISRO), L-band, track 149 descending, frame 75, HH channel",
+  "sources": [
+    "NISAR L2 GCOV, Provisional (NISAR_L2_GCOV_PROVISIONAL_V1), NASA Earthdata / ASF",
+    "Sentinel-2 L2A photo (ESA Copernicus), via Earth Search",
+    "OpenStreetMap, towns and river",
+    "Water levels and barrage discharge: Bihar Water Resources Department, reported in the press; SANDRP, 2026: Making Sense of Gandak Flood II: https://sandrp.in/2026/11/05/2026-making-sense-of-gandak-flood-ii/",
+    "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case2.ipynb)"
   ],
   "key_dates": {
-    "before": "2026-09-04",
-    "peak": "2026-09-28",
+    "before": "2026-08-11",
+    "event": "2026-09-28",
     "after": "2026-10-10"
   },
-  "pairs": [
+  "scene": {
+    "imagery": "case2/sentinel2_2026-06-25.webp",
+    "places": "case2/places.geojson"
+  },
+  "layers": [
     {
-      "before": "2026-09-04",
-      "after": "2026-09-28",
-      "png": "flood/flood_2026-09-04_2026-09-28.png",
-      "tif": "flood/flood_2026-09-04_2026-09-28.tif"
+      "name": "NISAR radar (HH), 2026-08-11, before",
+      "file": "case2/hh_clean_2026-08-11.webp",
+      "legend": {
+        "gradient": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ],
+        "labels": {
+          "lowEnd": "-25 dB: dark, calm water",
+          "highEnd": "0 dB: bright, villages and dense crops"
+        }
+      }
     },
     {
-      "before": "2026-09-28",
-      "after": "2026-10-10",
-      "png": "flood/flood_2026-09-28_2026-10-10.png",
-      "tif": "flood/flood_2026-09-28_2026-10-10.tif"
+      "name": "NISAR radar (HH), 2026-09-28, flood peak",
+      "file": "case2/hh_clean_2026-09-28.webp",
+      "legend": {
+        "gradient": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ],
+        "labels": {
+          "lowEnd": "-25 dB: dark, calm water",
+          "highEnd": "0 dB: bright, villages and dense crops"
+        }
+      }
+    },
+    {
+      "name": "Open water, 2026-09-04",
+      "file": "case2/water_2026-09-04.png",
+      "legend": {
+        "type": "categories",
+        "gradient": [
+          [
+            198,
+            219,
+            239
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Open water on this date",
+          "highEnd": "Open water on this date"
+        },
+        "categories": [
+          {
+            "color": [
+              198,
+              219,
+              239
+            ],
+            "label": "Open water on this date"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Open water, 2026-09-28",
+      "file": "case2/water_2026-09-28.png",
+      "legend": {
+        "type": "categories",
+        "gradient": [
+          [
+            198,
+            219,
+            239
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Open water on this date",
+          "highEnd": "Open water on this date"
+        },
+        "categories": [
+          {
+            "color": [
+              198,
+              219,
+              239
+            ],
+            "label": "Open water on this date"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Flood map, 2026-09-04 → 2026-09-28",
+      "file": "case2/flood_2026-09-04_2026-09-28.png",
+      "legend": {
+        "type": "categories",
+        "gradient": [
+          [
+            43,
+            140,
+            190
+          ],
+          [
+            8,
+            48,
+            107
+          ],
+          [
+            217,
+            178,
+            111
+          ],
+          [
+            106,
+            81,
+            163
+          ],
+          [
+            90,
+            180,
+            172
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Newly flooded (open water)",
+          "highEnd": "Darker: possibly submerged vegetation"
+        },
+        "categories": [
+          {
+            "color": [
+              43,
+              140,
+              190
+            ],
+            "label": "Newly flooded (open water)"
+          },
+          {
+            "color": [
+              8,
+              48,
+              107
+            ],
+            "label": "Water on both dates (river, ponds)"
+          },
+          {
+            "color": [
+              217,
+              178,
+              111
+            ],
+            "label": "Dry again (water receded)"
+          },
+          {
+            "color": [
+              106,
+              81,
+              163
+            ],
+            "label": "Brighter: villages, crops, trees standing in water"
+          },
+          {
+            "color": [
+              90,
+              180,
+              172
+            ],
+            "label": "Darker: possibly submerged vegetation"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Recession, 2026-09-28 → 2026-10-10",
+      "file": "case2/flood_2026-09-28_2026-10-10.png",
+      "legend": {
+        "type": "categories",
+        "gradient": [
+          [
+            43,
+            140,
+            190
+          ],
+          [
+            8,
+            48,
+            107
+          ],
+          [
+            217,
+            178,
+            111
+          ],
+          [
+            106,
+            81,
+            163
+          ],
+          [
+            90,
+            180,
+            172
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Newly flooded (open water)",
+          "highEnd": "Darker: possibly submerged vegetation"
+        },
+        "categories": [
+          {
+            "color": [
+              43,
+              140,
+              190
+            ],
+            "label": "Newly flooded (open water)"
+          },
+          {
+            "color": [
+              8,
+              48,
+              107
+            ],
+            "label": "Water on both dates (river, ponds)"
+          },
+          {
+            "color": [
+              217,
+              178,
+              111
+            ],
+            "label": "Dry again (water receded)"
+          },
+          {
+            "color": [
+              106,
+              81,
+              163
+            ],
+            "label": "Brighter: villages, crops, trees standing in water"
+          },
+          {
+            "color": [
+              90,
+              180,
+              172
+            ],
+            "label": "Darker: possibly submerged vegetation"
+          }
+        ]
+      }
     }
   ],
-  "legend": {
-    "1": {
-      "label": "water on both dates",
-      "color": "#08306b"
+  "pairs": [
+    {
+      "reference": "2026-09-04",
+      "secondary": "2026-09-28",
+      "file": "case2/flood_2026-09-04_2026-09-28.png",
+      "water on both dates": 49.3,
+      "newly flooded (open water)": 68.2,
+      "dry again (water receded)": 17.9,
+      "brighter: partly flooded villages, crops, trees": 21.0,
+      "darker: possibly submerged vegetation": 68.5
     },
-    "2": {
-      "label": "newly flooded (open water)",
-      "color": "#2b8cbe"
-    },
-    "3": {
-      "label": "dry again (water receded)",
-      "color": "#d9b26f"
-    },
-    "4": {
-      "label": "brighter: partly flooded villages, crops, trees",
-      "color": "#6a51a3"
-    },
-    "5": {
-      "label": "darker: possibly submerged vegetation",
-      "color": "#5ab4ac"
+    {
+      "reference": "2026-09-28",
+      "secondary": "2026-10-10",
+      "file": "case2/flood_2026-09-28_2026-10-10.png",
+      "water on both dates": 25.7,
+      "newly flooded (open water)": 12.8,
+      "dry again (water receded)": 93.0,
+      "brighter: partly flooded villages, crops, trees": 10.5,
+      "darker: possibly submerged vegetation": 31.2
     }
-  },
-  "water_color": "#c6dbef",
-  "files": {
-    "photo": {
-      "path": "reference/sentinel2_2026-06-25.webp",
-      "date": "2026-06-25",
-      "source": "Sentinel-2 L2A, Earth Search"
-    },
-    "places": "reference/places.geojson",
-    "radar_raw": {
-      "2026-06-24": "radar/hh_raw_2026-06-24.webp",
-      "2026-07-06": "radar/hh_raw_2026-07-06.webp",
-      "2026-07-18": "radar/hh_raw_2026-07-18.webp",
-      "2026-08-11": "radar/hh_raw_2026-08-11.webp",
-      "2026-09-04": "radar/hh_raw_2026-09-04.webp",
-      "2026-09-28": "radar/hh_raw_2026-09-28.webp",
-      "2026-10-10": "radar/hh_raw_2026-10-10.webp"
-    },
-    "radar_clean": {
-      "2026-06-24": "radar/hh_clean_2026-06-24.webp",
-      "2026-07-06": "radar/hh_clean_2026-07-06.webp",
-      "2026-07-18": "radar/hh_clean_2026-07-18.webp",
-      "2026-08-11": "radar/hh_clean_2026-08-11.webp",
-      "2026-09-04": "radar/hh_clean_2026-09-04.webp",
-      "2026-09-28": "radar/hh_clean_2026-09-28.webp",
-      "2026-10-10": "radar/hh_clean_2026-10-10.webp"
-    },
-    "radar_values": {
-      "2026-06-24": "radar/hh_clean_2026-06-24.tif",
-      "2026-07-06": "radar/hh_clean_2026-07-06.tif",
-      "2026-07-18": "radar/hh_clean_2026-07-18.tif",
-      "2026-08-11": "radar/hh_clean_2026-08-11.tif",
-      "2026-09-04": "radar/hh_clean_2026-09-04.tif",
-      "2026-09-28": "radar/hh_clean_2026-09-28.tif",
-      "2026-10-10": "radar/hh_clean_2026-10-10.tif"
-    },
-    "water": {
-      "2026-06-24": "water/water_2026-06-24.png",
-      "2026-07-06": "water/water_2026-07-06.png",
-      "2026-07-18": "water/water_2026-07-18.png",
-      "2026-08-11": "water/water_2026-08-11.png",
-      "2026-09-04": "water/water_2026-09-04.png",
-      "2026-09-28": "water/water_2026-09-28.png",
-      "2026-10-10": "water/water_2026-10-10.png"
-    }
-  },
-  "encodings": {
-    "radar_webp": {
-      "db_min": -25.0,
-      "db_max": 0.0,
-      "formula": "dB = db_min + (db_max - db_min) * grey / 255",
-      "no_data": "alpha 0"
-    },
-    "radar_tif": {
-      "dtype": "uint8",
-      "formula": "dB = -40.0 + 0.25 * value",
-      "no_data": 255
-    },
-    "flood_tif": {
-      "dtype": "uint8",
-      "codes": {
-        "0": "no flood change",
-        "1": "water on both dates",
-        "2": "newly flooded (open water)",
-        "3": "dry again (water receded)",
-        "4": "brighter: partly flooded villages, crops, trees",
-        "5": "darker: possibly submerged vegetation"
+  ],
+  "stages": [
+    {
+      "type": "leadUp",
+      "headline": "Before: the Gandak in its monsoon bed",
+      "metric": {
+        "label": "of open water on Sep 4, the starting point of the comparison",
+        "value": "68 km²"
       },
-      "no_data": 255
+      "summary": "On August 11 the Gandak is the dark ribbon across the top of the image: calm water acts like a mirror for radar and sends the pulse away. Every pixel darker than -16 dB, a value we measured on the river itself, counts as open water. Our flood comparison starts from the last pass before the flood, September 4, when the river covered 68 km².",
+      "confidence": "High",
+      "imagery": "case2/hh_clean_2026-08-11.webp",
+      "legend": {
+        "gradient": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ],
+        "labels": {
+          "lowEnd": "-25 dB: dark, calm water",
+          "highEnd": "0 dB: bright, villages and dense crops"
+        }
+      }
+    },
+    {
+      "type": "event",
+      "headline": "Flood peak: the river spreads over the floodplain",
+      "metric": {
+        "label": "newly flooded open water",
+        "value": "68 km²"
+      },
+      "summary": "Comparing September 4 and 28 pixel by pixel, open water grows from 68 to 119 km². Water leaves three signatures: open water turns dark (blue); villages, crops and trees standing in water turn brighter, because the pulse bounces between the water and walls or stems (violet, 21 km²); fully submerged vegetation turns darker without reaching open water (teal, 68 km², possibly flooded).",
+      "confidence": "High",
+      "imagery": "case2/flood_2026-09-04_2026-09-28.png",
+      "legend": {
+        "type": "categories",
+        "gradient": [
+          [
+            43,
+            140,
+            190
+          ],
+          [
+            8,
+            48,
+            107
+          ],
+          [
+            217,
+            178,
+            111
+          ],
+          [
+            106,
+            81,
+            163
+          ],
+          [
+            90,
+            180,
+            172
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Newly flooded (open water)",
+          "highEnd": "Darker: possibly submerged vegetation"
+        },
+        "categories": [
+          {
+            "color": [
+              43,
+              140,
+              190
+            ],
+            "label": "Newly flooded (open water)"
+          },
+          {
+            "color": [
+              8,
+              48,
+              107
+            ],
+            "label": "Water on both dates (river, ponds)"
+          },
+          {
+            "color": [
+              217,
+              178,
+              111
+            ],
+            "label": "Dry again (water receded)"
+          },
+          {
+            "color": [
+              106,
+              81,
+              163
+            ],
+            "label": "Brighter: villages, crops, trees standing in water"
+          },
+          {
+            "color": [
+              90,
+              180,
+              172
+            ],
+            "label": "Darker: possibly submerged vegetation"
+          }
+        ]
+      }
+    },
+    {
+      "type": "takeaway",
+      "headline": "The water recedes, the risk does not end",
+      "metric": {
+        "label": "dry again by October 10",
+        "value": "93 km²"
+      },
+      "summary": "By October 10 open water is back to 46 km² (sand: land that dried out). Two days after our peak image, on September 30, the Sheetalpur embankment breached in Gopalganj's Baikunthpur block, and more than 200 villages were inundated across six districts. NISAR passes every 12 days can follow such events through the clouds.",
+      "confidence": "Medium",
+      "imagery": "case2/flood_2026-09-28_2026-10-10.png",
+      "legend": {
+        "type": "categories",
+        "gradient": [
+          [
+            43,
+            140,
+            190
+          ],
+          [
+            8,
+            48,
+            107
+          ],
+          [
+            217,
+            178,
+            111
+          ],
+          [
+            106,
+            81,
+            163
+          ],
+          [
+            90,
+            180,
+            172
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Newly flooded (open water)",
+          "highEnd": "Darker: possibly submerged vegetation"
+        },
+        "categories": [
+          {
+            "color": [
+              43,
+              140,
+              190
+            ],
+            "label": "Newly flooded (open water)"
+          },
+          {
+            "color": [
+              8,
+              48,
+              107
+            ],
+            "label": "Water on both dates (river, ponds)"
+          },
+          {
+            "color": [
+              217,
+              178,
+              111
+            ],
+            "label": "Dry again (water receded)"
+          },
+          {
+            "color": [
+              106,
+              81,
+              163
+            ],
+            "label": "Brighter: villages, crops, trees standing in water"
+          },
+          {
+            "color": [
+              90,
+              180,
+              172
+            ],
+            "label": "Darker: possibly submerged vegetation"
+          }
+        ]
+      },
+      "actions": [
+        "Check the villages next to the violet areas first: buildings and crops standing in water.",
+        "Repeat the map on every 12-day NISAR pass to follow the water, even under monsoon clouds.",
+        "Use the teal areas to widen the search, as probably flooded, not as certain water."
+      ]
     }
-  }
+  ]
 }

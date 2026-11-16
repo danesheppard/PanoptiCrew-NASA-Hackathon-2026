@@ -1,0 +1,150 @@
+{
+  "image_corners": [
+    [
+      84.13646446971275,
+      26.614634172899674
+    ],
+    [
+      84.76620208267364,
+      26.614634172899674
+    ],
+    [
+      84.76620208267364,
+      26.085576677999846
+    ],
+    [
+      84.13646446971275,
+      26.085576677999846
+    ]
+  ],
+  "image_corners_order": "top-left, top-right, bottom-right, bottom-left, as [lon, lat]",
+  "raster_crs": "EPSG:32644",
+  "pixel_m": 20,
+  "product": "NISAR_L2_GCOV_PROVISIONAL_V1",
+  "track": "149D frame 075",
+  "channel": "HH",
+  "dates": [
+    "2026-06-24",
+    "2026-07-06",
+    "2026-07-18",
+    "2026-08-11",
+    "2026-09-04",
+    "2026-09-28",
+    "2026-10-10"
+  ],
+  "analysis_dates": {
+    "before": "2026-09-04",
+    "peak": "2026-09-28",
+    "after": "2026-10-10"
+  },
+  "files": {
+    "photo": {
+      "path": "case2/sentinel2_2026-06-25.webp",
+      "date": "2026-06-25"
+    },
+    "places": "case2/places.geojson",
+    "radar_raw": {
+      "2026-06-24": "case2/hh_raw_2026-06-24.webp",
+      "2026-07-06": "case2/hh_raw_2026-07-06.webp",
+      "2026-07-18": "case2/hh_raw_2026-07-18.webp",
+      "2026-08-11": "case2/hh_raw_2026-08-11.webp",
+      "2026-09-04": "case2/hh_raw_2026-09-04.webp",
+      "2026-09-28": "case2/hh_raw_2026-09-28.webp",
+      "2026-10-10": "case2/hh_raw_2026-10-10.webp"
+    },
+    "radar_clean": {
+      "2026-06-24": "case2/hh_clean_2026-06-24.webp",
+      "2026-07-06": "case2/hh_clean_2026-07-06.webp",
+      "2026-07-18": "case2/hh_clean_2026-07-18.webp",
+      "2026-08-11": "case2/hh_clean_2026-08-11.webp",
+      "2026-09-04": "case2/hh_clean_2026-09-04.webp",
+      "2026-09-28": "case2/hh_clean_2026-09-28.webp",
+      "2026-10-10": "case2/hh_clean_2026-10-10.webp"
+    },
+    "radar_values": {
+      "2026-06-24": "case2/hh_clean_2026-06-24.tif",
+      "2026-07-06": "case2/hh_clean_2026-07-06.tif",
+      "2026-07-18": "case2/hh_clean_2026-07-18.tif",
+      "2026-08-11": "case2/hh_clean_2026-08-11.tif",
+      "2026-09-04": "case2/hh_clean_2026-09-04.tif",
+      "2026-09-28": "case2/hh_clean_2026-09-28.tif",
+      "2026-10-10": "case2/hh_clean_2026-10-10.tif"
+    },
+    "water": {
+      "2026-06-24": "case2/water_2026-06-24.png",
+      "2026-07-06": "case2/water_2026-07-06.png",
+      "2026-07-18": "case2/water_2026-07-18.png",
+      "2026-08-11": "case2/water_2026-08-11.png",
+      "2026-09-04": "case2/water_2026-09-04.png",
+      "2026-09-28": "case2/water_2026-09-28.png",
+      "2026-10-10": "case2/water_2026-10-10.png"
+    },
+    "flood_codes": {
+      "2026-09-04_2026-09-28": "case2/flood_2026-09-04_2026-09-28.tif",
+      "2026-09-28_2026-10-10": "case2/flood_2026-09-28_2026-10-10.tif"
+    }
+  },
+  "encodings": {
+    "radar_webp": {
+      "db_min": -25.0,
+      "db_max": 0.0,
+      "formula": "dB = db_min + (db_max - db_min) * grey / 255",
+      "no_data": "alpha 0"
+    },
+    "radar_tif": {
+      "dtype": "uint8",
+      "pixel_m": 40,
+      "formula": "dB = -40.0 + 0.25 * value",
+      "no_data": 255
+    },
+    "flood_tif": {
+      "dtype": "uint8",
+      "codes": {
+        "0": "no flood change",
+        "1": "water on both dates",
+        "2": "newly flooded (open water)",
+        "3": "dry again (water receded)",
+        "4": "brighter: partly flooded villages, crops, trees",
+        "5": "darker: possibly submerged vegetation"
+      },
+      "no_data": 255
+    }
+  },
+  "stats": {
+    "thresholds": {
+      "water_db": -16.0,
+      "water_how": "90th percentile of cleaned HH in the river polygon [84.545, 26.481, 84.555, 26.488] on 2026-09-04 and 2026-09-28, rounded",
+      "otsu_db_for_comparison": -9.0,
+      "change_db": 3.0,
+      "change_how": "3 x standard deviation (1.00 dB) of HH change 2026-09-04 to 2026-09-28 in the dry-field polygon [84.684, 26.326, 84.696, 26.338], rounded",
+      "bright_min_db": -8.0,
+      "min_patch_pixels": 9,
+      "near_new_water_m": 500
+    },
+    "water_km2_by_date": {
+      "2026-06-24": 385.0,
+      "2026-07-06": 55.4,
+      "2026-07-18": 6.2,
+      "2026-08-11": 10.6,
+      "2026-09-04": 67.8,
+      "2026-09-28": 118.7,
+      "2026-10-10": 46.3
+    },
+    "pairs_km2": {
+      "2026-09-04_2026-09-28": {
+        "water on both dates": 49.3,
+        "newly flooded (open water)": 68.2,
+        "dry again (water receded)": 17.9,
+        "brighter: partly flooded villages, crops, trees": 21.0,
+        "darker: possibly submerged vegetation": 68.5
+      },
+      "2026-09-28_2026-10-10": {
+        "water on both dates": 25.7,
+        "newly flooded (open water)": 12.8,
+        "dry again (water receded)": 93.0,
+        "brighter: partly flooded villages, crops, trees": 10.5,
+        "darker: possibly submerged vegetation": 31.2
+      }
+    }
+  }
+}

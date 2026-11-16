@@ -1,20 +1,33 @@
 # Python 3.11 or newer
+
+# NISAR search and download
 earthaccess>=0.12
-xarray>=2024.6
-h5netcdf>=1.3
-h5py>=3.11
+requests>=2.32
 fsspec>=2024.6
 aiohttp>=3.9
+h5py>=3.11
+h5netcdf>=1.3
+xarray>=2024.6
+
+# rasters, projections and vectors
 rioxarray>=0.17
 rasterio>=1.4
 pyproj>=3.6
-scipy>=1.13
-numpy>=1.26
-pandas>=2.2
-matplotlib>=3.9
-pillow>=10.4
+shapely>=2.0
 geopandas>=1.0
 pyogrio>=0.9
 osmnx>=2.0
-nbformat>=5.10
+
+# analysis
+numpy>=1.26
+pandas>=2.2
+scipy>=1.13
+
+# plots and image export
+matplotlib>=3.9
+plotly>=5.22
+pillow>=10.4
+
+# notebooks
 jupyter
+nbformat>=5.10

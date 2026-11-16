@@ -1,0 +1,350 @@
+{
+  "image_corners": [
+    [
+      -90.11051709804283,
+      51.09761528601344
+    ],
+    [
+      -88.65204449365285,
+      51.09761528601344
+    ],
+    [
+      -88.65204449365285,
+      49.96259701546094
+    ],
+    [
+      -90.11051709804283,
+      49.96259701546094
+    ]
+  ],
+  "image_corners_order": "top-left, top-right, bottom-right, bottom-left, as [lon, lat]",
+  "raster_crs": "EPSG:32616",
+  "pixel_m": 40,
+  "product": "NISAR_L2_GCOV_PROVISIONAL_V1",
+  "track": "041D frame 063",
+  "channels": [
+    "HV",
+    "HH"
+  ],
+  "dates": [
+    "2026-06-17",
+    "2026-06-29",
+    "2026-07-11",
+    "2026-07-23",
+    "2026-08-16",
+    "2026-09-09",
+    "2026-09-21",
+    "2026-10-03",
+    "2026-10-15"
+  ],
+  "photo_days": {
+    "before": [
+      "2026-07-07",
+      "2026-07-04",
+      "2026-06-02"
+    ],
+    "after": [
+      "2026-09-22",
+      "2026-09-20",
+      "2026-09-10"
+    ]
+  },
+  "fire": {
+    "name": "Thunder Bay 36",
+    "fire_number": "THU036",
+    "start": "2026-07-12",
+    "official_size_ha": 301240.0,
+    "perimeter_mapped": "2026-08-06",
+    "other_fires_in_box": [
+      {
+        "FIRENUMB": "DRY034",
+        "CUR_SIZE": 45800.0
+      },
+      {
+        "FIRENUMB": "NIP070",
+        "CUR_SIZE": 1217.5968547
+      }
+    ]
+  },
+  "files": {
+    "radar_raw": {
+      "2026-06-17": "case5/hv_raw_2026-06-17.webp",
+      "2026-06-29": "case5/hv_raw_2026-06-29.webp",
+      "2026-07-11": "case5/hv_raw_2026-07-11.webp",
+      "2026-07-23": "case5/hv_raw_2026-07-23.webp",
+      "2026-08-16": "case5/hv_raw_2026-08-16.webp",
+      "2026-09-09": "case5/hv_raw_2026-09-09.webp",
+      "2026-09-21": "case5/hv_raw_2026-09-21.webp",
+      "2026-10-03": "case5/hv_raw_2026-10-03.webp",
+      "2026-10-15": "case5/hv_raw_2026-10-15.webp"
+    },
+    "radar_clean": {
+      "2026-06-17": "case5/hv_clean_2026-06-17.webp",
+      "2026-06-29": "case5/hv_clean_2026-06-29.webp",
+      "2026-07-11": "case5/hv_clean_2026-07-11.webp",
+      "2026-07-23": "case5/hv_clean_2026-07-23.webp",
+      "2026-08-16": "case5/hv_clean_2026-08-16.webp",
+      "2026-09-09": "case5/hv_clean_2026-09-09.webp",
+      "2026-09-21": "case5/hv_clean_2026-09-21.webp",
+      "2026-10-03": "case5/hv_clean_2026-10-03.webp",
+      "2026-10-15": "case5/hv_clean_2026-10-15.webp"
+    },
+    "radar_hh_clean": {
+      "2026-06-17": "case5/hh_clean_2026-06-17.webp",
+      "2026-06-29": "case5/hh_clean_2026-06-29.webp",
+      "2026-07-11": "case5/hh_clean_2026-07-11.webp",
+      "2026-07-23": "case5/hh_clean_2026-07-23.webp",
+      "2026-08-16": "case5/hh_clean_2026-08-16.webp",
+      "2026-09-09": "case5/hh_clean_2026-09-09.webp",
+      "2026-09-21": "case5/hh_clean_2026-09-21.webp",
+      "2026-10-03": "case5/hh_clean_2026-10-03.webp",
+      "2026-10-15": "case5/hh_clean_2026-10-15.webp"
+    },
+    "radar_values": {
+      "2026-06-17": "case5/hv_clean_2026-06-17.tif",
+      "2026-06-29": "case5/hv_clean_2026-06-29.tif",
+      "2026-07-11": "case5/hv_clean_2026-07-11.tif",
+      "2026-07-23": "case5/hv_clean_2026-07-23.tif",
+      "2026-08-16": "case5/hv_clean_2026-08-16.tif",
+      "2026-09-09": "case5/hv_clean_2026-09-09.tif",
+      "2026-09-21": "case5/hv_clean_2026-09-21.tif",
+      "2026-10-03": "case5/hv_clean_2026-10-03.tif",
+      "2026-10-15": "case5/hv_clean_2026-10-15.tif"
+    },
+    "burn_codes": {
+      "2026-07-23": "case5/burn_2026-07-23.tif",
+      "2026-08-16": "case5/burn_2026-08-16.tif",
+      "2026-09-09": "case5/burn_2026-09-09.tif",
+      "2026-09-21": "case5/burn_2026-09-21.tif",
+      "2026-10-03": "case5/burn_2026-10-03.tif",
+      "2026-10-15": "case5/burn_2026-10-15.tif"
+    },
+    "bright_codes": {
+      "2026-07-23": "case5/bright_2026-07-23.tif",
+      "2026-08-16": "case5/bright_2026-08-16.tif",
+      "2026-09-09": "case5/bright_2026-09-09.tif",
+      "2026-09-21": "case5/bright_2026-09-21.tif",
+      "2026-10-03": "case5/bright_2026-10-03.tif",
+      "2026-10-15": "case5/bright_2026-10-15.tif"
+    }
+  },
+  "encodings": {
+    "radar_webp": {
+      "db_min": -25.0,
+      "db_max": -5.0,
+      "formula": "dB = db_min + (db_max - db_min) * grey / 255",
+      "no_data": "alpha 0"
+    },
+    "radar_hh_webp": {
+      "db_min": -20.0,
+      "db_max": 0.0,
+      "formula": "dB = db_min + (db_max - db_min) * grey / 255",
+      "no_data": "alpha 0"
+    },
+    "radar_tif": {
+      "dtype": "uint8",
+      "pixel_m": 80,
+      "formula": "dB = -40.0 + 0.25 * value",
+      "no_data": 255
+    },
+    "burn_tif": {
+      "dtype": "uint8",
+      "codes": {
+        "0": "no canopy change",
+        "1": "canopy loss",
+        "2": "severe canopy loss"
+      },
+      "no_data": 255
+    },
+    "bright_tif": {
+      "dtype": "uint8",
+      "codes": {
+        "0": "no change",
+        "1": "brighter: burned trunks on bare ground (double bounce)"
+      },
+      "no_data": 255
+    }
+  },
+  "stats": {
+    "thresholds": {
+      "loss_db": -1.0,
+      "severe_db": -2.0,
+      "bright_db": 1.0,
+      "noise_hv_db": 0.54,
+      "noise_hh_db": 0.7,
+      "common_change_hv_db": -0.03,
+      "common_change_hh_db": 0.58,
+      "how": "relative change = change minus the median change of an unburned ring 1 to 6 km outside the perimeter (other 2026 fires removed); thresholds = 2 x (3 x for severe) the standard deviation in the ring, rounded",
+      "vegetated_min_hv_db": -18.0,
+      "min_patch_pixels": 9
+    },
+    "canopy_loss_km2_by_date": {
+      "2026-07-23": {
+        "canopy loss": 158.1,
+        "severe canopy loss": 9.7
+      },
+      "2026-08-16": {
+        "canopy loss": 658.9,
+        "severe canopy loss": 247.2
+      },
+      "2026-09-09": {
+        "canopy loss": 258.3,
+        "severe canopy loss": 20.0
+      },
+      "2026-09-21": {
+        "canopy loss": 1055.9,
+        "severe canopy loss": 424.6
+      },
+      "2026-10-03": {
+        "canopy loss": 737.5,
+        "severe canopy loss": 120.1
+      },
+      "2026-10-15": {
+        "canopy loss": 626.7,
+        "severe canopy loss": 66.1
+      }
+    },
+    "brighter_km2_by_date": {
+      "2026-07-23": 1857.1,
+      "2026-08-16": 2196.0,
+      "2026-09-09": 1916.7,
+      "2026-09-21": 903.1,
+      "2026-10-03": 1598.1,
+      "2026-10-15": 1812.7
+    },
+    "time_series_km2": [
+      {
+        "date": "2026-06-17",
+        "canopy loss inside (km²)": 3.9,
+        "canopy loss outside (km²)": 161.3,
+        "brighter HH inside (km²)": 65.6,
+        "brighter HH outside (km²)": 232.5
+      },
+      {
+        "date": "2026-06-29",
+        "canopy loss inside (km²)": 1.9,
+        "canopy loss outside (km²)": 235.7,
+        "brighter HH inside (km²)": 26.5,
+        "brighter HH outside (km²)": 118.8
+      },
+      {
+        "date": "2026-07-23",
+        "canopy loss inside (km²)": 14.4,
+        "canopy loss outside (km²)": 153.5,
+        "brighter HH inside (km²)": 1514.0,
+        "brighter HH outside (km²)": 343.1
+      },
+      {
+        "date": "2026-08-16",
+        "canopy loss inside (km²)": 690.9,
+        "canopy loss outside (km²)": 215.2,
+        "brighter HH inside (km²)": 1115.3,
+        "brighter HH outside (km²)": 1080.7
+      },
+      {
+        "date": "2026-09-09",
+        "canopy loss inside (km²)": 201.3,
+        "canopy loss outside (km²)": 77.0,
+        "brighter HH inside (km²)": 1386.1,
+        "brighter HH outside (km²)": 530.6
+      },
+      {
+        "date": "2026-09-21",
+        "canopy loss inside (km²)": 1273.9,
+        "canopy loss outside (km²)": 206.7,
+        "brighter HH inside (km²)": 554.9,
+        "brighter HH outside (km²)": 348.2
+      },
+      {
+        "date": "2026-10-03",
+        "canopy loss inside (km²)": 696.3,
+        "canopy loss outside (km²)": 161.2,
+        "brighter HH inside (km²)": 1134.5,
+        "brighter HH outside (km²)": 463.6
+      },
+      {
+        "date": "2026-10-15",
+        "canopy loss inside (km²)": 511.1,
+        "canopy loss outside (km²)": 181.7,
+        "brighter HH inside (km²)": 1293.0,
+        "brighter HH outside (km²)": 519.7
+      }
+    ],
+    "perimeter_check": {
+      "canopy_loss": {
+        "total (km²)": 1480.6,
+        "inside the official perimeter (%)": 86.0,
+        "share of the vegetated perimeter flagged (%)": 40.8,
+        "outside the perimeter (km²)": 206.7,
+        "  of which in other 2026 fires (km²)": 29.7
+      },
+      "brighter": {
+        "total (km²)": 1857.1,
+        "inside the official perimeter (%)": 81.5,
+        "share of the vegetated perimeter flagged (%)": 48.5,
+        "outside the perimeter (km²)": 343.1,
+        "  of which in other 2026 fires (km²)": 23.8
+      },
+      "either": {
+        "total (km²)": 2712.0,
+        "inside the official perimeter (%)": 80.1,
+        "share of the vegetated perimeter flagged (%)": 69.5,
+        "outside the perimeter (km²)": 540.6,
+        "  of which in other 2026 fires (km²)": 45.2
+      }
+    },
+    "optical_validation": [
+      {
+        "optical burn severity (dNBR)": "unburned",
+        "area in the box (km²)": 7497.2,
+        "inside the perimeter (km²)": 500.5,
+        "brighter HH 07-23 %": 4.8,
+        "canopy loss HV 09-21 %": 3.1,
+        "severe %": 0.1,
+        "either signal %": 7.5
+      },
+      {
+        "optical burn severity (dNBR)": "low",
+        "area in the box (km²)": 441.0,
+        "inside the perimeter (km²)": 208.8,
+        "brighter HH 07-23 %": 22.6,
+        "canopy loss HV 09-21 %": 7.0,
+        "severe %": 0.8,
+        "either signal %": 28.0
+      },
+      {
+        "optical burn severity (dNBR)": "moderate-low",
+        "area in the box (km²)": 264.1,
+        "inside the perimeter (km²)": 237.7,
+        "brighter HH 07-23 %": 41.2,
+        "canopy loss HV 09-21 %": 15.4,
+        "severe %": 3.2,
+        "either signal %": 51.5
+      },
+      {
+        "optical burn severity (dNBR)": "moderate-high",
+        "area in the box (km²)": 439.6,
+        "inside the perimeter (km²)": 421.9,
+        "brighter HH 07-23 %": 51.2,
+        "canopy loss HV 09-21 %": 25.3,
+        "severe %": 7.7,
+        "either signal %": 66.9
+      },
+      {
+        "optical burn severity (dNBR)": "high",
+        "area in the box (km²)": 1776.3,
+        "inside the perimeter (km²)": 1754.8,
+        "brighter HH 07-23 %": 58.9,
+        "canopy loss HV 09-21 %": 58.7,
+        "severe %": 20.5,
+        "either signal %": 87.9
+      }
+    ],
+    "hotspots_inside_perimeter": {
+      "count": 49102,
+      "first": "2026-05-31",
+      "last": "2026-08-31",
+      "share_jul12_jul22_pct": 98.2
+    }
+  }
+}

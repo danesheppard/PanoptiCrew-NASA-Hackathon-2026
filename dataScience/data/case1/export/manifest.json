@@ -1,156 +1,308 @@
 {
   "case": "case1",
   "title": "Bhotekoshi glacier collapse and debris flood, Nepal (August 2026)",
+  "location": "Bhote Koshi valley, Nepal",
   "event_date": "2026-08-26",
   "story": "On the morning of 26 August 2026, rock and glacier ice broke off Langtang Lirung and briefly dammed the river. The flood that followed swept down the Bhote Koshi through Rasuwagadhi, Timure and Syabrubesi, killing more than 1,400 people",
-  "method": "Coherence measures how similar the ground's radar fingerprint is between two passes 12 days apart. Ground that was ripped up, buried or flooded in between loses coherence, so a drop compared with the usual coherence marks where the flood went",
-  "bbox_lonlat": [
+  "method": "Coherence measures how similar the ground's radar fingerprint is between two passes 12 days apart. Ground that was ripped up, buried or flooded in between loses coherence, so a drop compared with the usual coherence marks where the flood went. Backscatter before and after, averaged to 50 m, shows how the surface changed",
+  "limitations": "Passes are 12 days apart, so the radar brackets the collapse (19 and 31 August) rather than catching it. Coherence is at 80 m, so narrow channels blur, and steep slopes facing away from the radar have gaps",
+  "coordinates": [
     85.25,
     28.1,
     85.6,
     28.4
   ],
   "image_crs": "EPSG:3857",
-  "image_corners": [
-    [
-      85.25,
-      28.4
-    ],
-    [
-      85.6,
-      28.4
-    ],
-    [
-      85.6,
-      28.1
-    ],
-    [
-      85.25,
-      28.1
-    ]
+  "satellite": "NISAR (NASA-ISRO), L-band, track 98 ascending, frame 16",
+  "sources": [
+    "NISAR L2 GUNW and GCOV, Provisional (NISAR_L2_GUNW_PROVISIONAL_V1, NISAR_L2_GCOV_PROVISIONAL_V1), NASA Earthdata / ASF",
+    "NISAR Data User Guide: https://nisar-docs.asf.alaska.edu/",
+    "ICIMOD, event timeline: https://www.icimod.org/kyirong-rasuwa-flood-2026-nepal-china-border/",
+    "OpenStreetMap, town locations",
+    "Esri World Imagery and AWS Terrain Tiles, 3D scene",
+    "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case1.ipynb)"
   ],
-  "image_corners_order": "top-left, top-right, bottom-right, bottom-left, as [lon, lat]",
-  "satellite": "NISAR (NASA-ISRO), L-band",
-  "products": [
-    "NISAR_L2_GUNW_PROVISIONAL_V1",
-    "NISAR_L2_GCOV_PROVISIONAL_V1"
-  ],
-  "track": "098_A_016",
   "key_dates": {
     "before": "2026-08-19",
     "event": "2026-08-26",
     "after": "2026-08-31"
   },
   "scene": {
-    "terrain": "reference/terrain.png",
+    "terrain": "case1/terrain.png",
     "terrain_encoding": "terrarium: height (m) = R * 256 + G + B / 256 - 32768",
     "height_range_m": [
       1158,
       7212
     ],
-    "imagery": "reference/imagery.jpg",
-    "places": "reference/places.geojson",
-    "flood_path": "flood_path.geojson",
+    "imagery": "case1/imagery.jpg",
+    "places": "case1/places.geojson",
+    "flood_path": "case1/flood_path.geojson",
     "flood_path_km": 44.4
   },
-  "layers": {
-    "coherence_baseline": {
-      "file": "coherence/coherence_baseline.png",
-      "legend": "usual coherence before the event, 0 (purple, always changing) to 1 (yellow, stable)"
+  "layers": [
+    {
+      "name": "Usual coherence (before)",
+      "file": "case1/coherence_baseline.png",
+      "legend": {
+        "gradient": [
+          [
+            68,
+            1,
+            84
+          ],
+          [
+            59,
+            82,
+            139
+          ],
+          [
+            33,
+            145,
+            140
+          ],
+          [
+            94,
+            201,
+            98
+          ],
+          [
+            253,
+            231,
+            37
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Always changing",
+          "highEnd": "Stable"
+        }
+      }
     },
-    "coherence_event": {
-      "file": "coherence/coherence_event.png",
-      "legend": "coherence Aug 19 → Aug 31, same colours"
+    {
+      "name": "Coherence Aug 19 → Aug 31",
+      "file": "case1/coherence_event.png",
+      "legend": {
+        "gradient": [
+          [
+            68,
+            1,
+            84
+          ],
+          [
+            59,
+            82,
+            139
+          ],
+          [
+            33,
+            145,
+            140
+          ],
+          [
+            94,
+            201,
+            98
+          ],
+          [
+            253,
+            231,
+            37
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Always changing",
+          "highEnd": "Stable"
+        }
+      }
     },
-    "coherence_change": {
-      "file": "coherence/coherence_change.png",
-      "legend": "red: coherence dropped below normal by 0.15 or more, fully red from 0.3"
+    {
+      "name": "Coherence drop",
+      "file": "case1/coherence_change.png",
+      "legend": {
+        "gradient": [
+          [
+            252,
+            171,
+            143
+          ],
+          [
+            248,
+            93,
+            66
+          ],
+          [
+            197,
+            23,
+            28
+          ],
+          [
+            103,
+            0,
+            13
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Small drop",
+          "highEnd": "Large drop"
+        }
+      }
     },
-    "hv_darkening": {
-      "file": "backscatter/hv_darkening.png",
-      "legend": "blue: HV darker after the event by 1.5 dB or more (vegetation lost)"
+    {
+      "name": "Vegetation loss (HV darker)",
+      "file": "case1/hv_darkening.png",
+      "legend": {
+        "gradient": [
+          [
+            157,
+            202,
+            225
+          ],
+          [
+            79,
+            155,
+            203
+          ],
+          [
+            25,
+            102,
+            173
+          ],
+          [
+            8,
+            48,
+            107
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Slightly darker",
+          "highEnd": "Much darker (vegetation lost)"
+        }
+      }
     },
-    "hh_change": {
-      "file": "backscatter/hh_change.png",
-      "legend": "red brighter, blue darker after the event, changes over 1.5 dB"
+    {
+      "name": "HH change",
+      "file": "case1/hh_change.png",
+      "legend": {
+        "gradient": [
+          [
+            5,
+            48,
+            97
+          ],
+          [
+            107,
+            172,
+            209
+          ],
+          [
+            247,
+            246,
+            246
+          ],
+          [
+            228,
+            128,
+            102
+          ],
+          [
+            103,
+            0,
+            31
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Darker after",
+          "highEnd": "Brighter after"
+        }
+      }
     }
-  },
+  ],
   "pairs": [
     {
       "reference": "2026-05-27",
       "secondary": "2026-06-08",
-      "png": "coherence/pairs/coherence_0527_0608.png",
+      "file": "case1/coherence_0527_0608.png",
       "mean_coherence": 0.407,
+      "path_coherence": 0.404,
       "spans_event": false
     },
     {
       "reference": "2026-06-08",
       "secondary": "2026-06-20",
-      "png": "coherence/pairs/coherence_0608_0620.png",
+      "file": "case1/coherence_0608_0620.png",
       "mean_coherence": 0.48,
+      "path_coherence": 0.472,
       "spans_event": false
     },
     {
       "reference": "2026-06-20",
       "secondary": "2026-07-02",
-      "png": "coherence/pairs/coherence_0620_0702.png",
+      "file": "case1/coherence_0620_0702.png",
       "mean_coherence": 0.485,
+      "path_coherence": 0.458,
       "spans_event": false
     },
     {
       "reference": "2026-07-02",
       "secondary": "2026-07-14",
-      "png": "coherence/pairs/coherence_0702_0714.png",
+      "file": "case1/coherence_0702_0714.png",
       "mean_coherence": 0.498,
+      "path_coherence": 0.419,
       "spans_event": false
     },
     {
       "reference": "2026-07-14",
       "secondary": "2026-07-26",
-      "png": "coherence/pairs/coherence_0714_0726.png",
+      "file": "case1/coherence_0714_0726.png",
       "mean_coherence": 0.614,
+      "path_coherence": 0.545,
       "spans_event": false
     },
     {
       "reference": "2026-07-26",
       "secondary": "2026-08-19",
-      "png": "coherence/pairs/coherence_0726_0819.png",
+      "file": "case1/coherence_0726_0819.png",
       "mean_coherence": 0.573,
+      "path_coherence": 0.423,
       "spans_event": false
     },
     {
       "reference": "2026-08-19",
       "secondary": "2026-08-31",
-      "png": "coherence/pairs/coherence_0819_0831.png",
+      "file": "case1/coherence_0819_0831.png",
       "mean_coherence": 0.612,
+      "path_coherence": 0.247,
       "spans_event": true
     },
     {
       "reference": "2026-08-31",
       "secondary": "2026-09-12",
-      "png": "coherence/pairs/coherence_0831_0912.png",
+      "file": "case1/coherence_0831_0912.png",
       "mean_coherence": 0.541,
+      "path_coherence": 0.35,
       "spans_event": false
     },
     {
       "reference": "2026-09-12",
       "secondary": "2026-09-24",
-      "png": "coherence/pairs/coherence_0912_0924.png",
+      "file": "case1/coherence_0912_0924.png",
       "mean_coherence": 0.516,
+      "path_coherence": 0.515,
       "spans_event": false
     },
     {
       "reference": "2026-09-24",
       "secondary": "2026-10-06",
-      "png": "coherence/pairs/coherence_0924_1006.png",
+      "file": "case1/coherence_0924_1006.png",
       "mean_coherence": 0.256,
+      "path_coherence": 0.384,
       "spans_event": false
     },
     {
       "reference": "2026-10-06",
       "secondary": "2026-10-18",
-      "png": "coherence/pairs/coherence_1006_1018.png",
+      "file": "case1/coherence_1006_1018.png",
       "mean_coherence": 0.518,
+      "path_coherence": 0.598,
       "spans_event": false
     }
   ],
@@ -164,8 +316,8 @@
       },
       "summary": "Before 26 August, NISAR passed over the valley every few days. Each pass is compared with the one 12 days earlier: where the ground stays the same, the radar picture stays the same too. Through June, July and August the valley looked normal, steady on the slopes and always changing on the snow and ice. The last pass before the collapse was on 19 August",
       "confidence": "Medium",
-      "imagery": "coherence/coherence_baseline.png",
-      "timeline": "coherence/pairs",
+      "imagery": "case1/coherence_baseline.png",
+      "timeline": "case1/pairs",
       "legend": {
         "gradient": [
           [
@@ -199,7 +351,7 @@
           "highEnd": "Stable"
         }
       },
-      "chart": "charts/lead_up.png"
+      "chart": "case1/lead_up.png"
     },
     {
       "type": "event",
@@ -210,8 +362,8 @@
       },
       "summary": "Comparing the passes on 19 August and 31 August, the valley floor changed along a 44 km line, from the collapse site below Langtang Lirung, through Rasuwagadhi and Timure, to Syabrubesi. That is the path of the debris flood: ground torn up, buried or scoured between the two passes",
       "confidence": "High",
-      "imagery": "coherence/coherence_change.png",
-      "replay": "flood_path.geojson",
+      "imagery": "case1/coherence_change.png",
+      "replay": "case1/flood_path.geojson",
       "legend": {
         "gradient": [
           [
@@ -240,7 +392,7 @@
           "highEnd": "Large drop"
         }
       },
-      "chart": "charts/event.png"
+      "chart": "case1/event.png"
     },
     {
       "type": "takeaway",
@@ -251,7 +403,7 @@
       },
       "summary": "Radar sees through monsoon cloud, day or night, so within a week of the collapse NISAR had mapped the whole flood path. Along the river, the radar signal from vegetation dropped over about 15 km², where trees and plants were stripped away. 2 days after the collapse, NISAR moved the area to Urgent Response, processing new passes faster",
       "confidence": "Medium",
-      "imagery": "backscatter/hv_darkening.png",
+      "imagery": "case1/hv_darkening.png",
       "actions": [
         "Use 12-day coherence to map damage along a valley soon after a collapse, even under monsoon cloud",
         "Keep regular passes over hanging glaciers above inhabited valleys"
@@ -284,7 +436,7 @@
           "highEnd": "Much darker (vegetation lost)"
         }
       },
-      "chart": "charts/takeaway.png"
+      "chart": "case1/takeaway.png"
     }
   ]
 }

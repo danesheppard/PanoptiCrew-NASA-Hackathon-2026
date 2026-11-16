@@ -2,7 +2,7 @@
 
 Produced by `notebooks/case1.ipynb` (section 4). Copy this folder to `application/public/assets/geospatial/case1/`
 
-Every image covers the same box in Web Mercator (EPSG:3857), corners in `manifest.json` → `image_corners`. Transparent pixels mean nothing to show
+Every image covers the box in `manifest.json` → `coordinates`, in Web Mercator (EPSG:3857). Transparent pixels mean nothing to show
 
 | File | What it is |
 |---|---|
@@ -14,4 +14,5 @@ Every image covers the same box in Web Mercator (EPSG:3857), corners in `manifes
 | `coherence/pairs/*.png` | one coherence layer per 12-day pair, for a timeline |
 | `backscatter/hv_darkening.png`, `hh_change.png` | backscatter change at 50 m |
 | `charts/*.png` | mini chart for each stage, shown on the story card |
-| `manifest.json` | dates, corners, legend, and the text for each stage |
+| `manifest.json` | the case study for the app, same structure as `CaseStudy` in `caseStudies.ts` |
+| `extra.json` | details from the analysis the app doesn't use yet |

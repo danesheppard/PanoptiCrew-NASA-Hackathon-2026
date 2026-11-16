@@ -1,14 +1,19 @@
+// SI Acknowledgment: This file was refactored and debugged with assistance for GPT-6 Luna and Claude Sonnet 5.5
 import { useEffect, useMemo, useState } from "react";
 import { useLocalStorage } from "../customHooks.ts";
 import DeckGL from "@deck.gl/react";
 import {
   FlyToInterpolator,
-  LinearInterpolator,
   MapView,
   _GlobeView as GlobeView,
 } from "@deck.gl/core";
 import { TileLayer } from "@deck.gl/geo-layers";
-import { BitmapLayer, IconLayer, LineLayer } from "@deck.gl/layers";
+import {
+  BitmapLayer,
+  LineLayer,
+  ScatterplotLayer,
+  IconLayer,
+} from "@deck.gl/layers";
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -17,8 +22,10 @@ import {
   IconMap,
 } from "@tabler/icons-react";
 import { caseStudies } from "../data/caseStudies.ts";
-import { calculateCentroid } from "../utilities.ts";
+import { calculateCentroid } from "../utilities/utilities.ts";
+import buildLegend from "../utilities/buildLegend.jsx";
 import Header from "./Header/Header.jsx";
+import { getPinIcon } from "../utilities/pinIcons.ts";
 import "./GlobalMap.css";
 
 const TILE_URL = import.meta.env.VITE_SAT_TILES;
@@ -27,28 +34,36 @@ const globe = new GlobeView({ resolution: 10 });
 const mapView = new MapView({ repeat: true });
 const initialView = { longitude: 70, latitude: 25, zoom: 2 };
 
-const ICON_PX = 128;
-const RING = 6;
 const BASE_ICON_ALTITUDE_METERS = 600000;
 const MIN_ICON_ALTITUDE_METERS = 5000;
 const MIN_ZOOM = 2;
 const MAX_ZOOM = 13;
-const GLOBE_MIN_ZOOM = 4; // was MAX_ZOOM / 2 (4)
+const GLOBE_MIN_ZOOM = 4;
+const PING_MS = 2200;
+const ICON_BASE_ZOOM = 2; // zoom where markers float at BASE_ICON_ALTITUDE_METERS.
 
-// Interpolators are stateless, so one instance of each is reused for every transition.
-// Globe: plain rotation. Flat map: FlyTo (zoom out, pan, zoom in), which is built for Web Mercator.
-const globeInterpolator = new LinearInterpolator([
-  "longitude",
-  "latitude",
-  "zoom",
-]);
-const flatInterpolator = new FlyToInterpolator();
-const easeInOut = (t) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
+// Story stages in order; `date` maps to a key in study.key_dates.
+const STAGE_LABELS = [
+  { type: "leadUp", label: "Lead-up", date: "before" },
+  { type: "event", label: "Event", date: "event" },
+  { type: "takeaway", label: "Takeaway", date: "after" },
+];
 
 // Case studies are static, so their centroids are computed once instead of on every render.
 const centroids = new Map(
-  caseStudies.map((study) => [study.id, calculateCentroid(study.coordinates)]),
+  caseStudies.map((study) => [
+    study.case,
+    calculateCentroid(study.coordinates),
+  ]),
 );
+
+/**
+ * Checks whether coordinates describe a bounding box rather than a point.
+ *
+ * @param {number[]} coordinates - A point or [west, south, east, north].
+ * @returns {boolean} Whether the coordinates describe an area.
+ */
+const isArea = (coordinates) => coordinates.length === 4;
 
 /**
  * Reads a CSS theme variable (e.g. "--accent") from the document root.
@@ -117,11 +132,15 @@ const tileIndex = (lon, lat, z) => {
   ];
 };
 
-// Zoom levels to prefetch around each case study, with the tile radius for each:
-// zoom 3 is where the globe lands, zoom 6 is where the flat map lands.
-const PREFETCH_LEVELS = [
+// Tile zoom levels to prefetch, as [zoom, radius in tiles].
+// Point studies are viewed around zoom 6; area studies are viewed closer, around zoom 10.
+const POINT_PREFETCH_LEVELS = [
   [3, 1],
   [6, 2],
+];
+const AREA_PREFETCH_LEVELS = [
+  [3, 1],
+  [10, 2],
 ];
 let hasPrefetched = false;
 
@@ -134,135 +153,125 @@ let hasPrefetched = false;
 const prefetchStudyTiles = () => {
   if (hasPrefetched || !TILE_URL) return;
   hasPrefetched = true;
-  for (const [lon, lat] of centroids.values()) {
-    for (const [z, r] of PREFETCH_LEVELS) {
+
+  // Prefetch the full zoom-2 world so clearing the selection lands on a complete map.
+  for (let x = 0; x < 4; x++) {
+    for (let y = 0; y < 4; y++) {
+      fetch(
+        TILE_URL.replace("{z}", 2).replace("{x}", x).replace("{y}", y),
+      ).catch(() => {});
+    }
+  }
+  // Prefetch tiles around each case study to improve map loading performance.
+  for (const study of caseStudies) {
+    const [lon, lat] = centroids.get(study.case);
+    const levels = isArea(study.coordinates)
+      ? AREA_PREFETCH_LEVELS
+      : POINT_PREFETCH_LEVELS;
+    for (const [z, r] of levels) {
       const [cx, cy] = tileIndex(lon, lat, z);
-      for (let x = cx - r; x <= cx + r; x++)
-        for (let y = cy - r; y <= cy + r; y++)
+      for (let x = cx - r; x <= cx + r; x++) {
+        for (let y = cy - r; y <= cy + r; y++) {
           fetch(
             TILE_URL.replace("{z}", z).replace("{x}", x).replace("{y}", y),
           ).catch(() => {});
+        }
+      }
     }
   }
 };
 
 /**
- * Creates a circular marker icon for a case study, with its photo cropped inside.
- * Falls back to a plain accent-coloured disc if the image can't be loaded.
+ * Renders the interactive case-study map in globe or flat-map mode.
  *
- * @param {Object} options
- * @param {string} options.iconImage - Filename in /public/assets/eventIcons.
- * @returns {Promise<string>} A data URL of the generated icon.
+ * @param {Object} props - Map content and navigation callbacks.
+ * @param {Object|null} props.selected - The selected case study, if any.
+ * @param {function(Object|null): void} props.onSelect - Selects a case study.
+ * @param {function(): void} props.onLaunch - Opens the selected case study.
+ * @param {function(): void} props.onHome - Returns to the welcome view.
  */
-async function circleIcon({ iconImage }) {
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = ICON_PX;
-  const ctx = canvas.getContext("2d");
-  const r = ICON_PX / 2;
-
-  ctx.beginPath();
-  ctx.arc(r, r, r - RING / 2, 0, Math.PI * 2);
-  ctx.fillStyle = getThemeColor("--accent");
-  ctx.fill();
-  try {
-    const img = new Image();
-    img.src = `/assets/eventIcons/${iconImage}`;
-    await img.decode();
-    // Centre-crop to a square so the photo fills the circle without stretching
-    const side = Math.min(img.width, img.height);
-    ctx.save();
-    ctx.clip();
-    ctx.drawImage(
-      img,
-      (img.width - side) / 2,
-      (img.height - side) / 2,
-      side,
-      side,
-      0,
-      0,
-      ICON_PX,
-      ICON_PX,
-    );
-    ctx.restore();
-  } catch {
-    // Keep the plain disc
-  }
-  ctx.lineWidth = RING;
-  ctx.strokeStyle = getThemeColor("--text");
-  ctx.stroke();
-  return canvas.toDataURL();
-}
-
 export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
-  const [icons, setIcons] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isGlobe, setIsGlobe] = useLocalStorage("isGlobe", false);
-  const [viewState, setViewState] = useLocalStorage("viewState", initialView);
+  // Drop deck's extra controller fields (e.g. maxBounds): JSON turns its Infinity into null, which locks panning.
+  const [viewState, setViewState] = useLocalStorage(
+    "viewState",
+    initialView,
+    ({ longitude, latitude, zoom, pitch, bearing }) => ({
+      longitude,
+      latitude,
+      zoom,
+      pitch,
+      bearing,
+    }),
+  );
   const [radarStageType, setRadarStageType] = useState("leadUp");
-  const [transitionProps, setTransitionProps] = useState(null);
+  const [pingProgress, setPingProgress] = useState(0);
+  const [hoveredCase, setHoveredCase] = useState(null);
 
-  // Theme colours only change on reload, so read them once
-  const accentRgb = useMemo(() => getThemeRgb("--accent"), []);
+  // Marker colour is the same in every theme, so it is read once.
+  const accentRgb = useMemo(() => getThemeRgb("--marker"), []);
 
   // Markers float above the surface; the height shrinks as you zoom in so they stay close to their spot
   const iconAltitude = Math.max(
     MIN_ICON_ALTITUDE_METERS,
-    BASE_ICON_ALTITUDE_METERS * 2 ** (initialView.zoom - viewState.zoom),
+    BASE_ICON_ALTITUDE_METERS * 2 ** (ICON_BASE_ZOOM - viewState.zoom),
   );
-  const radarStages = selected?.imageBounds
-    ? selected.stages.filter(
-        (stage) => stage.imagery && !stage.imagery.startsWith("Placeholder:"),
-      )
-    : [];
+  // Radar imagery requires an area and a browser-supported image file.
+  const radarStages =
+    selected && isArea(selected.coordinates)
+      ? (selected.layers ?? []).filter(
+          (stage) => stage.file && /\.(png|jpe?g|webp)$/i.test(stage.file),
+        )
+      : [];
   const radarStage =
-    radarStages.find((stage) => stage.type === radarStageType) ??
+    radarStages.find((stage) => stage.name.includes(radarStageType)) ??
     radarStages[0];
   const radarLegend = radarStage?.legend;
-  const hasRadarLegend =
-    Array.isArray(radarLegend?.gradient) &&
-    radarLegend.gradient.length >= 2 &&
-    typeof radarLegend.labels?.lowEnd === "string" &&
-    typeof radarLegend.labels?.highEnd === "string";
-  const radarGradient = hasRadarLegend
-    ? `linear-gradient(to right, ${radarLegend.gradient
-        .map(([red, green, blue]) => `rgb(${red} ${green} ${blue})`)
-        .join(", ")})`
-    : undefined;
+  const eventStage = selected?.stages.find((s) => s.type === "event");
+  const takeawayStage = selected?.stages.find((s) => s.type === "takeaway");
   /**
    * Builds the main basemap layer for high-detail tiles.
    * Change from projected to globe view requires updating the TileLayer id for a fresh retrieval of tiles.
    */
   const basemap = new TileLayer({
     id: isGlobe ? "basemap-globe" : "basemap-map",
-    data: import.meta.env.VITE_SAT_TILES,
+    data: TILE_URL,
     maxZoom: 19,
     tileSize: 256,
     refinementStrategy: isGlobe ? "never" : "best-available",
-    renderSubLayers: (props) => {
-      const { west, south, east, north } = props.tile.bbox;
-      return new BitmapLayer(props, {
-        data: null,
-        image: props.data,
-        bounds: [west, south, east, north],
-      });
-    },
+    renderSubLayers: renderTile, // skips cancelled tiles (avoids "assertion failed")
   });
 
-  // On switching views: clamp zoom to that view's limit and reset any tilt or rotation
+  // On switching views: clamp zoom to that view's limits and reset any tilt or rotation.
+  // Only the basic fields are kept, so leftover FlyTo settings are dropped.
   useEffect(() => {
-    setViewState((prev) => ({
-      ...prev,
-      zoom: Math.min(prev.zoom, isGlobe ? MAX_ZOOM : MIN_ZOOM),
+    setViewState(({ longitude, latitude, zoom }) => ({
+      longitude,
+      latitude,
+      zoom: Math.max(
+        isGlobe ? GLOBE_MIN_ZOOM : MIN_ZOOM,
+        Math.min(zoom, MAX_ZOOM),
+      ),
       pitch: 0,
       bearing: 0,
     }));
   }, [isGlobe]);
 
-  // Build the marker icons, then prefetch case study tiles once the first frame has painted
+  // Ping pulse timer; skipped when the user has turned on reduced motion
   useEffect(() => {
-    Promise.all(
-      caseStudies.map(async (study) => [study.id, await circleIcon(study)]),
-    ).then((entries) => setIcons(Object.fromEntries(entries)));
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let frame;
+    const tick = (time) => {
+      setPingProgress((time % PING_MS) / PING_MS);
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  // Prefetch case study tiles once the first frame has painted
+  useEffect(() => {
     const timer = setTimeout(prefetchStudyTiles, 1500);
     return () => clearTimeout(timer);
   }, []);
@@ -274,11 +283,8 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
    * @param {number} duration - Animation length in milliseconds.
    */
   const moveCamera = (target, duration) => {
-    setTransitionProps({
-      transitionDuration: duration,
-      transitionInterpolator: isGlobe ? globeInterpolator : flatInterpolator,
-      transitionEasing: easeInOut,
-    });
+    // When moving the camera, enforce a minimum zoom to ensure a good view of the target area
+    target.zoom = Math.max(target.zoom ?? 0, MAX_ZOOM / 1.5);
     setViewState((prev) => ({
       ...prev,
       ...target,
@@ -287,6 +293,9 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
         : target.longitude,
       pitch: 0,
       bearing: 0,
+      zoom: target.zoom,
+      transitionInterpolator: new FlyToInterpolator({ speed: 1.2 }),
+      transitionDuration: duration,
     }));
   };
 
@@ -298,94 +307,106 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
    */
   const selectStudy = (study) => {
     onSelect(study);
-    if (!study) return moveCamera(initialView, 1000);
-    const [longitude, latitude] = centroids.get(study.id);
-    const zoom = isGlobe ? 3 : study.imageBounds ? 9.5 : 6; // was 6 on the flat map
-    moveCamera({ longitude, latitude, zoom }, 1200);
+    if (!study) {
+      return moveCamera(initialView, 2000);
+    }
+    const [longitude, latitude] = centroids.get(study.case);
+    moveCamera({ longitude, latitude, zoom: MAX_ZOOM / 1.5 }, 2000);
   };
 
-  /**
-   * Builds the fallback basemap layer for low-detail tiles.
-   */
-  const fallbackBasemap = new TileLayer({
-    id: "basemap-fallback",
-    data: TILE_URL,
-    minZoom: 0,
-    maxZoom: 2, // above zoom 2 these tiles are stretched, never re-downloaded
-    tileSize: 256,
-    maxCacheSize: 50,
-    parameters: { depthTest: isGlobe }, // Enable depth testing only for the globe to hide the far side of the Earth.
-    renderSubLayers: renderTile,
-  });
-
-  /**
-   * Builds the radar layer for the selected case study, if available.
-   *
-   * @returns {BitmapLayer|null} The radar layer, or null if not available.
-   */
+  // Radar image for the selected layer, stretched over the study's bounding box.
+  // On the globe it's lifted 300 m so its middle doesn't dip below the curved Earth.
   const radarLayer =
-    selected?.imageBounds && radarStage
-      ? new BitmapLayer({
-          id: `radar-layer-${selected.id}-${radarStage.type}`,
-          data: null,
-          image: radarStage.imagery.startsWith("/")
-            ? radarStage.imagery
-            : `/assets/geospatial/${radarStage.imagery}`,
-          bounds: selected.imageBounds,
-          opacity: 0.75,
-          parameters: {
-            depthTest: isGlobe,
-            polygonOffsetFill: true,
-            polygonOffset: [-1, -1],
-          },
-        })
-      : null;
+    radarStage &&
+    new BitmapLayer({
+      id: `radar-layer-${selected.case}-${radarStage.name}-${isGlobe ? "globe" : "map"}`,
+      data: null,
+      image: radarStage.file.startsWith("/")
+        ? radarStage.file
+        : `/assets/geospatial/${radarStage.file}`,
+      bounds: isGlobe
+        ? (([west, south, east, north]) => [
+            [west, south, 300],
+            [west, north, 300],
+            [east, north, 300],
+            [east, south, 300],
+          ])(selected.coordinates)
+        : selected.coordinates,
+      opacity: 0.75,
+      parameters: { depthTest: isGlobe }, // globe: keeps the far side of the Earth hidden
+    });
 
-  // Filter out the selected case study from the marker data if a radar layer is present.
-  const markerData = radarLayer
-    ? caseStudies.filter(({ id }) => id !== selected?.id)
-    : caseStudies;
+  // Hide the selected study's ping while its radar image is showing. Keep this
+  // data stable across animation frames so marker attributes aren't needlessly rebuilt.
+  const hasRadarLayer = Boolean(radarStage);
+  const markerData = useMemo(
+    () =>
+      hasRadarLayer
+        ? caseStudies.filter(({ case: c }) => c !== selected?.case)
+        : caseStudies,
+    [hasRadarLayer, selected?.case],
+  );
 
-  /**
-   * Builds the vertical line layer from the ground up to each floating marker.
-   */
+  const pingPosition = ({ case: c }) => [...centroids.get(c), iconAltitude];
+
+  // Vertical line from the ground up to each floating ping
   const pointers = new LineLayer({
     id: "case-study-pointers",
     data: markerData,
-    getSourcePosition: ({ id }) => [...centroids.get(id), 0],
-    getTargetPosition: ({ id }) => [...centroids.get(id), iconAltitude],
-    getColor: [...accentRgb, 200],
+    getSourcePosition: ({ case: c }) => [...centroids.get(c), 0],
+    getTargetPosition: pingPosition,
+    getColor: ({ pinIcon }) => [...getPinIcon(pinIcon).color, 200],
     getWidth: 2,
     widthUnits: "pixels",
     parameters: { depthTest: true, cullMode: "none" },
     updateTriggers: { getTargetPosition: iconAltitude },
   });
 
-  /**
-   * Builds the photo marker layer for each case study.
-   * Skipped until the icons have been generated.
-   */
-  const markers =
-    icons &&
-    new IconLayer({
-      id: "case-studies",
-      data: markerData, // was data: caseStudies
-      getPosition: ({ id }) => [...centroids.get(id), iconAltitude],
-      getIcon: ({ id }) => ({
-        id,
-        url: icons[id],
-        width: ICON_PX,
-        height: ICON_PX,
-      }),
-      getSize: ({ id }) => (id === selected?.id ? 64 : 44),
-      parameters: { depthTest: true, cullMode: "none" },
-      pickable: true,
-      onClick: ({ object }) => selectStudy(object),
-      updateTriggers: {
-        getPosition: iconAltitude,
-        getSize: selected?.id,
-      },
-    });
+  // Expanding ring that fades as it grows, like a radar ping
+  const pingRings = new ScatterplotLayer({
+    id: "case-study-ping-rings",
+    data: markerData,
+    getPosition: pingPosition,
+    getRadius: 12 + pingProgress * 30,
+    radiusUnits: "pixels",
+    filled: false,
+    stroked: true,
+    getLineColor: ({ pinIcon }) => [
+      ...getPinIcon(pinIcon).color,
+      Math.round(255 * (1 - pingProgress)),
+    ],
+    getLineWidth: 3,
+    lineWidthUnits: "pixels",
+    billboard: true, // always faces the camera, so it stays round on the globe
+    parameters: { depthTest: isGlobe }, // globe: hidden when on the far side of the Earth
+    updateTriggers: { getPosition: iconAltitude, getLineColor: pingProgress },
+  });
+
+  // Solid lime dot with a dark outline; bigger when selected. This is what users click.
+  const pingDots = new IconLayer({
+    id: "case-study-pings",
+    data: markerData,
+    getPosition: pingPosition,
+    getIcon: ({ pinIcon }) => ({
+      url: getPinIcon(pinIcon).url, // colour and icon come from caseStudies.ts → pinIcons.js
+      width: 64,
+      height: 64,
+      anchorY: 32, // centre of the circle, so the ring sits around it
+      mask: false,
+    }),
+    getSize: ({ case: c }) =>
+      c === selected?.case || c === hoveredCase ? 37 : 30,
+    sizeUnits: "pixels",
+    billboard: true,
+    pickable: true,
+    onClick: ({ object }) => selectStudy(object),
+    onHover: ({ object }) => setHoveredCase(object?.case ?? null),
+    parameters: { depthTest: isGlobe, cullMode: "none" },
+    updateTriggers: {
+      getPosition: iconAltitude,
+      getSize: [selected?.case, hoveredCase],
+    },
+  });
 
   return (
     <div className="map-screen">
@@ -411,25 +432,53 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
             {selected ? (
               <>
                 <h2>{selected.title}</h2>
+                <p className="panel-meta">
+                  {[selected.type, selected.location]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+                {eventStage && (
+                  <p className="metric">
+                    <strong>{eventStage.metric.value}</strong>{" "}
+                    {eventStage.metric.label}
+                  </p>
+                )}
+                {takeawayStage && (
+                  <section aria-labelledby="why-it-matters">
+                    <h3 id="why-it-matters">Why it matters</h3>
+                    <p className="panel-headline">{takeawayStage.headline}</p>
+                    <p>{takeawayStage.summary}</p>
+                  </section>
+                )}
+                <h3>The story</h3>
+                <ol className="stage-preview">
+                  {STAGE_LABELS.map(({ type, label, date }) => {
+                    const stage = selected.stages.find((s) => s.type === type);
+                    return (
+                      stage && (
+                        <li key={type}>
+                          <span className="stage-preview-label">
+                            {label} · {selected.key_dates[date]}
+                          </span>
+                          {stage.headline}
+                        </li>
+                      )
+                    );
+                  })}
+                </ol>
                 <label className="radar-layer-select">
                   <span>Radar layer</span>
                   <div className="map-study-select-control">
                     <select
-                      value={radarStage?.type ?? ""}
+                      value={radarStage?.name ?? ""}
                       disabled={!radarStages.length}
                       aria-label="Radar layer"
-                      onChange={(event) =>
-                        setRadarStageType(event.target.value)
-                      }
+                      onChange={(e) => setRadarStageType(e.target.value)}
                     >
                       {radarStages.length ? (
                         radarStages.map((stage) => (
-                          <option key={stage.type} value={stage.type}>
-                            {stage.type === "leadUp"
-                              ? "Before"
-                              : stage.type === "event"
-                                ? "During"
-                                : "After"}
+                          <option key={stage.name} value={stage.name}>
+                            {stage.name}
                           </option>
                         ))
                       ) : (
@@ -443,28 +492,42 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
                     />
                   </div>
                 </label>
-                <dl>
-                  <dt>Type</dt>
-                  <dd>{selected.type}</dd>
-                  <dt>Location</dt>
-                  <dd>{selected.location}</dd>
-                  <dt>Timeline</dt>
-                  <dd>
-                    {selected.timeline.start} → {selected.timeline.end}
-                  </dd>
-                </dl>
-                <p>
-                  {
-                    selected.stages.find((stage) => stage.type === "takeaway")
-                      ?.summary
-                  }
-                </p>
-                <button className="launch" onClick={onLaunch}>
-                  Launch Case Study
-                </button>
+                <div className="panel-footer">
+                  <button className="launch" onClick={onLaunch}>
+                    Launch Case Study
+                  </button>
+                </div>
               </>
             ) : (
-              <p>Select a case study on the map to see its summary.</p>
+              <>
+                <p>Select a case study on the map or from the list below.</p>
+                <ul className="study-list">
+                  {caseStudies.map((study) => (
+                    <li key={study.case}>
+                      <button
+                        className="study-list-item"
+                        type="button"
+                        onClick={() => selectStudy(study)}
+                      >
+                        {study.iconImage && (
+                          <img
+                            src={`/assets/eventIcons/${study.iconImage}`}
+                            alt=""
+                          />
+                        )}
+                        <span>
+                          <strong>{study.title}</strong>
+                          <small>
+                            {[study.type, study.location]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </small>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
           </aside>
         )}
@@ -487,17 +550,19 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
               <div className="map-study-select-control">
                 <select
                   aria-label="Select a case study"
-                  value={selected?.id ?? ""}
+                  value={selected?.case ?? ""}
                   onChange={(event) =>
                     selectStudy(
-                      caseStudies.find(({ id }) => id === event.target.value) ??
-                        null,
+                      caseStudies.find(
+                        ({ case: studyCase }) =>
+                          studyCase === event.target.value,
+                      ) ?? null,
                     )
                   }
                 >
                   <option value="">Choose a case study</option>
                   {caseStudies.map((study) => (
-                    <option key={study.id} value={study.id}>
+                    <option key={study.case} value={study.case}>
                       {study.title}
                     </option>
                   ))}
@@ -520,45 +585,34 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
               controller={{
                 minZoom: isGlobe ? GLOBE_MIN_ZOOM : MIN_ZOOM,
                 maxZoom: MAX_ZOOM,
+                dragRotate: !isGlobe,
+                smooth: true,
               }}
-              /**
-               * Handles view state changes for the map or globe.
-               * Updates the view state unless the interaction is in transition.
-               */
-              onViewStateChange={({ viewState: nextViewState }) => {
-                const { longitude, latitude, zoom, pitch, bearing } =
-                  nextViewState;
-                setViewState({
-                  longitude,
-                  latitude,
-                  zoom: isGlobe
-                    ? Math.max(zoom, GLOBE_MIN_ZOOM)
-                    : Math.max(zoom, MIN_ZOOM),
-                  pitch: isGlobe ? 0 : pitch,
-                  bearing: isGlobe ? 0 : bearing,
-                });
-              }}
-              layers={[fallbackBasemap, basemap, radarLayer, pointers, markers]}
+              // Stored unmodified: deck cancels a flight if the state differs from its current frame
+              onViewStateChange={({ viewState: next }) => setViewState(next)}
+              layers={[basemap, radarLayer, pointers, pingRings, pingDots]}
               getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
+              // Hovering a marker shows the type of event
+              getTooltip={({ object }) =>
+                object && {
+                  html: `<strong>${getPinIcon(object.pinIcon).label}</strong>`,
+                  style: {
+                    background: "var(--panel)",
+                    color: "var(--text)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "6px",
+                    padding: "0.4rem 0.6rem",
+                    fontSize: "0.8rem",
+                    maxWidth: "16rem",
+                  },
+                }
+              }
             />
-            {hasRadarLegend && (
-              <div
-                className="stage-legend map-legend"
-                role="group"
-                aria-label={`${radarStage.type} map legend`}
-              >
-                <span className="stage-legend-title">Map legend</span>
-                <div
-                  className="stage-legend-gradient"
-                  style={{ background: radarGradient }}
-                  aria-hidden="true"
-                />
-                <div className="stage-legend-labels">
-                  <span>{radarLegend.labels.lowEnd}</span>
-                  <span>{radarLegend.labels.highEnd}</span>
-                </div>
-              </div>
-            )}
+            {buildLegend(radarLegend, {
+              className: "map-legend",
+              title: "Map legend",
+              ariaLabel: `${radarStage} map legend`,
+            })}
             <div className="toggle-view" role="group" aria-label="Map view">
               <button
                 className="toggle-view-option"

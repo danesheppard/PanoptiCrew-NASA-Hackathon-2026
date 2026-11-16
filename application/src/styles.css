@@ -2,16 +2,37 @@
 
 /* Global styles */
 :root {
-  --bg: #0b1020;
-  --panel: #111830;
-  --surface: #121a30;
-  --border: #1d2742;
-  --text: #e8ebf3;
-  --muted: #aab3c8;
+  color-scheme: light;
+  --bg: #cfd4de;
+  --panel: #dce0e8;
+  --surface: #e0e4ec;
+  --border: #b4bccb;
+  --text: #1c2233;
+  --muted: #434c63;
+  --accent: #3b6a00; /* lime fails contrast on light backgrounds; this is about 5:1 */
+  --accent-ink: #f4f6fa;
+  --warn-bg: #ead9b8;
+  --warn-text: #765000;
+  --scene-bg: #a9b1c1; /* 3D case study backdrop */
+  /* Map backdrop and markers drawn on imagery stay the same in both themes. */
+  --stage: #0b1020;
+  --stage-art-opacity: 0.3;
+  --marker: #c6f36b;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121212;
+  --panel: #1a1a1a;
+  --surface: #1e1e1e;
+  --border: #2e2e2e;
+  --text: #e6e6e6;
+  --muted: #a3a3a3;
   --accent: #c6f36b;
-  --accent-ink: #0b1020;
+  --accent-ink: #121212;
   --warn-bg: #5a3d0c;
   --warn-text: #f7cf7d;
+  --scene-bg: #121212;
 }
 
 * {
@@ -28,8 +49,14 @@ body,
   background: var(--bg);
 }
 
-button {
+button,
+input,
+select,
+textarea {
   font: inherit;
+}
+
+button {
   cursor: pointer;
   border: none;
   border-radius: 6px;
@@ -147,25 +174,25 @@ button.secondary {
   z-index: 1;
   width: min(20rem, calc(100% - 2rem));
   padding: 0.65rem 0.75rem;
-  border: 1px solid #4a5878;
+  border: 1px solid var(--border);
   border-radius: 4px;
-  background: rgba(11, 16, 32, 0.94);
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-  color: #e8ebf3;
+  color: var(--text);
   font-size: 0.75rem;
 }
 
 .stage-legend-title {
   display: block;
   margin-bottom: 0.45rem;
-  color: #aab3c8;
+  color: var(--muted);
   font-size: 0.7rem;
   font-weight: 600;
 }
 
 .stage-legend-gradient {
   height: 0.65rem;
-  border: 1px solid rgba(232, 235, 243, 0.45);
+  border: 1px solid color-mix(in srgb, var(--text) 45%, transparent);
   border-radius: 2px;
 }
 
@@ -183,6 +210,25 @@ button.secondary {
 
 .stage-legend-labels span:last-child {
   text-align: right;
+}
+
+.stage-legend-categories {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.stage-legend-category {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stage-legend-color {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: 0 0 auto;
+  border: 1px solid color-mix(in srgb, var(--text) 45%, transparent);
+  border-radius: 2px;
 }
 
 .case-legend {
@@ -234,6 +280,31 @@ button.secondary {
   display: block;
   font-size: 2rem;
   color: var(--text);
+}
+
+.chart-insert {
+  margin-bottom: 1.25rem;
+}
+
+.stage-legend-path {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.stage-legend-line {
+  width: 1.5rem;
+  height: 3px;
+  border-radius: 2px;
+  background: #ffa31a;
+}
+
+.chart-insert img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
 }
 
 .actions {
@@ -310,7 +381,7 @@ button.secondary {
 
 .point {
   position: absolute;
-  top: -0.6rem;
+  top: -0.375rem;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
@@ -406,7 +477,7 @@ button.secondary {
 .raster-controls {
   display: grid;
   gap: 0.6rem;
-  color: #c3cbe0;
+  color: var(--text);
   font-size: 0.85rem;
 }
 
@@ -417,7 +488,7 @@ button.secondary {
 }
 
 .raster-controls input[type="checkbox"] {
-  accent-color: #ffd27a;
+  accent-color: var(--accent);
 }
 
 .raster-controls .raster-opacity input {
@@ -428,5 +499,5 @@ button.secondary {
 .raster-controls p {
   min-height: 1em;
   margin: 0;
-  color: #9aa3b5;
+  color: var(--muted);
 }

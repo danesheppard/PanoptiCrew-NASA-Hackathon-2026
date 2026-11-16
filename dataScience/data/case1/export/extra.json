@@ -1,0 +1,27 @@
+{
+  "image_corners": [
+    [
+      85.25,
+      28.4
+    ],
+    [
+      85.6,
+      28.4
+    ],
+    [
+      85.6,
+      28.1
+    ],
+    [
+      85.25,
+      28.1
+    ]
+  ],
+  "image_corners_order": "top-left, top-right, bottom-right, bottom-left, as [lon, lat]",
+  "products": [
+    "NISAR_L2_GUNW_PROVISIONAL_V1",
+    "NISAR_L2_GCOV_PROVISIONAL_V1"
+  ],
+  "track": "098_A_016",
+  "question": "What did NISAR see before, during and after the collapse, and could it map the damage quickly?"
+}

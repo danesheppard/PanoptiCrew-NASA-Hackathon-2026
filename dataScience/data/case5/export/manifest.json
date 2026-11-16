@@ -1,0 +1,430 @@
+{
+  "case": "case5",
+  "title": "Thunder Bay 36 wildfire, Wabakimi, northwestern Ontario (July 2026)",
+  "event_date": "2026-07-12",
+  "story": "In early July 2026, after a warm, dry spring, lightning storms started many fires across northwestern Ontario. Around Wabakimi Provincial Park several of them merged on July 12 into Thunder Bay 36, which passed 315,000 ha by July 22: the largest wildfire ever recorded in Ontario. It reached remote First Nations with no road access. On July 13 the residents of Namaygoosisagagun (Collins) fled by boat across Collins Lake as their community burned; much of Whitewater Lake First Nation was destroyed days later, and Armstrong and Whitesand First Nation were evacuated. NISAR's L-band radar sees through the smoke and into the boreal forest.",
+  "method": "For every 40 m pixel we compare the radar after the fire with July 11 (before), and remove the common change of the unburned forest 1 to 6 km around the fire (weather, season). Two signals mark the burn: the HH echo rises when the canopy is gone and the pulse bounces between the ground and the burned trunks (seen on July 23), and the HV echo of the canopy drops (clearest on September 21). Each threshold is 2 times (3 times for severe) the normal movement of the unburned forest, on land that was vegetated before and in patches of 9 or more pixels. The result is checked against the official fire perimeter, the Sentinel-2 burn severity and the satellite fire detections.",
+  "limitations": "Provisional NISAR data (calibrated, not yet officially validated). The canopy-loss signal varies from one pass to the next, most likely with the moisture of the burned ground: on September 9 it almost disappears. Light ground fires under a surviving canopy are not detected. Pixels are 40 m. The western end of the southern lobe had already burned in early June, before the July 11 reference pass, so only its later change is seen; NISAR has no data between July 27 and August 10. Logging and other fires also change the echo; they are told apart by the date, the fire detections and the official perimeters.",
+  "coordinates": [
+    -90.110517,
+    49.962597,
+    -88.652044,
+    51.097615
+  ],
+  "image_crs": "EPSG:3857",
+  "satellite": "NISAR (NASA-ISRO), L-band, track 41 descending, frame 63, HV and HH channels",
+  "sources": [
+    "NISAR L2 GCOV, Provisional (NISAR_L2_GCOV_PROVISIONAL_V1), NASA Earthdata / ASF",
+    "Ontario Ministry of Natural Resources, In-year Fire Perimeters (THU036), Land Information Ontario",
+    "Canadian Wildland Fire Information System (Natural Resources Canada), satellite fire detections",
+    "Sentinel-2 L2A photos and burn severity (ESA Copernicus), via Earth Search",
+    "Canadian Geographical Names Database (Natural Resources Canada), place names",
+    "CBC News, TBNewsWatch, SNNewsWatch and Sudbury.com (July to August 2026); Wikipedia, Thunder Bay 36 Fire: https://en.wikipedia.org/wiki/Thunder_Bay_36_Fire",
+    "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case5.ipynb)"
+  ],
+  "key_dates": {
+    "before": "2026-07-11",
+    "event": "2026-07-23",
+    "after": "2026-09-21"
+  },
+  "scene": {
+    "imagery": "case5/sentinel2_before.webp",
+    "imagery_after": "case5/sentinel2_after.webp",
+    "places": "case5/places.geojson",
+    "perimeter": "case5/perimeter.geojson"
+  },
+  "layers": [
+    {
+      "name": "NISAR radar (HV), 2026-07-11, before",
+      "file": "case5/hv_clean_2026-07-11.webp",
+      "legend": {
+        "gradient": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ],
+        "labels": {
+          "lowEnd": "-25 dB: dark, lakes, rock or bare ground",
+          "highEnd": "-5 dB: bright, dense forest canopy"
+        }
+      }
+    },
+    {
+      "name": "NISAR radar (HV), 2026-09-21, after",
+      "file": "case5/hv_clean_2026-09-21.webp",
+      "legend": {
+        "gradient": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ],
+        "labels": {
+          "lowEnd": "-25 dB: dark, lakes, rock or bare ground",
+          "highEnd": "-5 dB: bright, dense forest canopy"
+        }
+      }
+    },
+    {
+      "name": "Burned forest brighter in HH, 2026-07-11 → 2026-07-23",
+      "file": "case5/bright_2026-07-23.png",
+      "legend": {
+        "type": "categories",
+        "gradient": [
+          [
+            106,
+            81,
+            163
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Brighter in HH by 1 dB or more: burned trunks on bare ground (double bounce)",
+          "highEnd": "Brighter in HH by 1 dB or more: burned trunks on bare ground (double bounce)"
+        },
+        "categories": [
+          {
+            "color": [
+              106,
+              81,
+              163
+            ],
+            "label": "Brighter in HH by 1 dB or more: burned trunks on bare ground (double bounce)"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Canopy loss (HV), 2026-07-11 → 2026-09-21",
+      "file": "case5/burn_2026-09-21.png",
+      "legend": {
+        "type": "categories",
+        "gradient": [
+          [
+            254,
+            196,
+            79
+          ],
+          [
+            215,
+            48,
+            31
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Canopy loss (radar HV echo 1 dB lower than the unburned forest)",
+          "highEnd": "Severe canopy loss (2 dB or more)"
+        },
+        "categories": [
+          {
+            "color": [
+              254,
+              196,
+              79
+            ],
+            "label": "Canopy loss (radar HV echo 1 dB lower than the unburned forest)"
+          },
+          {
+            "color": [
+              215,
+              48,
+              31
+            ],
+            "label": "Severe canopy loss (2 dB or more)"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Optical burn severity (Sentinel-2), early July → September 20 to 22",
+      "file": "case5/burn_severity_optical.png",
+      "legend": {
+        "type": "categories",
+        "gradient": [
+          [
+            240,
+            240,
+            240
+          ],
+          [
+            255,
+            255,
+            178
+          ],
+          [
+            254,
+            204,
+            92
+          ],
+          [
+            253,
+            141,
+            60
+          ],
+          [
+            189,
+            0,
+            38
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Optical burn severity: unburned",
+          "highEnd": "Optical burn severity: high"
+        },
+        "categories": [
+          {
+            "color": [
+              240,
+              240,
+              240
+            ],
+            "label": "Optical burn severity: unburned"
+          },
+          {
+            "color": [
+              255,
+              255,
+              178
+            ],
+            "label": "Optical burn severity: low"
+          },
+          {
+            "color": [
+              254,
+              204,
+              92
+            ],
+            "label": "Optical burn severity: moderate-low"
+          },
+          {
+            "color": [
+              253,
+              141,
+              60
+            ],
+            "label": "Optical burn severity: moderate-high"
+          },
+          {
+            "color": [
+              189,
+              0,
+              38
+            ],
+            "label": "Optical burn severity: high"
+          }
+        ]
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "reference": "2026-07-11",
+      "secondary": "2026-07-23",
+      "file": "case5/burn_2026-07-23.png",
+      "file_brighter": "case5/bright_2026-07-23.png",
+      "canopy loss": 158.1,
+      "severe canopy loss": 9.7,
+      "brighter HH (km²)": 1857.1,
+      "canopy loss inside (km²)": 14.4,
+      "canopy loss outside (km²)": 153.5,
+      "brighter HH inside (km²)": 1514.0,
+      "brighter HH outside (km²)": 343.1
+    },
+    {
+      "reference": "2026-07-11",
+      "secondary": "2026-08-16",
+      "file": "case5/burn_2026-08-16.png",
+      "file_brighter": "case5/bright_2026-08-16.png",
+      "canopy loss": 658.9,
+      "severe canopy loss": 247.2,
+      "brighter HH (km²)": 2196.0,
+      "canopy loss inside (km²)": 690.9,
+      "canopy loss outside (km²)": 215.2,
+      "brighter HH inside (km²)": 1115.3,
+      "brighter HH outside (km²)": 1080.7
+    },
+    {
+      "reference": "2026-07-11",
+      "secondary": "2026-09-09",
+      "file": "case5/burn_2026-09-09.png",
+      "file_brighter": "case5/bright_2026-09-09.png",
+      "canopy loss": 258.3,
+      "severe canopy loss": 20.0,
+      "brighter HH (km²)": 1916.7,
+      "canopy loss inside (km²)": 201.3,
+      "canopy loss outside (km²)": 77.0,
+      "brighter HH inside (km²)": 1386.1,
+      "brighter HH outside (km²)": 530.6
+    },
+    {
+      "reference": "2026-07-11",
+      "secondary": "2026-09-21",
+      "file": "case5/burn_2026-09-21.png",
+      "file_brighter": "case5/bright_2026-09-21.png",
+      "canopy loss": 1055.9,
+      "severe canopy loss": 424.6,
+      "brighter HH (km²)": 903.1,
+      "canopy loss inside (km²)": 1273.9,
+      "canopy loss outside (km²)": 206.7,
+      "brighter HH inside (km²)": 554.9,
+      "brighter HH outside (km²)": 348.2
+    },
+    {
+      "reference": "2026-07-11",
+      "secondary": "2026-10-03",
+      "file": "case5/burn_2026-10-03.png",
+      "file_brighter": "case5/bright_2026-10-03.png",
+      "canopy loss": 737.5,
+      "severe canopy loss": 120.1,
+      "brighter HH (km²)": 1598.1,
+      "canopy loss inside (km²)": 696.3,
+      "canopy loss outside (km²)": 161.2,
+      "brighter HH inside (km²)": 1134.5,
+      "brighter HH outside (km²)": 463.6
+    },
+    {
+      "reference": "2026-07-11",
+      "secondary": "2026-10-15",
+      "file": "case5/burn_2026-10-15.png",
+      "file_brighter": "case5/bright_2026-10-15.png",
+      "canopy loss": 626.7,
+      "severe canopy loss": 66.1,
+      "brighter HH (km²)": 1812.7,
+      "canopy loss inside (km²)": 511.1,
+      "canopy loss outside (km²)": 181.7,
+      "brighter HH inside (km²)": 1293.0,
+      "brighter HH outside (km²)": 519.7
+    }
+  ],
+  "stages": [
+    {
+      "type": "leadUp",
+      "headline": "Before: the boreal forest of Wabakimi",
+      "metric": {
+        "label": "last NISAR pass before the fire got its name",
+        "value": "1 day before"
+      },
+      "summary": "On July 11 the boreal forest around Wabakimi Provincial Park is bright in the radar's HV channel: the wave bounces many times in needles, leaves and branches before coming back. The hundreds of lakes are black. Lightning had started fires in the region since July 6; the next day several of them merged into Thunder Bay 36.",
+      "confidence": "High",
+      "imagery": "case5/hv_clean_2026-07-11.webp",
+      "legend": {
+        "gradient": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ],
+        "labels": {
+          "lowEnd": "-25 dB: dark, lakes, rock or bare ground",
+          "highEnd": "-5 dB: bright, dense forest canopy"
+        }
+      }
+    },
+    {
+      "type": "event",
+      "headline": "During the fire: the burned forest lights up",
+      "metric": {
+        "label": "of burned forest already brighter in the radar on July 23",
+        "value": "1,514 km²"
+      },
+      "summary": "On July 23, eleven days after the fire got its name, it had passed 315,000 ha and was still out of control; between July 12 and 22 satellites had detected flames inside its perimeter 48,239 times. Where the canopy burned, the radar's HH echo got brighter over 1,514 km²: with the needles gone, the pulse bounces between the ground and the standing burned trunks and comes straight back, the same double bounce as the flooded villages of case 2.",
+      "confidence": "High",
+      "imagery": "case5/bright_2026-07-23.png",
+      "legend": {
+        "type": "categories",
+        "gradient": [
+          [
+            106,
+            81,
+            163
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Brighter in HH by 1 dB or more: burned trunks on bare ground (double bounce)",
+          "highEnd": "Brighter in HH by 1 dB or more: burned trunks on bare ground (double bounce)"
+        },
+        "categories": [
+          {
+            "color": [
+              106,
+              81,
+              163
+            ],
+            "label": "Brighter in HH by 1 dB or more: burned trunks on bare ground (double bounce)"
+          }
+        ]
+      }
+    },
+    {
+      "type": "takeaway",
+      "headline": "After: where the boreal canopy burned",
+      "metric": {
+        "label": "of forest canopy lost by September 21, 86% of it inside the official perimeter",
+        "value": "1,481 km²"
+      },
+      "summary": "On September 21 the canopy loss stands out in the HV channel: 1,481 km², 425 km² of it severe. An independent optical check agrees: together, the two radar signals flag 88% of the forest Sentinel-2 rates as high burn severity, and only 8% of unburned forest. On some passes, most likely when the burned ground is wet, the canopy loss is partly hidden: one radar pass is not enough for a boreal fire.",
+      "confidence": "Medium",
+      "imagery": "case5/burn_2026-09-21.png",
+      "legend": {
+        "type": "categories",
+        "gradient": [
+          [
+            254,
+            196,
+            79
+          ],
+          [
+            215,
+            48,
+            31
+          ]
+        ],
+        "labels": {
+          "lowEnd": "Canopy loss (radar HV echo 1 dB lower than the unburned forest)",
+          "highEnd": "Severe canopy loss (2 dB or more)"
+        },
+        "categories": [
+          {
+            "color": [
+              254,
+              196,
+              79
+            ],
+            "label": "Canopy loss (radar HV echo 1 dB lower than the unburned forest)"
+          },
+          {
+            "color": [
+              215,
+              48,
+              31
+            ],
+            "label": "Severe canopy loss (2 dB or more)"
+          }
+        ]
+      },
+      "actions": [
+        "Map burned forest with NISAR while a fire is still burning: radar sees through the smoke over areas no road reaches.",
+        "Share the burn maps with Namaygoosisagagun and Whitewater Lake First Nations to plan rebuilding and safe access.",
+        "Combine several radar passes and both channels: one pass can hide the canopy loss, the double bounce keeps showing the burn."
+      ]
+    }
+  ]
+}
