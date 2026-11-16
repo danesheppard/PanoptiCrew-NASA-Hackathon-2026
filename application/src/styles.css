@@ -181,3 +181,15 @@ button:disabled {
   border-radius: 2px;
   background: #ffa31a;
 }
+
+#nl-wrap,
+.nl-wrap {
+  position: fixed !important;
+  top: 0.75rem !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 9999 !important;
+  max-width: calc(100vw - 1.5rem);
+}
