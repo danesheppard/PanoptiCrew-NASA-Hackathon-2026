@@ -25,7 +25,7 @@ import { caseStudies } from "../data/caseStudies.ts";
 import { calculateCentroid } from "../utilities/utilities.ts";
 import buildLegend from "../utilities/buildLegend.jsx";
 import Header from "./Header/Header.jsx";
-import { getPinIcon } from "../utilities/pinIcons.js";
+import { getPinIcon } from "../utilities/pinIcons.ts";
 import "./GlobalMap.css";
 
 const TILE_URL = import.meta.env.VITE_SAT_TILES;
