@@ -200,8 +200,8 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   const [radarStageType, setRadarStageType] = useState("leadUp");
   const [pingProgress, setPingProgress] = useState(0);
 
-  // Theme colours only change on reload.
-  const accentRgb = useMemo(() => getThemeRgb("--accent"), []);
+  // Marker colour is the same in every theme, so it is read once.
+  const accentRgb = useMemo(() => getThemeRgb("--marker"), []);
 
   // Markers float above the surface; the height shrinks as you zoom in so they stay close to their spot
   const iconAltitude = Math.max(
