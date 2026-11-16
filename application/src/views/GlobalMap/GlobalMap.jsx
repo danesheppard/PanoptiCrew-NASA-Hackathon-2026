@@ -1,6 +1,6 @@
 // SI Acknowledgment: This file was refactored and debugged with assistance for GPT-6 Luna and Claude Sonnet 5.5
 import { useEffect, useMemo, useState } from "react";
-import { useLocalStorage } from "../customHooks.ts";
+import { useLocalStorage } from "../../customHooks.ts";
 import DeckGL from "@deck.gl/react";
 import {
   FlyToInterpolator,
@@ -21,11 +21,11 @@ import {
   IconWorld,
   IconMap,
 } from "@tabler/icons-react";
-import { caseStudies } from "../data/caseStudies.ts";
-import { calculateCentroid } from "../utilities/utilities.ts";
-import buildLegend from "../utilities/buildLegend.jsx";
-import Header from "./Header/Header.jsx";
-import { getPinIcon } from "../utilities/pinIcons.ts";
+import { caseStudies } from "../../data/caseStudies.ts";
+import { calculateCentroid } from "../../utilities/utilities.ts";
+import buildLegend from "../../utilities/buildLegend.jsx";
+import Header from "../Header/Header.jsx";
+import { getPinIcon } from "../../utilities/pinIcons.ts";
 import "./GlobalMap.css";
 
 const TILE_URL = import.meta.env.VITE_SAT_TILES;
