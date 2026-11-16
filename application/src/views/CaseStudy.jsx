@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { calculateCentroid } from "../utilities/utilities.ts";
+import { useTheme } from "../customHooks.ts";
 import buildLegend from "../utilities/buildLegend.jsx";
 import Header from "./Header/Header.jsx";
 
@@ -47,6 +48,14 @@ const EXAGGERATION = 1;
 const SIZE = 10;
 // Chapter colors multiply the imagery, so keep them close to white.
 const tint = (hex) => new THREE.Color(0xffffff).lerp(new THREE.Color(hex), 0.3);
+
+// Scene backdrop from the active theme's CSS variable.
+const stageColor = () =>
+  new THREE.Color(
+    getComputedStyle(document.documentElement)
+      .getPropertyValue("--scene-bg")
+      .trim(),
+  );
 
 function lonLatToTile([lon, lat], z = ZOOM) {
   const n = 2 ** z;
@@ -360,6 +369,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
   const sceneRef = useRef(null);
   const flyRef = useRef(null);
   const tabRefs = useRef([]);
+  const [theme] = useTheme();
   const [index, setIndex] = useState(0);
   const chapter = chapters[index];
   const stage = study.stages.find((item) => item.type === chapter.key);
@@ -374,7 +384,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
   useEffect(() => {
     const mount = mountRef.current;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0b1020);
+    scene.background = stageColor();
 
     const camera = new THREE.PerspectiveCamera(
       50,
@@ -558,6 +568,7 @@ export default function CaseStudy({ study, onBack, onHome }) {
       flyRef.current = null;
     });
     sceneRef.current = {
+      scene,
       camera,
       controls,
       material,
@@ -632,6 +643,11 @@ export default function CaseStudy({ study, onBack, onHome }) {
       mount.removeChild(renderer.domElement);
     };
   }, []);
+
+  // The scene is built once; only its backdrop follows the theme.
+  useEffect(() => {
+    sceneRef.current.scene.background = stageColor();
+  }, [theme]);
 
   useEffect(() => {
     const sceneState = sceneRef.current;

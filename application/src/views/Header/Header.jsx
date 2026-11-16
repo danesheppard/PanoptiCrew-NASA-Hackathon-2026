@@ -1,3 +1,4 @@
+import ThemeToggle from "./ThemeToggle.jsx";
 import "./Header.css";
 
 export default function Header({ onHome }) {
@@ -6,7 +7,10 @@ export default function Header({ onHome }) {
       <button className="header-brand" type="button" onClick={onHome}>
         PanoptiCrew
       </button>
-      <span className="header-title">NASA Space Apps Challenge 2026</span>
+      <div className="header-actions">
+        <span className="header-title">NASA Space Apps Challenge 2026</span>
+        <ThemeToggle />
+      </div>
     </header>
   );
 }

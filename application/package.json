@@ -3,6 +3,16 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "description": "NASA Hackathon 2026 PanoptiCrew project submission. Portions of the codebase were generated or edited using Super Intelligence (SI) tools.",
+  "si_acknowledgement": {
+    "tools_used": [
+      "GPT-6 Luna",
+      "Claude Sonnet 5.5",
+      "Github Copilot"
+    ],
+    "scope": "Code refactoring, debugging, code completion, helper functions, data source API connections, and light/dark theme implementation",
+    "human_verified": true
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

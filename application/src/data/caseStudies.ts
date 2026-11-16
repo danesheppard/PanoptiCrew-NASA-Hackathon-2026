@@ -1,3 +1,4 @@
+// SI Acknowledgment: This file was refactored and debugged with assistance for GPT-6 Luna and Claude Sonnet 5.5
 type StageArray = Array<EventStage>;
 
 type EventStage = {
@@ -28,11 +29,13 @@ type Legend = {
 
 type CaseStudy = {
   case: string;
+  type: string; // e.g., "flood", "earthquake", "storm"
   title: string;
   location: string; // General location of the case study, e.g., river and country
   event_date: string;
   iconImage?: string; // Optional image representing the case study
   iconSource?: string; // Source or attribution for the icon image
+  pinIcon?: string;
   story: string; // Intro slide for case study
   method: string; // Description of how the case study was conducted
   limitations: string; // Limitations of the case study, e.g., data quality or coverage
@@ -55,8 +58,11 @@ type CaseStudy = {
 export const caseStudies = [
   {
     case: "case2",
+    type: "Flood",
     title: "Gandak River flood, Bihar (September 2026)",
+    location: "Gandak River, Bihar",
     event_date: "2026-09-28",
+    pinIcon: "flood",
     story:
       "Heavy rain over Nepal's Gandak basin in late September 2026 sent the river to record levels in Bihar: 91.25 m at Bagaha and 64.64 m at Dumariaghat, in Gopalganj. On the morning of September 28 the Valmikinagar barrage released about 543,500 cusecs. NISAR's L-band radar passed over the Gopalganj floodplain that evening: monsoon clouds blind optical satellites, but radar sees through them.",
     method:
@@ -72,6 +78,7 @@ export const caseStudies = [
       "Sentinel-2 L2A photo (ESA Copernicus), via Earth Search",
       "OpenStreetMap, towns and river",
       "Water levels and barrage discharge: Bihar Water Resources Department, reported in the press; SANDRP, 2026: Making Sense of Gandak Flood II: https://sandrp.in/2026/11/05/2026-making-sense-of-gandak-flood-ii/",
+      "Esri World Imagery and AWS Terrain Tiles, 3D scene",
       "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case2.ipynb)",
     ],
     key_dates: {
@@ -379,9 +386,11 @@ export const caseStudies = [
   },
   {
     case: "case1",
+    type: "Flood",
     title: "Bhotekoshi glacier collapse and debris flood, Nepal (August 2026)",
     location: "Bhotekoshi River, Nepal",
     event_date: "2026-08-26",
+    pinIcon: "glacier",
     story:
       "On the morning of 26 August 2026, rock and glacier ice broke off Langtang Lirung and briefly dammed the river. The flood that followed swept down the Bhote Koshi through Rasuwagadhi, Timure and Syabrubesi, killing more than 1,400 people",
     method:
@@ -675,8 +684,11 @@ export const caseStudies = [
   },
   {
     case: "case3",
+    type: "Wildfire",
     title: "Bald Range wildfire, Summerland, British Columbia (August 2026)",
+    location: "Summerland, British Columbia",
     event_date: "2026-08-07",
+    pinIcon: "fire",
     story:
       "On the evening of August 7, 2026 a wildfire started in the hills west of Summerland, in British Columbia's Okanagan valley. After a long drought, strong westerly winds pushed it downhill towards Okanagan Lake: about 5,000 ha burned in three hours and 15,600 ha by August 10. More than 20,000 people in Summerland and Peachland were ordered to leave, an 80-year-old woman died while evacuating, and about 150 structures were damaged or destroyed; in Faulder only 8 of 81 homes survived. The fire was held on August 28 at about 25,200 ha. NISAR's L-band radar sees through the smoke and into the forest canopy.",
     method:
@@ -694,6 +706,7 @@ export const caseStudies = [
       "OpenStreetMap, place names",
       "BC Wildfire Service, Bald Range incident K51490; Castanet, Summerland Review, Kelowna Capital News, CBC News and The Canadian Press (August to October 2026)",
       "Wikipedia, Bald Range fire: https://en.wikipedia.org/wiki/Bald_Range_fire",
+      "Esri World Imagery and AWS Terrain Tiles, 3D scene",
       "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case3.ipynb)",
     ],
     key_dates: {
@@ -991,15 +1004,21 @@ export const caseStudies = [
   },
   {
     case: "case4",
-    title: "Caroline Bezengi oil spill, Hallaniyat Islands, Oman (June to September 2026)",
+    title:
+      "Caroline Bezengi oil spill, Hallaniyat Islands, Oman (June to September 2026)",
     location: "Hallaniyat Islands, Oman",
     event_date: "2026-06-23",
-    story: "On 8 June 2026 an explosion disabled the Caroline Bezengi, a sanctioned tanker carrying close to a million barrels of Russian crude. Around 23 June it ended up on the rocks at Jazirat Al Qibliyyah, one of the Hallaniyat Islands off Oman, and leaked through the monsoon. By 10 August Oman put the slick at about 390 km², and on 13 August oil reached the beaches at Ras Madrakah",
-    method: "Oil smooths the small wind ripples on the sea, so it sends less of the radar pulse back and looks darker than the water around it. On every NISAR pass over the wreck, sea pixels at least 1.5 dB darker than the sea within about 12 km, in patches of 2 km² or more, are marked as slick. Frequency B images at 80 m, HH or VV",
-    limitations: "Calm patches of sea with little wind also look dark, so some marked areas may not be oil. At L-band the slicks here are only 1 to 2 dB darker than the sea on most passes. The box covers the wreck and the coast up to Ras Madrakah, not the whole slick, and passes are about 6 days apart, with no data from 27 July to 10 August",
+    pinIcon: "oilspill",
+    story:
+      "On 8 June 2026 an explosion disabled the Caroline Bezengi, a sanctioned tanker carrying close to a million barrels of Russian crude. Around 23 June it ended up on the rocks at Jazirat Al Qibliyyah, one of the Hallaniyat Islands off Oman, and leaked through the monsoon. By 10 August Oman put the slick at about 390 km², and on 13 August oil reached the beaches at Ras Madrakah",
+    method:
+      "Oil smooths the small wind ripples on the sea, so it sends less of the radar pulse back and looks darker than the water around it. On every NISAR pass over the wreck, sea pixels at least 1.5 dB darker than the sea within about 12 km, in patches of 2 km² or more, are marked as slick. Frequency B images at 80 m, HH or VV",
+    limitations:
+      "Calm patches of sea with little wind also look dark, so some marked areas may not be oil. At L-band the slicks here are only 1 to 2 dB darker than the sea on most passes. The box covers the wreck and the coast up to Ras Madrakah, not the whole slick, and passes are about 6 days apart, with no data from 27 July to 10 August",
     coordinates: [55.8, 17.2, 58, 19.2],
     image_crs: "EPSG:3857",
-    satellite: "NISAR (NASA-ISRO), L-band, track 150 descending (HH) and track 56 ascending (VV)",
+    satellite:
+      "NISAR (NASA-ISRO), L-band, track 150 descending (HH) and track 56 ascending (VV)",
     sources: [
       "NISAR L2 GCOV, Provisional (NISAR_L2_GCOV_PROVISIONAL_V1), NASA Earthdata / ASF",
       "NISAR Data User Guide: https://nisar-docs.asf.alaska.edu/",
@@ -1007,6 +1026,7 @@ export const caseStudies = [
       "Reuters via gCaptain, slick size: https://gcaptain.com/oil-spill-off-oman-from-tanker-under-sanctions-against-russia-spreads-over-huge-area/",
       "Al Jazeera, oil on the coast: https://www.aljazeera.com/news/2026/8/13/oman-says-oil-spill-from-stricken-tanker-has-reached-its-coast",
       "OpenStreetMap and Wikipedia, place locations",
+      "Esri World Imagery and AWS Terrain Tiles, 3D scene",
       "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case4.ipynb)",
     ],
     key_dates: {
@@ -1051,9 +1071,7 @@ export const caseStudies = [
         file: "case4/slick_event.png",
         legend: {
           type: "categories",
-          gradient: [
-            [220, 40, 40],
-          ],
+          gradient: [[220, 40, 40]],
           labels: {
             lowEnd: "Slick",
             highEnd: "Slick",
@@ -1212,7 +1230,8 @@ export const caseStudies = [
           label: "first pass after the tanker went aground",
           value: "1 day",
         },
-        summary: "An explosion disabled the Caroline Bezengi, carrying close to a million barrels of crude, on 8 June. Around 23 June it ended up on the rocks at the southwest tip of Jazirat Al Qibliyyah, in the Hallaniyat Islands. NISAR passed over the islands on 18 June and again on 24 June. On radar the sea is grey, the wind's small ripples sending part of the pulse back",
+        summary:
+          "An explosion disabled the Caroline Bezengi, carrying close to a million barrels of crude, on 8 June. Around 23 June it ended up on the rocks at the southwest tip of Jazirat Al Qibliyyah, in the Hallaniyat Islands. NISAR passed over the islands on 18 June and again on 24 June. On radar the sea is grey, the wind's small ripples sending part of the pulse back",
         confidence: "Medium",
         imagery: "case4/radar_before.png",
         legend: {
@@ -1234,14 +1253,13 @@ export const caseStudies = [
           label: "of slick in view on 16 September",
           value: "295 km²",
         },
-        summary: "Oil smooths the ripples on the sea, so less of the radar pulse comes back and the slick looks darker than the water around it. On 16 September, dark streaks run north-east from the wreck for up to 157 km. Oman put the whole slick at about 390 km² on 10 August, and on 13 August oil reached the beaches at Ras Madrakah",
+        summary:
+          "Oil smooths the ripples on the sea, so less of the radar pulse comes back and the slick looks darker than the water around it. On 16 September, dark streaks run north-east from the wreck for up to 157 km. Oman put the whole slick at about 390 km² on 10 August, and on 13 August oil reached the beaches at Ras Madrakah",
         confidence: "Medium",
         imagery: "case4/slick_event.png",
         legend: {
           type: "categories",
-          gradient: [
-            [220, 40, 40],
-          ],
+          gradient: [[220, 40, 40]],
           labels: {
             lowEnd: "Slick",
             highEnd: "Slick",
@@ -1262,7 +1280,8 @@ export const caseStudies = [
           label: "passes over the wreck, June to October",
           value: "17",
         },
-        summary: "NISAR never switched this area to emergency processing, yet its regular passes saw the wreck about every 6 days. Put together, they show where the oil went: 1086 km² of sea had a slick on at least one pass, mostly north-east of the islands. Radar sees the sea day or night and through cloud, so it can follow a spill when the weather keeps boats and planes away",
+        summary:
+          "NISAR never switched this area to emergency processing, yet its regular passes saw the wreck about every 6 days. Put together, they show where the oil went: 1086 km² of sea had a slick on at least one pass, mostly north-east of the islands. Radar sees the sea day or night and through cloud, so it can follow a spill when the weather keeps boats and planes away",
         confidence: "Medium",
         imagery: "case4/slick_footprint.png",
         legend: {
@@ -1289,7 +1308,9 @@ export const caseStudies = [
     case: "case5",
     title:
       "Thunder Bay 36 wildfire, Wabakimi, northwestern Ontario (July 2026)",
+
     event_date: "2026-07-12",
+    pinIcon: "fire",
     story:
       "In early July 2026, after a warm, dry spring, lightning storms started many fires across northwestern Ontario. Around Wabakimi Provincial Park several of them merged on July 12 into Thunder Bay 36, which passed 315,000 ha by July 22: the largest wildfire ever recorded in Ontario. It reached remote First Nations with no road access. On July 13 the residents of Namaygoosisagagun (Collins) fled by boat across Collins Lake as their community burned; much of Whitewater Lake First Nation was destroyed days later, and Armstrong and Whitesand First Nation were evacuated. NISAR's L-band radar sees through the smoke and into the boreal forest.",
     method:
@@ -1307,6 +1328,7 @@ export const caseStudies = [
       "Sentinel-2 L2A photos and burn severity (ESA Copernicus), via Earth Search",
       "Canadian Geographical Names Database (Natural Resources Canada), place names",
       "CBC News, TBNewsWatch, SNNewsWatch and Sudbury.com (July to August 2026); Wikipedia, Thunder Bay 36 Fire: https://en.wikipedia.org/wiki/Thunder_Bay_36_Fire",
+      "Esri World Imagery and AWS Terrain Tiles, 3D scene",
       "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case5.ipynb)",
     ],
     key_dates: {
