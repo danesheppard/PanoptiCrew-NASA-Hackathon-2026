@@ -8,7 +8,12 @@ import {
   _GlobeView as GlobeView,
 } from "@deck.gl/core";
 import { TileLayer } from "@deck.gl/geo-layers";
-import { BitmapLayer, LineLayer, ScatterplotLayer } from "@deck.gl/layers";
+import {
+  BitmapLayer,
+  LineLayer,
+  ScatterplotLayer,
+  IconLayer,
+} from "@deck.gl/layers";
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -20,6 +25,7 @@ import { caseStudies } from "../data/caseStudies.ts";
 import { calculateCentroid } from "../utilities/utilities.ts";
 import buildLegend from "../utilities/buildLegend.jsx";
 import Header from "./Header/Header.jsx";
+import { getPinIcon } from "../utilities/pinIcons.js";
 import "./GlobalMap.css";
 
 const TILE_URL = import.meta.env.VITE_SAT_TILES;
@@ -34,6 +40,7 @@ const MIN_ZOOM = 2;
 const MAX_ZOOM = 13;
 const GLOBE_MIN_ZOOM = 4;
 const PING_MS = 2200;
+const ICON_BASE_ZOOM = 2; // zoom where markers float at BASE_ICON_ALTITUDE_METERS.
 
 // Story stages in order; `date` maps to a key in study.key_dates.
 const STAGE_LABELS = [
@@ -200,6 +207,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   );
   const [radarStageType, setRadarStageType] = useState("leadUp");
   const [pingProgress, setPingProgress] = useState(0);
+  const [hoveredCase, setHoveredCase] = useState(null);
 
   // Marker colour is the same in every theme, so it is read once.
   const accentRgb = useMemo(() => getThemeRgb("--marker"), []);
@@ -207,7 +215,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
   // Markers float above the surface; the height shrinks as you zoom in so they stay close to their spot
   const iconAltitude = Math.max(
     MIN_ICON_ALTITUDE_METERS,
-    BASE_ICON_ALTITUDE_METERS * 2 ** (initialView.zoom - viewState.zoom),
+    BASE_ICON_ALTITUDE_METERS * 2 ** (ICON_BASE_ZOOM - viewState.zoom),
   );
   // Radar imagery requires an area and a browser-supported image file.
   const radarStages =
@@ -299,9 +307,11 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
    */
   const selectStudy = (study) => {
     onSelect(study);
-    if (!study) return moveCamera(initialView, 2000);
+    if (!study) {
+      return moveCamera(initialView, 2000);
+    }
     const [longitude, latitude] = centroids.get(study.case);
-    moveCamera({ longitude, latitude }, 2000);
+    moveCamera({ longitude, latitude, zoom: MAX_ZOOM / 1.5 }, 2000);
   };
 
   // Radar image for the selected layer, stretched over the study's bounding box.
@@ -345,7 +355,7 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     data: markerData,
     getSourcePosition: ({ case: c }) => [...centroids.get(c), 0],
     getTargetPosition: pingPosition,
-    getColor: [...accentRgb, 200],
+    getColor: ({ pinIcon }) => [...getPinIcon(pinIcon).color, 200],
     getWidth: 2,
     widthUnits: "pixels",
     parameters: { depthTest: true, cullMode: "none" },
@@ -361,31 +371,41 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
     radiusUnits: "pixels",
     filled: false,
     stroked: true,
-    getLineColor: [232, 235, 243, Math.round(255 * (1 - pingProgress))],
+    getLineColor: ({ pinIcon }) => [
+      ...getPinIcon(pinIcon).color,
+      Math.round(255 * (1 - pingProgress)),
+    ],
     getLineWidth: 3,
     lineWidthUnits: "pixels",
     billboard: true, // always faces the camera, so it stays round on the globe
     parameters: { depthTest: isGlobe }, // globe: hidden when on the far side of the Earth
-    updateTriggers: { getPosition: iconAltitude },
+    updateTriggers: { getPosition: iconAltitude, getLineColor: pingProgress },
   });
 
   // Solid lime dot with a dark outline; bigger when selected. This is what users click.
-  const pingDots = new ScatterplotLayer({
+  const pingDots = new IconLayer({
     id: "case-study-pings",
     data: markerData,
     getPosition: pingPosition,
-    getRadius: ({ case: c }) => (c === selected?.case ? 15 : 11),
-    radiusUnits: "pixels",
-    getFillColor: accentRgb,
-    stroked: true,
-    getLineColor: [11, 16, 32],
-    getLineWidth: 3,
-    lineWidthUnits: "pixels",
+    getIcon: ({ pinIcon }) => ({
+      url: getPinIcon(pinIcon).url, // colour and icon come from caseStudies.ts → pinIcons.js
+      width: 64,
+      height: 64,
+      anchorY: 32, // centre of the circle, so the ring sits around it
+      mask: false,
+    }),
+    getSize: ({ case: c }) =>
+      c === selected?.case || c === hoveredCase ? 37 : 30,
+    sizeUnits: "pixels",
     billboard: true,
-    parameters: { depthTest: isGlobe },
     pickable: true,
     onClick: ({ object }) => selectStudy(object),
-    updateTriggers: { getPosition: iconAltitude, getRadius: selected?.case },
+    onHover: ({ object }) => setHoveredCase(object?.case ?? null),
+    parameters: { depthTest: isGlobe, cullMode: "none" },
+    updateTriggers: {
+      getPosition: iconAltitude,
+      getSize: [selected?.case, hoveredCase],
+    },
   });
 
   return (
@@ -572,6 +592,21 @@ export default function GlobalMap({ selected, onSelect, onLaunch, onHome }) {
               onViewStateChange={({ viewState: next }) => setViewState(next)}
               layers={[basemap, radarLayer, pointers, pingRings, pingDots]}
               getCursor={({ isHovering }) => (isHovering ? "pointer" : "grab")}
+              // Hovering a marker shows the type of event
+              getTooltip={({ object }) =>
+                object && {
+                  html: `<strong>${getPinIcon(object.pinIcon).label}</strong>`,
+                  style: {
+                    background: "var(--panel)",
+                    color: "var(--text)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "6px",
+                    padding: "0.4rem 0.6rem",
+                    fontSize: "0.8rem",
+                    maxWidth: "16rem",
+                  },
+                }
+              }
             />
             {buildLegend(radarLegend, {
               className: "map-legend",

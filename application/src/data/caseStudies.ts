@@ -35,6 +35,7 @@ type CaseStudy = {
   event_date: string;
   iconImage?: string; // Optional image representing the case study
   iconSource?: string; // Source or attribution for the icon image
+  pinIcon?: string;
   story: string; // Intro slide for case study
   method: string; // Description of how the case study was conducted
   limitations: string; // Limitations of the case study, e.g., data quality or coverage
@@ -61,6 +62,7 @@ export const caseStudies = [
     title: "Gandak River flood, Bihar (September 2026)",
     location: "Gandak River, Bihar",
     event_date: "2026-09-28",
+    pinIcon: "flood",
     story:
       "Heavy rain over Nepal's Gandak basin in late September 2026 sent the river to record levels in Bihar: 91.25 m at Bagaha and 64.64 m at Dumariaghat, in Gopalganj. On the morning of September 28 the Valmikinagar barrage released about 543,500 cusecs. NISAR's L-band radar passed over the Gopalganj floodplain that evening: monsoon clouds blind optical satellites, but radar sees through them.",
     method:
@@ -388,6 +390,7 @@ export const caseStudies = [
     title: "Bhotekoshi glacier collapse and debris flood, Nepal (August 2026)",
     location: "Bhotekoshi River, Nepal",
     event_date: "2026-08-26",
+    pinIcon: "glacier",
     story:
       "On the morning of 26 August 2026, rock and glacier ice broke off Langtang Lirung and briefly dammed the river. The flood that followed swept down the Bhote Koshi through Rasuwagadhi, Timure and Syabrubesi, killing more than 1,400 people",
     method:
@@ -685,6 +688,7 @@ export const caseStudies = [
     title: "Bald Range wildfire, Summerland, British Columbia (August 2026)",
     location: "Summerland, British Columbia",
     event_date: "2026-08-07",
+    pinIcon: "fire",
     story:
       "On the evening of August 7, 2026 a wildfire started in the hills west of Summerland, in British Columbia's Okanagan valley. After a long drought, strong westerly winds pushed it downhill towards Okanagan Lake: about 5,000 ha burned in three hours and 15,600 ha by August 10. More than 20,000 people in Summerland and Peachland were ordered to leave, an 80-year-old woman died while evacuating, and about 150 structures were damaged or destroyed; in Faulder only 8 of 81 homes survived. The fire was held on August 28 at about 25,200 ha. NISAR's L-band radar sees through the smoke and into the forest canopy.",
     method:
@@ -1004,6 +1008,7 @@ export const caseStudies = [
       "Caroline Bezengi oil spill, Hallaniyat Islands, Oman (June to September 2026)",
     location: "Hallaniyat Islands, Oman",
     event_date: "2026-06-23",
+    pinIcon: "oilspill",
     story:
       "On 8 June 2026 an explosion disabled the Caroline Bezengi, a sanctioned tanker carrying close to a million barrels of Russian crude. Around 23 June it ended up on the rocks at Jazirat Al Qibliyyah, one of the Hallaniyat Islands off Oman, and leaked through the monsoon. By 10 August Oman put the slick at about 390 km², and on 13 August oil reached the beaches at Ras Madrakah",
     method:
@@ -1303,7 +1308,9 @@ export const caseStudies = [
     case: "case5",
     title:
       "Thunder Bay 36 wildfire, Wabakimi, northwestern Ontario (July 2026)",
+
     event_date: "2026-07-12",
+    pinIcon: "fire",
     story:
       "In early July 2026, after a warm, dry spring, lightning storms started many fires across northwestern Ontario. Around Wabakimi Provincial Park several of them merged on July 12 into Thunder Bay 36, which passed 315,000 ha by July 22: the largest wildfire ever recorded in Ontario. It reached remote First Nations with no road access. On July 13 the residents of Namaygoosisagagun (Collins) fled by boat across Collins Lake as their community burned; much of Whitewater Lake First Nation was destroyed days later, and Armstrong and Whitesand First Nation were evacuated. NISAR's L-band radar sees through the smoke and into the boreal forest.",
     method:
