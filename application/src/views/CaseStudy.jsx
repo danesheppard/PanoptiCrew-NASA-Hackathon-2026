@@ -52,7 +52,9 @@ const tint = (hex) => new THREE.Color(0xffffff).lerp(new THREE.Color(hex), 0.3);
 // Scene backdrop from the active theme's CSS variable.
 const stageColor = () =>
   new THREE.Color(
-    getComputedStyle(document.documentElement).getPropertyValue("--scene-bg").trim(),
+    getComputedStyle(document.documentElement)
+      .getPropertyValue("--scene-bg")
+      .trim(),
   );
 
 function lonLatToTile([lon, lat], z = ZOOM) {
