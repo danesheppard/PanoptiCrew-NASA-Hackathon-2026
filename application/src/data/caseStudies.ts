@@ -76,6 +76,7 @@ export const caseStudies = [
       "Sentinel-2 L2A photo (ESA Copernicus), via Earth Search",
       "OpenStreetMap, towns and river",
       "Water levels and barrage discharge: Bihar Water Resources Department, reported in the press; SANDRP, 2026: Making Sense of Gandak Flood II: https://sandrp.in/2026/11/05/2026-making-sense-of-gandak-flood-ii/",
+      "Esri World Imagery and AWS Terrain Tiles, 3D scene",
       "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case2.ipynb)",
     ],
     key_dates: {
@@ -701,6 +702,7 @@ export const caseStudies = [
       "OpenStreetMap, place names",
       "BC Wildfire Service, Bald Range incident K51490; Castanet, Summerland Review, Kelowna Capital News, CBC News and The Canadian Press (August to October 2026)",
       "Wikipedia, Bald Range fire: https://en.wikipedia.org/wiki/Bald_Range_fire",
+      "Esri World Imagery and AWS Terrain Tiles, 3D scene",
       "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case3.ipynb)",
     ],
     key_dates: {
@@ -1019,6 +1021,7 @@ export const caseStudies = [
       "Reuters via gCaptain, slick size: https://gcaptain.com/oil-spill-off-oman-from-tanker-under-sanctions-against-russia-spreads-over-huge-area/",
       "Al Jazeera, oil on the coast: https://www.aljazeera.com/news/2026/8/13/oman-says-oil-spill-from-stricken-tanker-has-reached-its-coast",
       "OpenStreetMap and Wikipedia, place locations",
+      "Esri World Imagery and AWS Terrain Tiles, 3D scene",
       "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case4.ipynb)",
     ],
     key_dates: {
@@ -1318,6 +1321,7 @@ export const caseStudies = [
       "Sentinel-2 L2A photos and burn severity (ESA Copernicus), via Earth Search",
       "Canadian Geographical Names Database (Natural Resources Canada), place names",
       "CBC News, TBNewsWatch, SNNewsWatch and Sudbury.com (July to August 2026); Wikipedia, Thunder Bay 36 Fire: https://en.wikipedia.org/wiki/Thunder_Bay_36_Fire",
+      "Esri World Imagery and AWS Terrain Tiles, 3D scene",
       "Analysis: https://github.com/danesheppard/PanoptiCrew-NASA-Hackathon-2026 (dataScience/notebooks/case5.ipynb)",
     ],
     key_dates: {
