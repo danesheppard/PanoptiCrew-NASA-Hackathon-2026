@@ -71,20 +71,24 @@ The corresponding analysis and exported research products live under `../dataSci
 
 ```text
 src/
-	App.jsx                         View state and navigation
-	data/
-		caseStudies.ts                Study content and render metadata
-		team.js                       Welcome-page team list
-	utilities/
-		buildLegend.jsx               Shared gradient/category legend renderer
-		utilities.ts                  Geographic helpers
-	views/
-		LandingPage/                  Welcome view
-		GlobalMap.jsx                 Deck.gl map and globe
-		CaseStudy.jsx                 Three.js terrain and story chapters
-		Header/                       Shared project navigation
-	styles.css                      Global and case-study styles
-public/assets/                    Static images and geospatial products
+├── App.jsx                        View state and navigation
+├── main.jsx                       React application entry point
+├── customHooks.ts                 Shared browser-storage and theme hooks
+├── styles.css                     Global theme, resets, and shared styles
+├── data/
+│   ├── caseStudies.ts             Study content and render metadata
+│   └── team.js                    Welcome-page team list
+├── utilities/
+│   ├── buildLegend.jsx            Shared gradient/category legend renderer
+│   ├── pinIcons.ts                Map marker icon helpers
+│   └── utilities.ts               Geographic helpers
+└── views/
+    ├── CaseStudy/                  Three.js story view and its styles
+    ├── GlobalMap/                  Deck.gl map and its styles
+    ├── Header/                     Shared navigation and theme control
+    └── LandingPage/                Welcome view and its styles
+
+public/assets/                     Static images and geospatial products
 ```
 
 ## Validation

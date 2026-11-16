@@ -1,7 +1,7 @@
 import { useState } from "react";
 import LandingPage from "./views/LandingPage/LandingPage.jsx";
-import GlobalMap from "./views/GlobalMap.jsx";
-import CaseStudy from "./views/CaseStudy.jsx";
+import GlobalMap from "./views/GlobalMap/GlobalMap.jsx";
+import CaseStudy from "./views/CaseStudy/CaseStudy.jsx";
 
 /**
  * Main application component managing

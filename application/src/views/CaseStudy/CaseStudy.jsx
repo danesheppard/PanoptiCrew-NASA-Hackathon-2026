@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { calculateCentroid } from "../utilities/utilities.ts";
-import { useTheme } from "../customHooks.ts";
-import buildLegend from "../utilities/buildLegend.jsx";
-import Header from "./Header/Header.jsx";
+import { calculateCentroid } from "../../utilities/utilities.ts";
+import { useTheme } from "../../customHooks.ts";
+import buildLegend from "../../utilities/buildLegend.jsx";
+import Header from "../Header/Header.jsx";
+import "./CaseStudy.css";
 
 // `key` matches a study stage type; `date` maps to a key in study.key_dates.
 const chapters = [
