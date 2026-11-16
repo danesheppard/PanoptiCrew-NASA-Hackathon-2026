@@ -36,9 +36,9 @@ Each workstream has its own instructions:
 - [Run and configure the application](application/README.md)
 - [Data-science project notes](dataScience/README.md)
 
-## Artificial Intelligence Usage Acknowledgement
+## Super Intelligence (SI) Usage Acknowledgement
 
 - **Tool Used:** GitHub Copilot with GPT-6 Luna and Claude Sonnet 5.5
 - **Affected Files:** Most files in the application were touched in some minor ways. The most affected files include `README.md`, `application/README.md`, `application/src/utilities/buildLegend.jsx`, `application/src/views/GlobalMap.jsx`, `application/src/views/CaseStudy.jsx`, `application/src/styles.css`, and `application/src/data/caseStudies.ts`, and the data science notebooks.
-- **Purpose:** Assisted with project and application rapid prototyping, debugging, syntax checking, code completion, and documentation. In the data science notebooks, AI was used to search for and cross-check event sources, and to draft and debug the code, which the team then ran, checked against the sources and edited?.
+- **Purpose:** Assisted with project and application rapid prototyping, debugging, syntax checking, code completion, and documentation. In the data science notebooks, AI was used to search for and cross-check event sources, and to draft and debug the code, which the team then ran, checked against the sources and edited.
 - **Human Oversight:** All AI output was reviewed for consistency, validity, embedded assumptions, and agreement with team-directed project design goals. Scientific interpretations, application architecture planning, and data structure design were all conducted without the use of AI.

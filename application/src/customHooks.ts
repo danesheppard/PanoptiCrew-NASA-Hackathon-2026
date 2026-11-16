@@ -20,6 +20,8 @@ const subscribeTheme = (listener: () => void) => {
  * Reads the current theme and returns a function to flip it. The choice is
  * persisted; non-React consumers (deck.gl, three.js) re-read CSS variables
  * when a component using this hook re-renders.
+ *
+ * Built by Claude Sonnet 5.5
  */
 export function useTheme() {
   const theme = useSyncExternalStore(subscribeTheme, getTheme);

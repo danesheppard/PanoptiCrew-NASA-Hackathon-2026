@@ -1,3 +1,4 @@
+// SI Acknowledgment: This file was refactored and debugged with assistance for GPT-6 Luna and Claude Sonnet 5.5
 type StageArray = Array<EventStage>;
 
 type EventStage = {
@@ -997,15 +998,20 @@ export const caseStudies = [
   },
   {
     case: "case4",
-    title: "Caroline Bezengi oil spill, Hallaniyat Islands, Oman (June to September 2026)",
+    title:
+      "Caroline Bezengi oil spill, Hallaniyat Islands, Oman (June to September 2026)",
     location: "Hallaniyat Islands, Oman",
     event_date: "2026-06-23",
-    story: "On 8 June 2026 an explosion disabled the Caroline Bezengi, a sanctioned tanker carrying close to a million barrels of Russian crude. Around 23 June it ended up on the rocks at Jazirat Al Qibliyyah, one of the Hallaniyat Islands off Oman, and leaked through the monsoon. By 10 August Oman put the slick at about 390 km², and on 13 August oil reached the beaches at Ras Madrakah",
-    method: "Oil smooths the small wind ripples on the sea, so it sends less of the radar pulse back and looks darker than the water around it. On every NISAR pass over the wreck, sea pixels at least 1.5 dB darker than the sea within about 12 km, in patches of 2 km² or more, are marked as slick. Frequency B images at 80 m, HH or VV",
-    limitations: "Calm patches of sea with little wind also look dark, so some marked areas may not be oil. At L-band the slicks here are only 1 to 2 dB darker than the sea on most passes. The box covers the wreck and the coast up to Ras Madrakah, not the whole slick, and passes are about 6 days apart, with no data from 27 July to 10 August",
+    story:
+      "On 8 June 2026 an explosion disabled the Caroline Bezengi, a sanctioned tanker carrying close to a million barrels of Russian crude. Around 23 June it ended up on the rocks at Jazirat Al Qibliyyah, one of the Hallaniyat Islands off Oman, and leaked through the monsoon. By 10 August Oman put the slick at about 390 km², and on 13 August oil reached the beaches at Ras Madrakah",
+    method:
+      "Oil smooths the small wind ripples on the sea, so it sends less of the radar pulse back and looks darker than the water around it. On every NISAR pass over the wreck, sea pixels at least 1.5 dB darker than the sea within about 12 km, in patches of 2 km² or more, are marked as slick. Frequency B images at 80 m, HH or VV",
+    limitations:
+      "Calm patches of sea with little wind also look dark, so some marked areas may not be oil. At L-band the slicks here are only 1 to 2 dB darker than the sea on most passes. The box covers the wreck and the coast up to Ras Madrakah, not the whole slick, and passes are about 6 days apart, with no data from 27 July to 10 August",
     coordinates: [55.8, 17.2, 58, 19.2],
     image_crs: "EPSG:3857",
-    satellite: "NISAR (NASA-ISRO), L-band, track 150 descending (HH) and track 56 ascending (VV)",
+    satellite:
+      "NISAR (NASA-ISRO), L-band, track 150 descending (HH) and track 56 ascending (VV)",
     sources: [
       "NISAR L2 GCOV, Provisional (NISAR_L2_GCOV_PROVISIONAL_V1), NASA Earthdata / ASF",
       "NISAR Data User Guide: https://nisar-docs.asf.alaska.edu/",
@@ -1057,9 +1063,7 @@ export const caseStudies = [
         file: "case4/slick_event.png",
         legend: {
           type: "categories",
-          gradient: [
-            [220, 40, 40],
-          ],
+          gradient: [[220, 40, 40]],
           labels: {
             lowEnd: "Slick",
             highEnd: "Slick",
@@ -1218,7 +1222,8 @@ export const caseStudies = [
           label: "first pass after the tanker went aground",
           value: "1 day",
         },
-        summary: "An explosion disabled the Caroline Bezengi, carrying close to a million barrels of crude, on 8 June. Around 23 June it ended up on the rocks at the southwest tip of Jazirat Al Qibliyyah, in the Hallaniyat Islands. NISAR passed over the islands on 18 June and again on 24 June. On radar the sea is grey, the wind's small ripples sending part of the pulse back",
+        summary:
+          "An explosion disabled the Caroline Bezengi, carrying close to a million barrels of crude, on 8 June. Around 23 June it ended up on the rocks at the southwest tip of Jazirat Al Qibliyyah, in the Hallaniyat Islands. NISAR passed over the islands on 18 June and again on 24 June. On radar the sea is grey, the wind's small ripples sending part of the pulse back",
         confidence: "Medium",
         imagery: "case4/radar_before.png",
         legend: {
@@ -1240,14 +1245,13 @@ export const caseStudies = [
           label: "of slick in view on 16 September",
           value: "295 km²",
         },
-        summary: "Oil smooths the ripples on the sea, so less of the radar pulse comes back and the slick looks darker than the water around it. On 16 September, dark streaks run north-east from the wreck for up to 157 km. Oman put the whole slick at about 390 km² on 10 August, and on 13 August oil reached the beaches at Ras Madrakah",
+        summary:
+          "Oil smooths the ripples on the sea, so less of the radar pulse comes back and the slick looks darker than the water around it. On 16 September, dark streaks run north-east from the wreck for up to 157 km. Oman put the whole slick at about 390 km² on 10 August, and on 13 August oil reached the beaches at Ras Madrakah",
         confidence: "Medium",
         imagery: "case4/slick_event.png",
         legend: {
           type: "categories",
-          gradient: [
-            [220, 40, 40],
-          ],
+          gradient: [[220, 40, 40]],
           labels: {
             lowEnd: "Slick",
             highEnd: "Slick",
@@ -1268,7 +1272,8 @@ export const caseStudies = [
           label: "passes over the wreck, June to October",
           value: "17",
         },
-        summary: "NISAR never switched this area to emergency processing, yet its regular passes saw the wreck about every 6 days. Put together, they show where the oil went: 1086 km² of sea had a slick on at least one pass, mostly north-east of the islands. Radar sees the sea day or night and through cloud, so it can follow a spill when the weather keeps boats and planes away",
+        summary:
+          "NISAR never switched this area to emergency processing, yet its regular passes saw the wreck about every 6 days. Put together, they show where the oil went: 1086 km² of sea had a slick on at least one pass, mostly north-east of the islands. Radar sees the sea day or night and through cloud, so it can follow a spill when the weather keeps boats and planes away",
         confidence: "Medium",
         imagery: "case4/slick_footprint.png",
         legend: {

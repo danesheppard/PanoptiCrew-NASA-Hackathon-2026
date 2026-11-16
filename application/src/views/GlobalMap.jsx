@@ -1,3 +1,4 @@
+// SI Acknowledgment: This file was refactored and debugged with assistance for GPT-6 Luna and Claude Sonnet 5.5
 import { useEffect, useMemo, useState } from "react";
 import { useLocalStorage } from "../customHooks.ts";
 import DeckGL from "@deck.gl/react";
